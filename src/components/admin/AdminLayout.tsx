@@ -28,11 +28,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       if (result.success && result.data) {
         setUser(result.data)
       } else {
-        window.location.href = '/login'
+        window.location.href = '/api/auth/discord'
       }
     } catch (error) {
       console.error('Auth check error:', error)
-      window.location.href = '/login'
+      window.location.href = '/api/auth/discord'
     } finally {
       setLoading(false)
     }
@@ -78,8 +78,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className={styles.authCard}>
           <h2>Accès non autorisé</h2>
           <p>Vous devez être connecté pour accéder au panel admin.</p>
-          <button onClick={() => window.location.href = '/login'}>
-            Se connecter
+          <button onClick={() => window.location.href = '/api/auth/discord'}>
+            Se connecter avec Discord
           </button>
         </div>
       </div>
