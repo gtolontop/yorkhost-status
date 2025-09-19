@@ -114,12 +114,6 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           )}
           {isCollapsed && <Shield size={24} />}
         </div>
-        <button 
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className={styles.toggleBtn}
-        >
-          {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-        </button>
       </div>
 
       {/* Profil utilisateur */}

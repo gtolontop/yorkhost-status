@@ -46,25 +46,6 @@
   }
 }
 
-.toggleBtn {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6b7280;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  
-  &:hover {
-    background: #f3f4f6;
-    color: #374151;
-  }
-}
-
 .userProfile {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid #f3f4f6;
