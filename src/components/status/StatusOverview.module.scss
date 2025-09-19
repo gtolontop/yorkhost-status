@@ -44,7 +44,7 @@
   gap: var(--space-6);
   margin-bottom: var(--space-8);
   
-  @include respond-to('md') {
+  @media (min-width: 768px) {
     gap: var(--space-8);
   }
 }
@@ -81,7 +81,7 @@
   gap: var(--space-6);
   margin-bottom: var(--space-6);
   
-  @include respond-to('md') {
+  @media (min-width: 768px) {
     gap: var(--space-8);
   }
 }
