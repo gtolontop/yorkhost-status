@@ -29,14 +29,6 @@ export default function RootLayout({
         <div id="__next">
           {children}
         </div>
-        <style jsx global>{`
-          #nprogress {
-            display: none !important;
-          }
-          .nprogress-busy {
-            display: none !important;
-          }
-        `}</style>
       </body>
     </html>
   )

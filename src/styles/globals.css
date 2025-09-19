@@ -226,9 +226,17 @@ ul, ol {
   border: 0;
 }
 
-/* Page transitions */
+/* Page transitions and hide loading indicators */
 body {
   transition: opacity 200ms ease-in-out;
+}
+
+#nprogress {
+  display: none !important;
+}
+
+.nprogress-busy {
+  display: none !important;
 }
 
 /* Container */
