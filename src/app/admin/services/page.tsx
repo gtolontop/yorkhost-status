@@ -454,17 +454,7 @@ export default function AdminServicesPage() {
                         border: '1px solid #e5e7eb',
                         borderRadius: '12px',
                         padding: '1.5rem',
-                        background: '#fafafa',
-                        transition: 'all 0.2s ease',
-                        cursor: 'pointer'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px)'
-                        e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)'
-                        e.currentTarget.style.boxShadow = 'none'
+                        background: '#ffffff'
                       }}
                       >
                         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
