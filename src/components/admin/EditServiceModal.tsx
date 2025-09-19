@@ -168,7 +168,7 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
               marginBottom: '0.5rem',
               color: '#374151'
             }}>
-              Nom du service *
+              Service Name *
             </label>
             <input
               type="text"
@@ -256,7 +256,7 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
                 fontSize: '0.875rem'
               }}
             >
-              <option value="">Aucune machine assignée</option>
+              <option value="">No machine assigned</option>
               {machines.map((machine) => (
                 <option key={machine.id} value={machine.id}>
                   {machine.name} ({machine.category})
@@ -280,7 +280,7 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
                 onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                 style={{ marginRight: '0.5rem' }}
               />
-              Service actif
+              Active service
             </label>
           </div>
 
@@ -303,7 +303,7 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
                 cursor: 'pointer'
               }}
             >
-              Annuler
+              Cancel
             </button>
             <button
               type="submit"
@@ -319,7 +319,7 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
                 cursor: loading ? 'not-allowed' : 'pointer'
               }}
             >
-              {loading ? 'Mise à jour...' : 'Mettre à jour'}
+              {loading ? 'Updating...' : 'Update'}
             </button>
           </div>
         </form>
