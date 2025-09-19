@@ -69,81 +69,47 @@ export default function AdminServicesPage() {
 
   const fetchServices = async () => {
     try {
-      // Mock data - replace with real API
-      const mockServices: Service[] = [
-        {
-          id: '1',
-          name: 'API Gateway',
-          description: 'Point d\'entrée principal pour toutes les API',
-          url: 'https://api.yorkhost.com',
-          status: 'operational',
-          uptime: 99.95,
-          responseTime: 125,
-          lastCheck: new Date(Date.now() - 30000).toISOString(),
-          isActive: true,
-          group: 'backend',
-          machine: { id: '1', name: 'Server-01', category: 'web' }
-        },
-        {
-          id: '2',
-          name: 'Database Master',
-          description: 'Base de données principale PostgreSQL',
-          url: '',
-          status: 'degraded',
-          uptime: 98.2,
-          responseTime: 450,
-          lastCheck: new Date(Date.now() - 60000).toISOString(),
-          isActive: true,
-          group: 'database',
-          machine: { id: '2', name: 'DB-01', category: 'database' }
-        },
-        {
-          id: '3',
-          name: 'CDN',
-          description: 'Réseau de distribution de contenu',
-          url: 'https://cdn.yorkhost.com',
-          status: 'operational',
-          uptime: 100,
-          responseTime: 45,
-          lastCheck: new Date(Date.now() - 15000).toISOString(),
-          isActive: true,
-          group: 'frontend',
-          machine: { id: '3', name: 'CDN-Global', category: 'network' }
-        },
-        {
-          id: '4',
-          name: 'Auth Service',
-          description: 'Service d\'authentification et autorisation',
-          url: 'https://auth.yorkhost.com',
-          status: 'operational',
-          uptime: 99.8,
-          responseTime: 85,
-          lastCheck: new Date(Date.now() - 45000).toISOString(),
-          isActive: true,
-          group: 'backend',
-          machine: { id: '4', name: 'Auth-01', category: 'web' }
-        },
-        {
-          id: '5',
-          name: 'File Storage',
-          description: 'Stockage de fichiers S3 compatible',
-          url: '',
-          status: 'outage',
-          uptime: 95.1,
-          responseTime: 0,
-          lastCheck: new Date(Date.now() - 120000).toISOString(),
-          isActive: false,
-          group: 'storage',
-          machine: { id: '5', name: 'Storage-01', category: 'storage' }
-        }
-      ]
+      const response = await fetch('/api/admin/services')
+      const result = await response.json()
       
-      setServices(mockServices)
+      if (result.success) {
+        // Transform the API response to match our component interface
+        const transformedServices = result.data.map((service: any) => ({
+          id: service.id,
+          name: service.name,
+          description: service.description,
+          url: service.url,
+          status: service.checks?.[0]?.success ? 'operational' : 'outage',
+          uptime: calculateUptime(service.checks || []),
+          responseTime: service.checks?.[0]?.responseTime || 0,
+          lastCheck: service.checks?.[0]?.createdAt || new Date().toISOString(),
+          isActive: true,
+          group: service.machine?.category || 'other',
+          machine: {
+            id: service.machine?.id || '',
+            name: service.machine?.name || 'Unknown',
+            category: service.machine?.category || 'other'
+          }
+        }))
+        
+        setServices(transformedServices)
+      } else {
+        console.error('Services API error:', result.error)
+        setServices([])
+      }
     } catch (error) {
       console.error('Failed to fetch services:', error)
+      setServices([])
     } finally {
       setLoading(false)
     }
+  }
+
+  // Helper function to calculate uptime from checks
+  const calculateUptime = (checks: any[]) => {
+    if (!checks || checks.length === 0) return 0
+    const successfulChecks = checks.filter(check => check.success).length
+    return Math.round((successfulChecks / checks.length) * 100 * 100) / 100
   }
 
   const fetchGroups = async () => {
@@ -222,16 +188,55 @@ export default function AdminServicesPage() {
   }
 
   const toggleServiceStatus = async (serviceId: string) => {
-    setServices(prev => prev.map(service => 
-      service.id === serviceId 
-        ? { ...service, isActive: !service.isActive }
-        : service
-    ))
+    try {
+      // Update UI optimistically
+      setServices(prev => prev.map(service => 
+        service.id === serviceId 
+          ? { ...service, isActive: !service.isActive }
+          : service
+      ))
+
+      const response = await fetch(`/api/admin/services/${serviceId}/toggle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+
+      if (!response.ok) {
+        // Revert on error
+        setServices(prev => prev.map(service => 
+          service.id === serviceId 
+            ? { ...service, isActive: !service.isActive }
+            : service
+        ))
+        console.error('Failed to toggle service status')
+      }
+    } catch (error) {
+      // Revert on error
+      setServices(prev => prev.map(service => 
+        service.id === serviceId 
+          ? { ...service, isActive: !service.isActive }
+          : service
+      ))
+      console.error('Failed to toggle service status:', error)
+    }
   }
 
   const deleteService = async (serviceId: string) => {
-    setServices(prev => prev.filter(service => service.id !== serviceId))
-    setShowDeleteConfirm(null)
+    try {
+      const response = await fetch(`/api/admin/services/${serviceId}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        setServices(prev => prev.filter(service => service.id !== serviceId))
+        setShowDeleteConfirm(null)
+      } else {
+        const result = await response.json()
+        console.error('Failed to delete service:', result.error)
+      }
+    } catch (error) {
+      console.error('Failed to delete service:', error)
+    }
   }
 
   const filteredServices = services.filter(service => {

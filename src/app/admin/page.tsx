@@ -66,95 +66,48 @@ export default function AdminDashboard() {
     try {
       setRefreshing(true)
       
-      // Mock data for now - replace with real API calls
-      const mockStats: DashboardStats = {
-        totalServices: 24,
-        totalMachines: 8,
-        activeIncidents: 2,
-        averageUptime: 99.97,
-        checksLast24h: 1440,
-        responseTimeP95: 245,
-        mttr: 18,
-        uptimeChange: 0.12,
-        responseTimeChange: -5.3
+      // Fetch real dashboard data
+      const response = await fetch('/api/admin/dashboard')
+      const result = await response.json()
+      
+      if (result.success) {
+        setStats(result.data.stats)
+        setActivities(result.data.activities || [])
+        setServices(result.data.services || [])
+      } else {
+        console.error('Dashboard API error:', result.error)
+        // Fallback to empty data
+        setStats({
+          totalServices: 0,
+          totalMachines: 0,
+          activeIncidents: 0,
+          averageUptime: 0,
+          checksLast24h: 0,
+          responseTimeP95: 0,
+          mttr: 0,
+          uptimeChange: 0,
+          responseTimeChange: 0
+        })
+        setActivities([])
+        setServices([])
       }
-      
-      const mockActivities: RecentActivity[] = [
-        {
-          id: '1',
-          type: 'incident',
-          title: 'API Gateway Down',
-          description: 'Service indisponible depuis 5 minutes',
-          timestamp: new Date(Date.now() - 5 * 60000).toISOString(),
-          status: 'error'
-        },
-        {
-          id: '2',
-          type: 'check',
-          title: 'Database Health Check',
-          description: 'Check automatique réussi - 128ms',
-          timestamp: new Date(Date.now() - 2 * 60000).toISOString(),
-          status: 'success'
-        },
-        {
-          id: '3',
-          type: 'service',
-          title: 'Web Server Restart',
-          description: 'Redémarrage automatique effectué',
-          timestamp: new Date(Date.now() - 15 * 60000).toISOString(),
-          status: 'warning'
-        },
-        {
-          id: '4',
-          type: 'check',
-          title: 'CDN Performance',
-          description: 'Temps de réponse optimal - 45ms',
-          timestamp: new Date(Date.now() - 30 * 60000).toISOString(),
-          status: 'success'
-        }
-      ]
-      
-      const mockServices: ServiceStatus[] = [
-        {
-          id: '1',
-          name: 'API Gateway',
-          status: 'outage',
-          uptime: 98.5,
-          responseTime: 0,
-          lastCheck: new Date(Date.now() - 5 * 60000).toISOString()
-        },
-        {
-          id: '2',
-          name: 'Database Cluster',
-          status: 'degraded',
-          uptime: 99.2,
-          responseTime: 450,
-          lastCheck: new Date(Date.now() - 1 * 60000).toISOString()
-        },
-        {
-          id: '3',
-          name: 'Web Server',
-          status: 'operational',
-          uptime: 100,
-          responseTime: 125,
-          lastCheck: new Date(Date.now() - 30000).toISOString()
-        },
-        {
-          id: '4',
-          name: 'CDN',
-          status: 'operational',
-          uptime: 99.9,
-          responseTime: 45,
-          lastCheck: new Date(Date.now() - 45000).toISOString()
-        }
-      ]
-      
-      setStats(mockStats)
-      setActivities(mockActivities)
-      setServices(mockServices)
       
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error)
+      // Fallback to empty data
+      setStats({
+        totalServices: 0,
+        totalMachines: 0,
+        activeIncidents: 0,
+        averageUptime: 0,
+        checksLast24h: 0,
+        responseTimeP95: 0,
+        mttr: 0,
+        uptimeChange: 0,
+        responseTimeChange: 0
+      })
+      setActivities([])
+      setServices([])
     } finally {
       setLoading(false)
       setRefreshing(false)
