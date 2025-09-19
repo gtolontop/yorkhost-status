@@ -206,26 +206,7 @@ export default function AdminMachinesPage() {
   const offlineMachines = machines.filter(m => m.status === 'offline').length
   const maintenanceMachines = machines.filter(m => m.status === 'maintenance').length
 
-  if (loading) {
-    return (
-      <AdminLayout>
-        <div className="admin-page">
-          <div style={{ textAlign: 'center', padding: '4rem' }}>
-            <div style={{ 
-              width: '48px', 
-              height: '48px', 
-              border: '3px solid #e5e7eb',
-              borderTop: '3px solid #3b82f6',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-              margin: '0 auto 1rem'
-            }}></div>
-            <p>Chargement des machines...</p>
-          </div>
-        </div>
-      </AdminLayout>
-    )
-  }
+  // Remove loading screen
 
   return (
     <AdminLayout>
