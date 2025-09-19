@@ -8,32 +8,13 @@ export default function MaintenancePage() {
   return (
     <Layout>
       <div className="container">
-        <div style={{ 
-          textAlign: 'center', 
-          padding: '60px 20px',
-          maxWidth: '800px',
-          margin: '0 auto'
-        }}>
-          <Settings size={64} style={{ color: 'var(--color-warning)', marginBottom: '24px' }} />
-          
-          <h1 style={{
-            fontSize: '2.5rem',
-            fontWeight: '700',
-            color: 'var(--text-primary)',
-            marginBottom: '16px'
-          }}>
-            Scheduled Maintenance
-          </h1>
-          
-          <p style={{
-            fontSize: '1.125rem',
-            color: 'var(--text-secondary)',
-            marginBottom: '48px',
-            lineHeight: '1.6'
-          }}>
-            All planned maintenance windows and system updates for Yorkhost services.
-          </p>
+        <PageHeader
+          icon={<Settings size={96} />}
+          title="Scheduled Maintenance"
+          subtitle="All planned maintenance windows and system updates for Yorkhost services"
+        />
 
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <div style={{
             background: 'var(--bg-secondary)',
             border: '1px solid var(--border-color)',
