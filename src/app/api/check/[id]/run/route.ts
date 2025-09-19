@@ -18,7 +18,7 @@ export async function POST(
 
     requirePermission(auth.payload!, 'canManageServices')
 
-    const checkId = params.id
+    const { id: checkId } = await params
 
     // Verify check exists
     const check = await prisma.check.findUnique({
