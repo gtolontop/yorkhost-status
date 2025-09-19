@@ -23,6 +23,8 @@ export interface ServiceWithChecks extends Service {
 }
 
 export interface ServiceWithStats extends Service {
+  checks: Check[]
+  machine: Machine
   uptimePercent24h: number
   uptimePercent7d: number
   uptimePercent30d: number
