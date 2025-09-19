@@ -11,12 +11,15 @@ interface IncidentBannerProps {
 }
 
 export default function IncidentBanner({ incidents }: IncidentBannerProps) {
-  if (!incidents || incidents.length === 0) {
+  // Ensure incidents is an array
+  const safeIncidents = Array.isArray(incidents) ? incidents : []
+  
+  if (safeIncidents.length === 0) {
     return null
   }
 
   // Sort by severity and recency
-  const sortedIncidents = [...incidents].sort((a, b) => {
+  const sortedIncidents = [...safeIncidents].sort((a, b) => {
     const severityOrder = { CRITICAL: 4, HIGH: 3, MEDIUM: 2, LOW: 1 }
     const aSeverity = severityOrder[a.severity] || 1
     const bSeverity = severityOrder[b.severity] || 1
@@ -29,7 +32,7 @@ export default function IncidentBanner({ incidents }: IncidentBannerProps) {
   })
 
   const primaryIncident = sortedIncidents[0]
-  const additionalCount = incidents.length - 1
+  const additionalCount = safeIncidents.length - 1
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
