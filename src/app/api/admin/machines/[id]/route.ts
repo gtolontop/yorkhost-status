@@ -98,9 +98,7 @@ export async function PUT(
         description: body.description,
         category: body.category,
         location: body.location,
-        specs: body.specs,
-        metrics: body.metrics,
-        tags: body.tags
+        tags: body.tags || []
       },
       include: {
         services: {
