@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Layout from '@/components/layout/Layout'
 import ServiceGrid from '@/components/status/ServiceGrid'
 import IncidentBanner from '@/components/incidents/IncidentBanner'
+import PageHeader from '@/components/ui/PageHeader'
 import { StatusOverview as StatusOverviewType } from '@/types'
 import { useStatusUpdates } from '@/lib/pusher/client'
 
@@ -87,25 +88,15 @@ export default function HomePage() {
         )}
 
         {/* Hero Status Section */}
-        <div style={{ 
-          textAlign: 'center', 
-          padding: '80px 20px 60px',
-          maxWidth: '800px',
-          margin: '0 auto'
-        }}>
-          <div style={{
-            marginBottom: '32px',
-            display: 'flex',
-            justifyContent: 'center'
-          }}>
-            {status?.overall === 'operational' ? (
+        <PageHeader
+          icon={
+            status?.overall === 'operational' ? (
               <svg 
                 width="96" 
                 height="96" 
                 viewBox="0 0 24 24" 
                 fill="none" 
                 xmlns="http://www.w3.org/2000/svg"
-                style={{ color: 'var(--color-success)' }}
               >
                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
                 <path d="m9 12 2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -117,7 +108,6 @@ export default function HomePage() {
                 viewBox="0 0 24 24" 
                 fill="none" 
                 xmlns="http://www.w3.org/2000/svg"
-                style={{ color: 'var(--color-warning)' }}
               >
                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
                 <path d="M12 8v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -130,41 +120,26 @@ export default function HomePage() {
                 viewBox="0 0 24 24" 
                 fill="none" 
                 xmlns="http://www.w3.org/2000/svg"
-                style={{ color: 'var(--color-danger)' }}
               >
                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
                 <path d="m15 9-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="m9 9 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-            )}
-          </div>
-          
-          <h1 style={{
-            fontSize: '3rem',
-            fontWeight: '700',
-            color: status?.overall === 'operational' ? 'var(--color-success)' : 
-                  status?.overall === 'degraded' ? 'var(--color-warning)' : 'var(--color-danger)',
-            marginBottom: '16px',
-            lineHeight: '1.2'
-          }}>
-            {status?.overall === 'operational' ? 'All Systems Operational' :
-             status?.overall === 'degraded' ? 'Some Systems Degraded' : 'System Outage'}
-          </h1>
-          
-          <p style={{
-            fontSize: '1.25rem',
-            color: 'var(--text-secondary)',
-            marginBottom: '48px',
-            lineHeight: '1.6'
-          }}>
-            {status?.overall === 'operational' 
+            )
+          }
+          title={
+            status?.overall === 'operational' ? 'All Systems Operational' :
+            status?.overall === 'degraded' ? 'Some Systems Degraded' : 'System Outage'
+          }
+          subtitle={
+            status?.overall === 'operational' 
               ? 'All Yorkhost services are running smoothly. Everything is working as expected.'
               : status?.overall === 'degraded'
               ? 'Some services may be experiencing issues. Our team is working on it.'
               : 'We are experiencing issues with our services. We apologize for the inconvenience.'
-            }
-          </p>
-        </div>
+          }
+          status={status?.overall}
+        />
 
         {/* Service Grid */}
         <ServiceGrid services={status?.services || []} />

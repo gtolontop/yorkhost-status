@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import Layout from '@/components/layout/Layout'
+import PageHeader from '@/components/ui/PageHeader'
 import { IncidentWithDetails, IncidentFilter } from '@/types'
 import { formatRelativeTime, getSeverityColor } from '@/lib/utils'
+import { Clock } from 'lucide-react'
 import styles from './incidents.module.scss'
 
 export default function IncidentsPage() {
@@ -127,12 +129,14 @@ export default function IncidentsPage() {
   return (
     <Layout>
       <div className="container">
-        <div className={styles.header}>
-          <h1>Incident History</h1>
-          <p>Track incidents and maintenance on Yorkhost services</p>
-        </div>
+        <PageHeader
+          icon={<Clock size={96} />}
+          title="Incident History"
+          subtitle="Track incidents and maintenance on Yorkhost services"
+        />
 
-        <div className={styles.filters}>
+        <div className={styles.content}>
+          <div className={styles.filters}>
           <div className={styles.searchBox}>
             <input
               type="text"
@@ -166,83 +170,84 @@ export default function IncidentsPage() {
           </div>
         </div>
 
-        <div className={styles.incidents}>
-          {incidents.length === 0 ? (
-            <div className={styles.empty}>
-              <h3>No incidents found</h3>
-              <p>No incidents match the search criteria.</p>
-            </div>
-          ) : (
-            incidents.map((incident) => (
-              <div key={incident.id} className={styles.incident}>
-                <div className={styles.incidentHeader}>
-                  <div className={styles.incidentTitle}>
-                    <h3>{incident.title}</h3>
-                    <div className={styles.incidentMeta}>
-                      <span 
-                        className={styles.status}
-                        style={{ 
-                          backgroundColor: getStatusColor(incident.status),
-                          color: 'white'
-                        }}
-                      >
-                        {getStatusLabel(incident.status)}
-                      </span>
-                      <span 
-                        className={styles.severity}
-                        style={{ color: getSeverityColor(incident.severity) }}
-                      >
-                        {getSeverityLabel(incident.severity)}
-                      </span>
-                      <span className={styles.time}>
-                        {formatRelativeTime(new Date(incident.startTime))}
-                      </span>
+          <div className={styles.incidents}>
+            {incidents.length === 0 ? (
+              <div className={styles.empty}>
+                <h3>No incidents found</h3>
+                <p>No incidents match the search criteria.</p>
+              </div>
+            ) : (
+              incidents.map((incident) => (
+                <div key={incident.id} className={styles.incident}>
+                  <div className={styles.incidentHeader}>
+                    <div className={styles.incidentTitle}>
+                      <h3>{incident.title}</h3>
+                      <div className={styles.incidentMeta}>
+                        <span 
+                          className={styles.status}
+                          style={{ 
+                            backgroundColor: getStatusColor(incident.status),
+                            color: 'white'
+                          }}
+                        >
+                          {getStatusLabel(incident.status)}
+                        </span>
+                        <span 
+                          className={styles.severity}
+                          style={{ color: getSeverityColor(incident.severity) }}
+                        >
+                          {getSeverityLabel(incident.severity)}
+                        </span>
+                        <span className={styles.time}>
+                          {formatRelativeTime(new Date(incident.startTime))}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className={styles.incidentBody}>
-                  <p>{incident.description}</p>
-                  
-                  {incident.service && (
-                    <div className={styles.affectedService}>
-                      <span>Affected service: <strong>{incident.service.name}</strong></span>
-                    </div>
-                  )}
+                  <div className={styles.incidentBody}>
+                    <p>{incident.description}</p>
+                    
+                    {incident.service && (
+                      <div className={styles.affectedService}>
+                        <span>Affected service: <strong>{incident.service.name}</strong></span>
+                      </div>
+                    )}
 
-                  {incident.updates && incident.updates.length > 0 && (
-                    <div className={styles.updates}>
-                      <h4>Updates:</h4>
-                      {incident.updates.slice(0, 3).map((update) => (
-                        <div key={update.id} className={styles.update}>
-                          <div className={styles.updateTime}>
-                            {formatRelativeTime(new Date(update.timestamp))}
+                    {incident.updates && incident.updates.length > 0 && (
+                      <div className={styles.updates}>
+                        <h4>Updates:</h4>
+                        {incident.updates.slice(0, 3).map((update) => (
+                          <div key={update.id} className={styles.update}>
+                            <div className={styles.updateTime}>
+                              {formatRelativeTime(new Date(update.timestamp))}
+                            </div>
+                            <div className={styles.updateContent}>
+                              {update.message}
+                            </div>
                           </div>
-                          <div className={styles.updateContent}>
-                            {update.message}
+                        ))}
+                        {incident.updates.length > 3 && (
+                          <div className={styles.moreUpdates}>
+                            +{incident.updates.length - 3} more updates
                           </div>
-                        </div>
-                      ))}
-                      {incident.updates.length > 3 && (
-                        <div className={styles.moreUpdates}>
-                          +{incident.updates.length - 3} more updates
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                <div className={styles.incidentFooter}>
-                  <div className={styles.timeline}>
-                    <span>Started: {new Date(incident.startTime).toLocaleDateString('en-US')}</span>
-                    {incident.endTime && (
-                      <span>Ended: {new Date(incident.endTime).toLocaleDateString('en-US')}</span>
+                        )}
+                      </div>
                     )}
                   </div>
+
+                  <div className={styles.incidentFooter}>
+                    <div className={styles.timeline}>
+                      <span>Started: {new Date(incident.startTime).toLocaleDateString('en-US')}</span>
+                      {incident.endTime && (
+                        <span>Ended: {new Date(incident.endTime).toLocaleDateString('en-US')}</span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
       </div>
     </Layout>
