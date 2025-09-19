@@ -28,11 +28,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       if (result.success && result.data) {
         setUser(result.data)
       } else {
-        window.location.href = '/admin'
+        window.location.href = '/login'
       }
     } catch (error) {
       console.error('Auth check error:', error)
-      window.location.href = '/admin'
+      window.location.href = '/login'
     } finally {
       setLoading(false)
     }
