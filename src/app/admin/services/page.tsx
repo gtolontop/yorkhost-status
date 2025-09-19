@@ -562,6 +562,16 @@ export default function AdminServicesPage() {
           ))}
         </div>
 
+        {/* Create Service Modal */}
+        <CreateServiceModal 
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            fetchServices()
+            fetchGroups()
+          }}
+        />
+
         {/* Delete Confirmation Modal */}
         {showDeleteConfirm && (
           <div style={{
