@@ -33,7 +33,7 @@ export default function IncidentsPage() {
       const result = await response.json()
       
       if (result.success) {
-        setIncidents(result.data)
+        setIncidents(Array.isArray(result.data) ? result.data : [])
         setError(null)
       } else {
         setError(result.error || 'Failed to fetch incidents')

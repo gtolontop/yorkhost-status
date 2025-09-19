@@ -23,11 +23,14 @@ export default function ServiceGrid({ services }: ServiceGridProps) {
     setExpandedServices(newExpanded)
   }
 
+  // Ensure services is an array
+  const safeServices = Array.isArray(services) ? services : []
+
   // Group services by machine category
-  const servicesByCategory = groupBy(services, (service) => service.machine?.category || 'uncategorized')
+  const servicesByCategory = groupBy(safeServices, (service) => service.machine?.category || 'uncategorized')
   const categories = Object.keys(servicesByCategory)
 
-  if (services.length === 0) {
+  if (safeServices.length === 0) {
     return (
       <div className={styles.empty}>
         <h2>No Services Found</h2>
