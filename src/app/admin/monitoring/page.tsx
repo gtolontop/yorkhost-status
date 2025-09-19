@@ -156,6 +156,23 @@ export default function AdminMonitoringPage() {
     return `${seconds}s`
   }
 
+  const triggerManualCheck = async (serviceId: string) => {
+    try {
+      const response = await fetch(`/api/admin/services/${serviceId}/check`, {
+        method: 'POST'
+      })
+
+      if (response.ok) {
+        // Refresh monitoring data to show updated status
+        fetchMonitoringData()
+      } else {
+        console.error('Failed to trigger manual check')
+      }
+    } catch (error) {
+      console.error('Manual check error:', error)
+    }
+  }
+
   const filteredServices = services.filter(service => {
     if (selectedFilter === 'all') return true
     return service.status === selectedFilter
@@ -441,10 +458,7 @@ export default function AdminMonitoringPage() {
                 <button 
                   className="btn btn-primary"
                   style={{ fontSize: '0.8rem', padding: '0.5rem 0.75rem' }}
-                  onClick={() => {
-                    // Trigger manual check
-                    console.log('Manual check for', service.name)
-                  }}
+                  onClick={() => triggerManualCheck(service.id)}
                 >
                   <Zap size={14} />
                 </button>
