@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
 import CreateServiceModal from '@/components/admin/CreateServiceModal'
+import CreateGroupModal from '@/components/admin/CreateGroupModal'
 import '../admin.css'
 import { 
   Plus, 
@@ -568,6 +569,15 @@ export default function AdminServicesPage() {
           onClose={() => setShowCreateModal(false)}
           onSuccess={() => {
             fetchServices()
+            fetchGroups()
+          }}
+        />
+
+        {/* Create Group Modal */}
+        <CreateGroupModal 
+          isOpen={showCreateGroupModal}
+          onClose={() => setShowCreateGroupModal(false)}
+          onSuccess={() => {
             fetchGroups()
           }}
         />
