@@ -76,7 +76,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
     },
     {
       icon: Users,
-      label: 'Utilisateurs',
+      label: 'Users',
       href: '/admin/users',
       active: pathname.startsWith('/admin/users')
     },
@@ -131,7 +131,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         {!isCollapsed && (
           <div className={styles.userInfo}>
             <h4>{user.username}</h4>
-            <p>Administrateur</p>
+            <p>Administrator</p>
           </div>
         )}
       </div>
@@ -139,7 +139,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       {/* Navigation */}
       <nav className={styles.navigation}>
         <div className={styles.navSection}>
-          {!isCollapsed && <span className={styles.sectionTitle}>Principal</span>}
+          {!isCollapsed && <span className={styles.sectionTitle}>Main</span>}
           {menuItems.slice(0, 4).map((item) => (
             <button
               key={item.href}
@@ -163,7 +163,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         </div>
 
         <div className={styles.navSection}>
-          {!isCollapsed && <span className={styles.sectionTitle}>Gestion</span>}
+          {!isCollapsed && <span className={styles.sectionTitle}>Management</span>}
           {menuItems.slice(4).map((item) => (
             <button
               key={item.href}
@@ -192,18 +192,18 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         <button
           onClick={() => navigate('/admin/settings')}
           className={styles.footerBtn}
-          title={isCollapsed ? 'Paramètres' : undefined}
+          title={isCollapsed ? 'Settings' : undefined}
         >
           <Settings size={20} />
-          {!isCollapsed && <span>Paramètres</span>}
+          {!isCollapsed && <span>Settings</span>}
         </button>
         <button
           onClick={handleLogout}
           className={`${styles.footerBtn} ${styles.logoutBtn}`}
-          title={isCollapsed ? 'Déconnexion' : undefined}
+          title={isCollapsed ? 'Logout' : undefined}
         >
           <LogOut size={20} />
-          {!isCollapsed && <span>Déconnexion</span>}
+          {!isCollapsed && <span>Logout</span>}
         </button>
       </div>
     </div>
