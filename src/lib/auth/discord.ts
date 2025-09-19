@@ -95,6 +95,7 @@ export class DiscordAuth {
   }
 
   async getUserGuilds(accessToken: string): Promise<any[]> {
+    this.checkConfig()
     try {
       const response = await axios.get('https://discord.com/api/users/@me/guilds', {
         headers: {
@@ -110,6 +111,7 @@ export class DiscordAuth {
   }
 
   async getGuildMember(accessToken: string, userId: string): Promise<DiscordGuildMember | null> {
+    this.checkConfig()
     try {
       // First, check if user is in the guild using bot token (if available)
       // For now, we'll use the user's access token with guilds.members.read scope
