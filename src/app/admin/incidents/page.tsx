@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
+import CreateIncidentModal from '@/components/admin/CreateIncidentModal'
+import EditIncidentModal from '@/components/admin/EditIncidentModal'
 import '../admin.css'
 import { 
   Plus, 
@@ -64,6 +66,8 @@ export default function AdminIncidentsPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('all')
   const [selectedSeverity, setSelectedSeverity] = useState<string>('all')
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingIncident, setEditingIncident] = useState<Incident | null>(null)
   const [selectedIncident, setSelectedIncident] = useState<string | null>(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
 
@@ -460,6 +464,10 @@ export default function AdminIncidentsPage() {
                         <button 
                           className="btn btn-secondary"
                           style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem' }}
+                          onClick={() => {
+                            setEditingIncident(incident)
+                            setShowEditModal(true)
+                          }}
                         >
                           <Edit size={14} />
                           Modifier
@@ -630,6 +638,33 @@ export default function AdminIncidentsPage() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Create Incident Modal */}
+        <CreateIncidentModal 
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            fetchIncidents()
+            setShowCreateModal(false)
+          }}
+        />
+
+        {/* Edit Incident Modal */}
+        {editingIncident && (
+          <EditIncidentModal 
+            isOpen={showEditModal}
+            onClose={() => {
+              setShowEditModal(false)
+              setEditingIncident(null)
+            }}
+            onSuccess={() => {
+              fetchIncidents()
+              setShowEditModal(false)
+              setEditingIncident(null)
+            }}
+            incident={editingIncident}
+          />
         )}
       </div>
     </AdminLayout>
