@@ -538,7 +538,7 @@ export default function AdminServicesPage() {
                             }}
                           >
                             <Edit size={14} />
-                            Modifier
+                            Edit
                           </button>
                           
                           {service.url && (

@@ -470,7 +470,7 @@ export default function AdminIncidentsPage() {
                           }}
                         >
                           <Edit size={14} />
-                          Modifier
+                          Edit
                         </button>
                         <button 
                           className="btn btn-danger"
