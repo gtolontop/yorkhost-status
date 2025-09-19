@@ -24,7 +24,7 @@ export async function POST(
 
     requirePermission(auth.payload!, 'canManageIncidents')
 
-    const incidentId = params.id
+    const { id: incidentId } = await params
     const body = await request.json()
     const data = createUpdateSchema.parse(body)
 
