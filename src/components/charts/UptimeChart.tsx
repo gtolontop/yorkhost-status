@@ -71,7 +71,7 @@ export default function UptimeChart({ data }: UptimeChartProps) {
         color: 'var(--text-primary)',
         font: {
           size: 14,
-          weight: '600' as const,
+          weight: 'bold' as const,
         },
         padding: {
           bottom: 20
