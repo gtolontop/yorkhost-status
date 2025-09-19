@@ -42,7 +42,7 @@ export default function Footer() {
               <ul className={styles.linkList}>
                 <li>
                   <a 
-                    href="https://yorkhost.com" 
+                    href="https://yorkhost.fr" 
                     className={styles.link}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -52,7 +52,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <a 
-                    href="https://docs.yorkhost.com" 
+                    href="https://docs.yorkhost.fr" 
                     className={styles.link}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -62,7 +62,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <a 
-                    href="https://support.yorkhost.com" 
+                    href="https://support.yorkhost.fr" 
                     className={styles.link}
                     target="_blank"
                     rel="noopener noreferrer"

@@ -43,7 +43,7 @@ async function main() {
       discordId: "sample-discord-id",
       username: "Admin",
       avatar: null,
-      email: "admin@yorkhost.com"
+      email: "admin@yorkhost.fr"
     }
   })
 
@@ -56,7 +56,7 @@ async function main() {
       machineId: webMachine.id,
       name: "Site Web Principal",
       description: "Site web principal de Yorkhost",
-      url: "https://yorkhost.com",
+      url: "https://yorkhost.fr",
       icon: "🌐",
       isActive: true
     }
@@ -70,7 +70,7 @@ async function main() {
       machineId: apiMachine.id,
       name: "API REST",
       description: "API REST pour les applications",
-      url: "https://api.yorkhost.com",
+      url: "https://api.yorkhost.fr",
       icon: "⚡",
       isActive: true
     }
@@ -85,7 +85,7 @@ async function main() {
       serviceId: websiteService.id,
       name: "Vérification HTTP Site Web",
       type: CheckType.HTTP,
-      target: "https://yorkhost.com",
+      target: "https://yorkhost.fr",
       timeout: 30,
       interval: 300,
       retryAttempts: 3,

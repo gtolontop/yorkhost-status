@@ -165,7 +165,7 @@ export default function TermsPage() {
                 borderRadius: 'var(--radius-md)',
                 border: '1px solid var(--border-color)'
               }}>
-                <strong>Email:</strong> legal@yorkhost.com<br/>
+                <strong>Email:</strong> legal@yorkhost.fr<br/>
                 <strong>Address:</strong> Paris, France
               </div>
             </section>

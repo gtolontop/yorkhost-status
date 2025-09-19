@@ -233,7 +233,7 @@ worker = "npm run worker"
 DATABASE_URL="postgresql://user:pass@host:5432/db"
 
 # Production domains
-NEXTAUTH_URL="https://status.yorkhost.com"
+NEXTAUTH_URL="https://status.yorkhost.fr"
 
 # Production Discord app
 DISCORD_CLIENT_ID="production-client-id"
@@ -383,7 +383,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For support and questions:
 - Create an issue on GitHub
 - Join our Discord server
-- Email: support@yorkhost.com
+- Email: support@yorkhost.fr
 
 ## 🎯 Roadmap
 

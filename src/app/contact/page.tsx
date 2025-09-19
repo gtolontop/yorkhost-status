@@ -38,7 +38,7 @@ export default function ContactPage() {
                 For general inquiries and support requests
               </p>
               <a 
-                href="mailto:support@yorkhost.com"
+                href="mailto:support@yorkhost.fr"
                 style={{
                   color: 'var(--color-primary)',
                   textDecoration: 'none',
@@ -48,7 +48,7 @@ export default function ContactPage() {
                   gap: '4px'
                 }}
               >
-                support@yorkhost.com
+                support@yorkhost.fr
                 <ExternalLink size={14} />
               </a>
             </div>
