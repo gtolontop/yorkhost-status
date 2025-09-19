@@ -132,6 +132,7 @@ export class DiscordAuth {
   }
 
   async verifyUserRole(accessToken: string, userId: string): Promise<boolean> {
+    this.checkConfig()
     try {
       const member = await this.getGuildMember(accessToken, userId)
       
