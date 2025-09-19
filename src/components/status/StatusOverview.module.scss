@@ -1,4 +1,4 @@
-@import '@/styles/tokens.scss';
+/* Using CSS variables defined in globals.css */
 
 .overview {
   background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
@@ -9,7 +9,7 @@
   box-shadow: var(--shadow-lg);
   transition: var(--transition-all);
   
-  @include respond-to('md') {
+  @media (min-width: 768px) {
     padding: var(--space-12);
   }
   
