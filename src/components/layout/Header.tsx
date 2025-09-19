@@ -36,10 +36,6 @@ export default function Header() {
         </nav>
 
         <div className={styles.actions}>
-          <Link href="/contact" className={styles.contactBtn}>
-            Get in Touch
-          </Link>
-
           <button
             onClick={toggleTheme}
             className={styles.themeToggle}
@@ -47,6 +43,10 @@ export default function Header() {
           >
             {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
           </button>
+
+          <Link href="/contact" className={styles.contactBtn}>
+            Get in Touch
+          </Link>
 
           <button
             onClick={toggleMenu}
