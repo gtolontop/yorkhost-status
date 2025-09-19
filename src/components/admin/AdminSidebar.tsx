@@ -64,9 +64,15 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
     },
     {
       icon: Activity,
-      label: 'Monitoring',
+      label: 'Monitoring Live',
       href: '/admin/monitoring',
-      active: pathname.startsWith('/admin/monitoring')
+      active: pathname === '/admin/monitoring'
+    },
+    {
+      icon: Shield,
+      label: 'Monitors',
+      href: '/admin/monitors',
+      active: pathname.startsWith('/admin/monitors')
     },
     {
       icon: Users,
