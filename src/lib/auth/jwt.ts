@@ -1,145 +1,69 @@
-import jwt from 'jsonwebtoken'
-import { prisma } from '@/lib/db'
+import jwt from "jsonwebtoken"
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'your-fallback-secret-key'
-const JWT_EXPIRES_IN = '7d'
+const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-for-development"
 
 export interface JWTPayload {
   userId: string
-  discordId: string
   username: string
-  role: string
-  permissions: Record<string, boolean>
+  avatar?: string
+  discordId: string
   iat?: number
   exp?: number
 }
 
-export function generateToken(payload: Omit<JWTPayload, 'iat' | 'exp'>): string {
+export function createToken(payload: Omit<JWTPayload, "iat"  < /dev/null |  "exp">): string {
   return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
-    issuer: 'yorkhost-status',
-    audience: 'yorkhost-status-admin'
+    expiresIn: "7d"
   })
 }
 
-export function verifyToken(token: string): JWTPayload | null {
+export async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload
     return decoded
   } catch (error) {
-    console.error('JWT verification error:', error)
+    console.error("JWT verification error:", error)
     return null
   }
 }
 
-export async function validateUserSession(token: string): Promise<{
-  valid: boolean
-  user?: any
-  payload?: JWTPayload
-}> {
-  const payload = verifyToken(token)
-  
-  if (!payload) {
-    return { valid: false }
-  }
+export function requireAuth(allowedRoles?: string[]) {
+  return async (request: Request) => {
+    try {
+      const authHeader = request.headers.get("authorization")
+      const token = authHeader?.replace("Bearer ", "")
 
-  try {
-    // Check if user still exists and has admin role
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-      include: { adminRole: true }
-    })
+      if (\!token) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: "Authentication required"
+        }), { 
+          status: 401,
+          headers: { "Content-Type": "application/json" }
+        })
+      }
 
-    if (!user || !user.adminRole) {
-      return { valid: false }
-    }
+      const payload = await verifyToken(token)
+      if (\!payload) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: "Invalid token"
+        }), { 
+          status: 401,
+          headers: { "Content-Type": "application/json" }
+        })
+      }
 
-    return {
-      valid: true,
-      user,
-      payload
-    }
-  } catch (error) {
-    console.error('User session validation error:', error)
-    return { valid: false }
-  }
-}
-
-export function extractTokenFromHeader(authHeader: string | undefined): string | null {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
-  }
-  
-  return authHeader.substring(7)
-}
-
-export async function createUserSession(user: any): Promise<string> {
-  const adminRole = user.adminRole || await prisma.adminRole.findUnique({
-    where: { userId: user.id }
-  })
-
-  if (!adminRole) {
-    throw new Error('User does not have admin role')
-  }
-
-  const payload: Omit<JWTPayload, 'iat' | 'exp'> = {
-    userId: user.id,
-    discordId: user.discordId,
-    username: user.username,
-    role: adminRole.role,
-    permissions: adminRole.permissions as Record<string, boolean>
-  }
-
-  return generateToken(payload)
-}
-
-// Middleware helper for API routes
-export async function requireAuth(req: any): Promise<{
-  authorized: boolean
-  user?: any
-  payload?: JWTPayload
-  error?: string
-}> {
-  const authHeader = req.headers.authorization
-  const token = extractTokenFromHeader(authHeader)
-
-  if (!token) {
-    return {
-      authorized: false,
-      error: 'No authorization token provided'
+      return { user: payload }
+    } catch (error) {
+      console.error("Auth middleware error:", error)
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Authentication error"
+      }), { 
+        status: 500,
+        headers: { "Content-Type": "application/json" }
+      })
     }
   }
-
-  const session = await validateUserSession(token)
-
-  if (!session.valid) {
-    return {
-      authorized: false,
-      error: 'Invalid or expired token'
-    }
-  }
-
-  return {
-    authorized: true,
-    user: session.user,
-    payload: session.payload
-  }
-}
-
-// Permission checking helper
-export function hasPermission(
-  payload: JWTPayload,
-  permission: string
-): boolean {
-  return payload.permissions[permission] === true
-}
-
-export function requirePermission(
-  payload: JWTPayload,
-  permission: string
-): boolean {
-  if (!hasPermission(payload, permission)) {
-    throw new Error(`Permission denied: ${permission}`)
-  }
-  return true
 }

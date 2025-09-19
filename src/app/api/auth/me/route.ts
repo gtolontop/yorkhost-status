@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get("auth-token")?.value
 
-    if (\!token) {
+    if (!token) {
       return NextResponse.json({
         success: false,
         error: "Not authenticated"
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     }
 
     const payload = await verifyToken(token)
-    if (\!payload) {
+    if (!payload) {
       return NextResponse.json({
         success: false,
         error: "Invalid token"
