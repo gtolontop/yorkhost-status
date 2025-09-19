@@ -61,16 +61,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     }
   }
 
-  if (loading) {
-    return (
-      <div className={styles.loadingScreen}>
-        <div className={styles.loadingSpinner}>
-          <div className={styles.spinner}></div>
-          <p>Chargement du panel admin...</p>
-        </div>
-      </div>
-    )
-  }
+  // Remove loading screen
 
   if (!user) {
     return (
