@@ -39,7 +39,7 @@ export function useTheme() {
     const newTheme = theme === 'light' ? 'dark' : 'light'
     setTheme(newTheme)
     applyTheme(newTheme)
-    localStorage.set('theme', newTheme)
+    localStorage.setItem('theme', newTheme)
   }
 
   return {
@@ -48,7 +48,7 @@ export function useTheme() {
     setTheme: (newTheme: Theme) => {
       setTheme(newTheme)
       applyTheme(newTheme)
-      localStorage.set('theme', newTheme)
+      localStorage.setItem('theme', newTheme)
     }
   }
 }
