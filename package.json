@@ -14,10 +14,10 @@
     "db:seed": "tsx prisma/seed.ts",
     "worker": "tsx workers/monitor.ts",
     "test": "jest",
-    "test:watch": "jest --watch",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
-    "next": "^15.0.0",
+    "next": "14.2.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "@prisma/client": "^5.18.0",
