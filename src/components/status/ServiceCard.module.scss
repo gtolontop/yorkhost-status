@@ -1,4 +1,4 @@
-@import '@/styles/tokens.scss';
+/* Using CSS variables defined in globals.css */
 
 .card {
   background-color: var(--bg-primary);
@@ -136,7 +136,7 @@
   background-color: var(--bg-secondary);
   border-top: 1px solid var(--border-light);
   
-  @include respond-to('lg') {
+  @media (min-width: 1024px) {
     grid-template-columns: repeat(4, 1fr);
   }
 }
