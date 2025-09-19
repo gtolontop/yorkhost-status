@@ -51,6 +51,8 @@ export default function AdminMonitorsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingMonitor, setEditingMonitor] = useState<Monitor | null>(null)
   const [newGroupName, setNewGroupName] = useState('')
 
   useEffect(() => {
