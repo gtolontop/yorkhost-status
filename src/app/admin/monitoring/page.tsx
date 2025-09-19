@@ -105,7 +105,7 @@ export default function AdminMonitoringPage() {
             timestamp: new Date(Date.now() - i * 60000).toISOString(),
             errorMessage: Math.random() > 0.8 ? 'Connection refused' : undefined
           }))
-        ).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        ).sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
         
         setRecentChecks(checks.slice(0, 20))
         setError(null)

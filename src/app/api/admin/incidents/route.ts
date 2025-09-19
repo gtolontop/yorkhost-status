@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     const incidents = await prisma.incident.findMany({
       include: {
         updates: {
-          orderBy: { createdAt: 'desc' }
+          orderBy: { timestamp: 'desc' }
         },
         service: {
           select: {
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
           }
         }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { startTime: 'desc' }
     })
 
     return NextResponse.json({

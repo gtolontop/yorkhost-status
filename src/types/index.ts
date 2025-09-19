@@ -182,8 +182,20 @@ export interface NotificationConfig {
   isActive: boolean
 }
 
-// Export Prisma enums
-export { CheckType, IncidentStatus, IncidentSeverity }
+// Export Prisma types and enums
+export { 
+  Machine, 
+  Service, 
+  Check, 
+  CheckResult, 
+  Incident, 
+  IncidentUpdate, 
+  User, 
+  AdminRole,
+  CheckType, 
+  IncidentStatus, 
+  IncidentSeverity 
+}
 
 // Form types
 export interface CreateMachineForm {
