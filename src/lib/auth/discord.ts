@@ -23,22 +23,21 @@ export class DiscordAuth {
   private requiredRoleId: string
 
   constructor() {
-    if (!process.env.DISCORD_CLIENT_ID || !process.env.DISCORD_CLIENT_SECRET || !process.env.DISCORD_GUILD_ID || !process.env.DISCORD_ROLE_ID) {
-      throw new Error('Missing required Discord environment variables')
-    }
-    
-    this.clientId = process.env.DISCORD_CLIENT_ID
-    this.clientSecret = process.env.DISCORD_CLIENT_SECRET
+    this.clientId = process.env.DISCORD_CLIENT_ID || ''
+    this.clientSecret = process.env.DISCORD_CLIENT_SECRET || ''
     this.redirectUri = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/discord/callback`
-    this.guildId = process.env.DISCORD_GUILD_ID
-    this.requiredRoleId = process.env.DISCORD_ROLE_ID
+    this.guildId = process.env.DISCORD_GUILD_ID || ''
+    this.requiredRoleId = process.env.DISCORD_ROLE_ID || ''
+  }
 
+  private checkConfig() {
     if (!this.clientId || !this.clientSecret || !this.guildId || !this.requiredRoleId) {
       throw new Error('Missing required Discord environment variables')
     }
   }
 
   getAuthUrl(): string {
+    this.checkConfig()
     const params = new URLSearchParams({
       client_id: this.clientId,
       redirect_uri: this.redirectUri,
