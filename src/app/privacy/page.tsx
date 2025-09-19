@@ -143,7 +143,7 @@ export default function PrivacyPage() {
                 borderRadius: 'var(--radius-md)',
                 border: '1px solid var(--border-color)'
               }}>
-                <strong>Email:</strong> privacy@yorkhost.com<br/>
+                <strong>Email:</strong> privacy@yorkhost.fr<br/>
                 <strong>Discord:</strong> Join our community server
               </div>
             </section>
