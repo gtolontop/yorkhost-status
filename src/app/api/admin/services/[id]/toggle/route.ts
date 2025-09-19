@@ -57,7 +57,7 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      data: { active: newActiveState }
+      data: { isActive: newActiveState }
     })
   } catch (error) {
     console.error('Toggle service error:', error)
