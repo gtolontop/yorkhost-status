@@ -226,6 +226,11 @@ ul, ol {
   border: 0;
 }
 
+/* Page transitions */
+body {
+  transition: opacity 200ms ease-in-out;
+}
+
 /* Container */
 .container {
   width: 100%;
