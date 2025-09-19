@@ -129,7 +129,7 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
           marginBottom: '1.5rem'
         }}>
           <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
-            Modifier le service
+            Edit Service
           </h2>
           <button
             onClick={onClose}
