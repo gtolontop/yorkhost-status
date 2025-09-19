@@ -6,8 +6,20 @@ let pusher: Pusher | null = null
 
 export function getPusher(): Pusher {
   if (!pusher) {
-    pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+    const pusherKey = process.env.NEXT_PUBLIC_PUSHER_KEY
+    const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER
+    
+    if (!pusherKey || !pusherCluster) {
+      console.warn('Pusher credentials not configured, using mock client')
+      // Return a mock pusher client for development
+      return {
+        subscribe: () => ({ bind: () => {}, unbind: () => {} }),
+        unsubscribe: () => {}
+      } as any
+    }
+    
+    pusher = new Pusher(pusherKey, {
+      cluster: pusherCluster,
       forceTLS: true
     })
 
