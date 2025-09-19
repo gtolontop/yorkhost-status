@@ -94,10 +94,49 @@ export default function HomePage() {
           margin: '0 auto'
         }}>
           <div style={{
-            fontSize: '4rem',
-            marginBottom: '24px'
+            marginBottom: '32px',
+            display: 'flex',
+            justifyContent: 'center'
           }}>
-            🚀
+            {status?.overall === 'operational' ? (
+              <svg 
+                width="96" 
+                height="96" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ color: 'var(--color-success)' }}
+              >
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                <path d="m9 12 2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            ) : status?.overall === 'degraded' ? (
+              <svg 
+                width="96" 
+                height="96" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ color: 'var(--color-warning)' }}
+              >
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                <path d="M12 8v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="m12 16 .01 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            ) : (
+              <svg 
+                width="96" 
+                height="96" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ color: 'var(--color-danger)' }}
+              >
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                <path d="m15 9-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="m9 9 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
           </div>
           
           <h1 style={{
@@ -115,7 +154,7 @@ export default function HomePage() {
           <p style={{
             fontSize: '1.25rem',
             color: 'var(--text-secondary)',
-            marginBottom: '32px',
+            marginBottom: '48px',
             lineHeight: '1.6'
           }}>
             {status?.overall === 'operational' 
@@ -125,30 +164,10 @@ export default function HomePage() {
               : 'We are experiencing issues with our services. We apologize for the inconvenience.'
             }
           </p>
-
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '32px',
-            fontSize: '0.875rem',
-            color: 'var(--text-tertiary)'
-          }}>
-            <div>
-              <strong>24h Uptime:</strong> {status?.uptimeStats?.['24h']?.toFixed(1) || '100.0'}%
-            </div>
-            <div>
-              <strong>7d Uptime:</strong> {status?.uptimeStats?.['7d']?.toFixed(1) || '100.0'}%
-            </div>
-            <div>
-              <strong>30d Uptime:</strong> {status?.uptimeStats?.['30d']?.toFixed(1) || '100.0'}%
-            </div>
-          </div>
         </div>
 
         {/* Service Grid */}
-        {status?.services && status.services.length > 0 && (
-          <ServiceGrid services={status.services} />
-        )}
+        <ServiceGrid services={status?.services || []} />
       </div>
     </Layout>
   )
