@@ -72,122 +72,53 @@ export default function AdminIncidentsPage() {
 
   const fetchIncidents = async () => {
     try {
-      // Mock data - replace with real API
-      const mockIncidents: Incident[] = [
-        {
-          id: '1',
-          title: 'API Gateway Indisponible',
-          description: 'Le service API Gateway ne répond plus depuis 10 minutes. Impact sur tous les services clients.',
-          severity: 'CRITICAL',
-          status: 'INVESTIGATING',
-          isScheduled: false,
-          startTime: new Date(Date.now() - 10 * 60000).toISOString(),
-          serviceId: '1',
-          machineId: '1',
-          tags: ['api', 'gateway', 'urgent'],
-          creator: {
-            id: '1',
-            username: 'admin',
-            avatar: undefined
-          },
-          service: {
-            id: '1',
-            name: 'API Gateway'
-          },
-          machine: {
-            id: '1',
-            name: 'Server-01'
-          },
-          updates: [
-            {
-              id: '1',
-              title: 'Investigation en cours',
-              message: 'Nous enquêtons sur la cause de l\'indisponibilité du service.',
-              timestamp: new Date(Date.now() - 5 * 60000).toISOString()
-            }
-          ]
-        },
-        {
-          id: '2',
-          title: 'Performance dégradée - Base de données',
-          description: 'Ralentissements observés sur les requêtes de base de données.',
-          severity: 'HIGH',
-          status: 'IDENTIFIED',
-          isScheduled: false,
-          startTime: new Date(Date.now() - 45 * 60000).toISOString(),
-          serviceId: '2',
-          tags: ['database', 'performance'],
-          creator: {
-            id: '1',
-            username: 'admin'
-          },
-          service: {
-            id: '2',
-            name: 'Database Master'
-          },
-          updates: [
-            {
-              id: '2',
-              title: 'Cause identifiée',
-              message: 'Problème de cache identifié. Redémarrage en cours.',
-              timestamp: new Date(Date.now() - 20 * 60000).toISOString()
-            }
-          ]
-        },
-        {
-          id: '3',
-          title: 'Maintenance programmée - CDN',
-          description: 'Mise à jour de sécurité sur le réseau CDN.',
-          severity: 'MEDIUM',
-          status: 'SCHEDULED',
-          isScheduled: true,
-          startTime: new Date(Date.now() + 24 * 60 * 60000).toISOString(),
-          endTime: new Date(Date.now() + 24 * 60 * 60000 + 2 * 60 * 60000).toISOString(),
-          serviceId: '3',
-          tags: ['maintenance', 'cdn', 'sécurité'],
-          creator: {
-            id: '1',
-            username: 'admin'
-          },
-          service: {
-            id: '3',
-            name: 'CDN'
-          },
-          updates: []
-        },
-        {
-          id: '4',
-          title: 'Incident résolu - Auth Service',
-          description: 'Problème de connexion résolu sur le service d\'authentification.',
-          severity: 'MEDIUM',
-          status: 'RESOLVED',
-          isScheduled: false,
-          startTime: new Date(Date.now() - 2 * 60 * 60000).toISOString(),
-          endTime: new Date(Date.now() - 30 * 60000).toISOString(),
-          serviceId: '4',
-          tags: ['auth', 'résolu'],
-          creator: {
-            id: '1',
-            username: 'admin'
-          },
-          service: {
-            id: '4',
-            name: 'Auth Service'
-          },
-          updates: [
-            {
-              id: '3',
-              title: 'Incident résolu',
-              message: 'Le service fonctionne normalement après redémarrage.',
-              timestamp: new Date(Date.now() - 30 * 60000).toISOString()
-            }
-          ]
-        }
-      ]
+      const response = await fetch('/api/admin/incidents')
+      const result = await response.json()
       
-      setIncidents(mockIncidents)
+      if (result.success) {
+        // Transform the API response to match our component interface
+        const transformedIncidents = result.data.map((incident: any) => ({
+          id: incident.id,
+          title: incident.title,
+          description: incident.description,
+          severity: incident.severity,
+          status: incident.status,
+          isScheduled: incident.isScheduled,
+          startTime: incident.startTime,
+          endTime: incident.endTime,
+          eta: incident.eta,
+          serviceId: incident.serviceId,
+          machineId: incident.machineId,
+          tags: incident.tags || [],
+          creator: {
+            id: incident.creator?.id || 'unknown',
+            username: incident.creator?.username || 'Système',
+            avatar: incident.creator?.avatar
+          },
+          service: incident.service ? {
+            id: incident.service.id,
+            name: incident.service.name
+          } : undefined,
+          machine: incident.machine ? {
+            id: incident.machine.id,
+            name: incident.machine.name
+          } : undefined,
+          updates: incident.updates?.map((update: any) => ({
+            id: update.id,
+            title: update.title,
+            message: update.message,
+            timestamp: update.timestamp
+          })) || []
+        }))
+        
+        setIncidents(transformedIncidents)
+      } else {
+        console.error('Incidents API error:', result.error)
+        setIncidents([])
+      }
     } catch (error) {
       console.error('Failed to fetch incidents:', error)
+      setIncidents([])
     } finally {
       setLoading(false)
     }
@@ -264,8 +195,21 @@ export default function AdminIncidentsPage() {
   }
 
   const deleteIncident = async (incidentId: string) => {
-    setIncidents(prev => prev.filter(incident => incident.id !== incidentId))
-    setShowDeleteConfirm(null)
+    try {
+      const response = await fetch(`/api/admin/incidents/${incidentId}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        setIncidents(prev => prev.filter(incident => incident.id !== incidentId))
+        setShowDeleteConfirm(null)
+      } else {
+        const result = await response.json()
+        console.error('Failed to delete incident:', result.error)
+      }
+    } catch (error) {
+      console.error('Failed to delete incident:', error)
+    }
   }
 
   const filteredIncidents = incidents.filter(incident => {

@@ -67,137 +67,47 @@ export default function AdminMachinesPage() {
 
   const fetchMachines = async () => {
     try {
-      // Mock data - replace with real API
-      const mockMachines: Machine[] = [
-        {
-          id: '1',
-          name: 'Server-01',
-          description: 'Serveur web principal pour les APIs',
-          category: 'web',
-          location: 'Paris, France - OVH DC1',
-          tags: ['production', 'api', 'critical'],
-          status: 'online',
-          specs: {
-            cpu: '8 vCPU Intel Xeon',
-            memory: '32 GB DDR4',
-            storage: '500 GB NVMe SSD',
-            network: '1 Gbps'
+      const response = await fetch('/api/admin/machines')
+      const result = await response.json()
+      
+      if (result.success) {
+        // Transform the API response to match our component interface
+        const transformedMachines = result.data.map((machine: any) => ({
+          id: machine.id,
+          name: machine.name,
+          description: machine.description,
+          category: machine.category,
+          location: machine.location,
+          tags: machine.tags || [],
+          status: machine.status || 'online',
+          specs: machine.specs || {
+            cpu: 'Unknown',
+            memory: 'Unknown',
+            storage: 'Unknown',
+            network: 'Unknown'
           },
-          services: [
-            { id: '1', name: 'API Gateway', status: 'operational' },
-            { id: '4', name: 'Auth Service', status: 'operational' }
-          ],
-          metrics: {
-            cpuUsage: 45,
-            memoryUsage: 68,
-            diskUsage: 32,
-            uptime: 99.95
-          },
-          lastUpdate: new Date(Date.now() - 2 * 60000).toISOString()
-        },
-        {
-          id: '2',
-          name: 'DB-01',
-          description: 'Base de données PostgreSQL principale',
-          category: 'database',
-          location: 'Amsterdam, Netherlands - DigitalOcean',
-          tags: ['production', 'database', 'critical'],
-          status: 'online',
-          specs: {
-            cpu: '16 vCPU Intel Xeon',
-            memory: '64 GB DDR4',
-            storage: '2 TB NVMe SSD',
-            network: '1 Gbps'
-          },
-          services: [
-            { id: '2', name: 'Database Master', status: 'degraded' }
-          ],
-          metrics: {
-            cpuUsage: 78,
-            memoryUsage: 85,
-            diskUsage: 65,
-            uptime: 98.2
-          },
-          lastUpdate: new Date(Date.now() - 1 * 60000).toISOString()
-        },
-        {
-          id: '3',
-          name: 'CDN-Global',
-          description: 'Réseau de distribution de contenu mondial',
-          category: 'network',
-          location: 'Multi-région - Cloudflare',
-          tags: ['cdn', 'global', 'cache'],
-          status: 'online',
-          specs: {
-            cpu: 'Edge Computing',
-            memory: 'Distributed',
-            storage: '10 TB Cache',
-            network: '100 Gbps'
-          },
-          services: [
-            { id: '3', name: 'CDN', status: 'operational' }
-          ],
-          metrics: {
-            cpuUsage: 25,
-            memoryUsage: 42,
-            diskUsage: 78,
-            uptime: 100
-          },
-          lastUpdate: new Date(Date.now() - 30000).toISOString()
-        },
-        {
-          id: '4',
-          name: 'Storage-01',
-          description: 'Serveur de stockage de fichiers',
-          category: 'storage',
-          location: 'Frankfurt, Germany - Hetzner',
-          tags: ['storage', 'files', 's3'],
-          status: 'maintenance',
-          specs: {
-            cpu: '4 vCPU AMD EPYC',
-            memory: '16 GB DDR4',
-            storage: '10 TB HDD RAID',
-            network: '10 Gbps'
-          },
-          services: [
-            { id: '5', name: 'File Storage', status: 'outage' }
-          ],
-          metrics: {
+          services: machine.services?.map((service: any) => ({
+            id: service.id,
+            name: service.name,
+            status: service.checks?.[0]?.success ? 'operational' : 'outage'
+          })) || [],
+          metrics: machine.metrics || {
             cpuUsage: 0,
             memoryUsage: 0,
-            diskUsage: 89,
-            uptime: 95.1
+            diskUsage: 0,
+            uptime: 0
           },
-          lastUpdate: new Date(Date.now() - 30 * 60000).toISOString()
-        },
-        {
-          id: '5',
-          name: 'Monitor-01',
-          description: 'Serveur de monitoring et métriques',
-          category: 'monitoring',
-          location: 'Londres, UK - AWS EC2',
-          tags: ['monitoring', 'metrics', 'grafana'],
-          status: 'online',
-          specs: {
-            cpu: '4 vCPU Intel Xeon',
-            memory: '8 GB DDR4',
-            storage: '100 GB GP3 SSD',
-            network: '5 Gbps'
-          },
-          services: [],
-          metrics: {
-            cpuUsage: 35,
-            memoryUsage: 55,
-            diskUsage: 48,
-            uptime: 99.8
-          },
-          lastUpdate: new Date(Date.now() - 45000).toISOString()
-        }
-      ]
-      
-      setMachines(mockMachines)
+          lastUpdate: machine.updatedAt || new Date().toISOString()
+        }))
+        
+        setMachines(transformedMachines)
+      } else {
+        console.error('Machines API error:', result.error)
+        setMachines([])
+      }
     } catch (error) {
       console.error('Failed to fetch machines:', error)
+      setMachines([])
     } finally {
       setLoading(false)
     }
@@ -264,8 +174,21 @@ export default function AdminMachinesPage() {
   }
 
   const deleteMachine = async (machineId: string) => {
-    setMachines(prev => prev.filter(machine => machine.id !== machineId))
-    setShowDeleteConfirm(null)
+    try {
+      const response = await fetch(`/api/admin/machines/${machineId}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        setMachines(prev => prev.filter(machine => machine.id !== machineId))
+        setShowDeleteConfirm(null)
+      } else {
+        const result = await response.json()
+        console.error('Failed to delete machine:', result.error)
+      }
+    } catch (error) {
+      console.error('Failed to delete machine:', error)
+    }
   }
 
   const filteredMachines = machines.filter(machine => {
