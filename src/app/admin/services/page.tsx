@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
+import CreateServiceModal from '@/components/admin/CreateServiceModal'
 import '../admin.css'
 import { 
   Plus, 
