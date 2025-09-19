@@ -27,43 +27,37 @@ export async function verifyToken(token: string): Promise<JWTPayload | null> {
   }
 }
 
-export function requireAuth(allowedRoles?: string[]) {
-  return async (request: Request) => {
-    try {
-      const authHeader = request.headers.get("authorization")
-      const token = authHeader?.replace("Bearer ", "")
+export async function requireAuth(request: any): Promise<{ authorized: boolean; user?: JWTPayload; error?: string }> {
+  try {
+    const token = request.cookies?.get("auth-token")?.value
 
-      if (!token) {
-        return new Response(JSON.stringify({
-          success: false,
-          error: "Authentication required"
-        }), { 
-          status: 401,
-          headers: { "Content-Type": "application/json" }
-        })
-      }
-
-      const payload = await verifyToken(token)
-      if (!payload) {
-        return new Response(JSON.stringify({
-          success: false,
-          error: "Invalid token"
-        }), { 
-          status: 401,
-          headers: { "Content-Type": "application/json" }
-        })
-      }
-
-      return { user: payload }
-    } catch (error) {
-      console.error("Auth middleware error:", error)
-      return new Response(JSON.stringify({
-        success: false,
-        error: "Authentication error"
-      }), { 
-        status: 500,
-        headers: { "Content-Type": "application/json" }
-      })
+    if (!token) {
+      return { authorized: false, error: "Authentication required" }
     }
+
+    const payload = await verifyToken(token)
+    if (!payload) {
+      return { authorized: false, error: "Invalid token" }
+    }
+
+    return { authorized: true, user: payload }
+  } catch (error) {
+    console.error("Auth middleware error:", error)
+    return { authorized: false, error: "Authentication error" }
   }
+}
+
+export function requirePermission(permission?: string) {
+  return requireAuth
+}
+
+export function createUserSession(user: any) {
+  const token = createToken({
+    userId: user.id,
+    username: user.username,
+    avatar: user.avatar,
+    discordId: user.discordId
+  })
+
+  return { token, user }
 }
