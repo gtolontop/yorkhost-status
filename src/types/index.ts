@@ -183,7 +183,7 @@ export interface NotificationConfig {
 }
 
 // Export Prisma types and enums
-export { 
+export type { 
   Machine, 
   Service, 
   Check, 
@@ -191,7 +191,10 @@ export {
   Incident, 
   IncidentUpdate, 
   User, 
-  AdminRole,
+  AdminRole
+}
+
+export { 
   CheckType, 
   IncidentStatus, 
   IncidentSeverity 
