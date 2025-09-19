@@ -39,14 +39,12 @@ export async function POST(
       check = await prisma.check.create({
         data: {
           serviceId: serviceId,
+          name: `${service.name} HTTP Check`,
           type: 'HTTP',
-          config: {
-            url: service.url,
-            method: 'GET',
-            timeout: 30000
-          },
+          target: service.url,
+          timeout: 30000,
           interval: 300, // 5 minutes
-          active: true
+          isActive: true
         }
       })
     }

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     // Get recent activities
     const recentActivities = await prisma.auditLog.findMany({
       take: 10,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { timestamp: 'desc' },
       include: {
         user: {
           select: {
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
       type: log.resource.toLowerCase(),
       title: `${log.action} ${log.resource}`,
       description: `${log.user?.username || 'Système'} a ${log.action.toLowerCase()} ${log.resource.toLowerCase()}`,
-      timestamp: log.createdAt.toISOString(),
+      timestamp: log.timestamp.toISOString(),
       status: log.action === 'CREATE' ? 'success' : log.action === 'DELETE' ? 'error' : 'warning'
     }))
 
