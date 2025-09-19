@@ -14,7 +14,8 @@
     "db:seed": "tsx prisma/seed.ts",
     "worker": "tsx workers/monitor.ts",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "postinstall": "npm audit fix --force || true"
   },
   "dependencies": {
     "next": "^15.0.0",
