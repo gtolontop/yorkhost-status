@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       include: {
         machine: true,
         checks: {
-          orderBy: { timestamp: 'desc' },
+          orderBy: { createdAt: 'desc' },
           take: 1
         }
       },
