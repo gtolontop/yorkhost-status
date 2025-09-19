@@ -1,6 +1,7 @@
 'use client'
 
 import Layout from '@/components/layout/Layout'
+import PageHeader from '@/components/ui/PageHeader'
 import { Mail, MessageCircle, Phone, ExternalLink } from 'lucide-react'
 
 export default function ContactPage() {
