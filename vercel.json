@@ -1,0 +1,32 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "regions": ["iad1"],
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "NEXTAUTH_SECRET": "@nextauth_secret",
+    "DISCORD_CLIENT_ID": "@discord_client_id",
+    "DISCORD_CLIENT_SECRET": "@discord_client_secret",
+    "DISCORD_GUILD_ID": "@discord_guild_id",
+    "DISCORD_ROLE_ID": "@discord_role_id",
+    "PUSHER_APP_ID": "@pusher_app_id",
+    "PUSHER_KEY": "@pusher_key",
+    "PUSHER_SECRET": "@pusher_secret",
+    "PUSHER_CLUSTER": "@pusher_cluster",
+    "NEXT_PUBLIC_PUSHER_KEY": "@next_public_pusher_key",
+    "NEXT_PUBLIC_PUSHER_CLUSTER": "@next_public_pusher_cluster"
+  },
+  "build": {
+    "env": {
+      "DATABASE_URL": "@database_url"
+    }
+  },
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  }
+}
