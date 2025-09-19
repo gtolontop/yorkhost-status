@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db'
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await requireAuth(request)
@@ -16,7 +16,7 @@ export async function DELETE(
       }, { status: 401 })
     }
 
-    const incidentId = params.id
+    const { id: incidentId } = await params
 
     // Check if incident exists
     const incident = await prisma.incident.findUnique({
@@ -69,7 +69,7 @@ export async function DELETE(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await requireAuth(request)
@@ -81,7 +81,7 @@ export async function PUT(
       }, { status: 401 })
     }
 
-    const incidentId = params.id
+    const { id: incidentId } = await params
     const body = await request.json()
 
     // Update incident

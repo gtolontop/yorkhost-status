@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db'
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await requireAuth(request)
@@ -16,7 +16,7 @@ export async function DELETE(
       }, { status: 401 })
     }
 
-    const machineId = params.id
+    const { id: machineId } = await params
 
     // Check if machine exists
     const machine = await prisma.machine.findUnique({
@@ -75,7 +75,7 @@ export async function DELETE(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await requireAuth(request)
@@ -87,7 +87,7 @@ export async function PUT(
       }, { status: 401 })
     }
 
-    const machineId = params.id
+    const { id: machineId } = await params
     const body = await request.json()
 
     // Update machine
