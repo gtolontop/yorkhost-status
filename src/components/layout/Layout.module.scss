@@ -1,0 +1,22 @@
+@import '@/styles/tokens.scss';
+
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+  transition: var(--transition-colors);
+}
+
+.main {
+  flex: 1;
+  padding: var(--space-6) 0;
+  
+  @include respond-to('md') {
+    padding: var(--space-8) 0;
+  }
+  
+  @include respond-to('lg') {
+    padding: var(--space-12) 0;
+  }
+}
