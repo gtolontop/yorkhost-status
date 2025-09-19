@@ -77,132 +77,23 @@ export default function AdminMonitoringPage() {
     try {
       setRefreshing(true)
       
-      // Mock data - replace with real API
-      const mockServices: ServiceMonitor[] = [
-        {
-          id: '1',
-          name: 'API Gateway',
-          category: 'api',
-          status: Math.random() > 0.1 ? 'up' : 'down',
-          uptime: 99.95 + (Math.random() * 0.1 - 0.05),
-          responseTime: Math.floor(Math.random() * 50 + 100),
-          lastCheck: new Date(Date.now() - Math.random() * 60000).toISOString(),
-          machine: 'Server-01',
-          url: 'https://api.yorkhost.com',
-          checkHistory: Array.from({ length: 20 }, (_, i) => ({
-            timestamp: new Date(Date.now() - i * 30000).toISOString(),
-            success: Math.random() > 0.05,
-            responseTime: Math.floor(Math.random() * 100 + 80),
-            error: Math.random() > 0.9 ? 'Connection timeout' : undefined
-          }))
-        },
-        {
-          id: '2',
-          name: 'Database Master',
-          category: 'database',
-          status: Math.random() > 0.2 ? 'degraded' : 'up',
-          uptime: 98.2 + (Math.random() * 0.5),
-          responseTime: Math.floor(Math.random() * 200 + 300),
-          lastCheck: new Date(Date.now() - Math.random() * 120000).toISOString(),
-          machine: 'DB-01',
-          checkHistory: Array.from({ length: 20 }, (_, i) => ({
-            timestamp: new Date(Date.now() - i * 30000).toISOString(),
-            success: Math.random() > 0.1,
-            responseTime: Math.floor(Math.random() * 200 + 250),
-            error: Math.random() > 0.8 ? 'Query timeout' : undefined
-          }))
-        },
-        {
-          id: '3',
-          name: 'CDN',
-          category: 'network',
-          status: 'up',
-          uptime: 100,
-          responseTime: Math.floor(Math.random() * 20 + 30),
-          lastCheck: new Date(Date.now() - Math.random() * 30000).toISOString(),
-          machine: 'CDN-Global',
-          url: 'https://cdn.yorkhost.com',
-          checkHistory: Array.from({ length: 20 }, (_, i) => ({
-            timestamp: new Date(Date.now() - i * 30000).toISOString(),
-            success: true,
-            responseTime: Math.floor(Math.random() * 20 + 25)
-          }))
-        },
-        {
-          id: '4',
-          name: 'Auth Service',
-          category: 'api',
-          status: 'up',
-          uptime: 99.8 + (Math.random() * 0.2),
-          responseTime: Math.floor(Math.random() * 30 + 70),
-          lastCheck: new Date(Date.now() - Math.random() * 45000).toISOString(),
-          machine: 'Server-01',
-          url: 'https://auth.yorkhost.com',
-          checkHistory: Array.from({ length: 20 }, (_, i) => ({
-            timestamp: new Date(Date.now() - i * 30000).toISOString(),
-            success: Math.random() > 0.02,
-            responseTime: Math.floor(Math.random() * 40 + 60)
-          }))
-        },
-        {
-          id: '5',
-          name: 'File Storage',
-          category: 'storage',
-          status: 'down',
-          uptime: 95.1,
-          responseTime: 0,
-          lastCheck: new Date(Date.now() - Math.random() * 300000).toISOString(),
-          machine: 'Storage-01',
-          checkHistory: Array.from({ length: 20 }, (_, i) => ({
-            timestamp: new Date(Date.now() - i * 30000).toISOString(),
-            success: i > 5 ? false : Math.random() > 0.3,
-            responseTime: i > 5 ? 0 : Math.floor(Math.random() * 500 + 200),
-            error: i > 5 ? 'Service unavailable' : undefined
-          }))
-        }
-      ]
+      const response = await fetch('/api/admin/monitoring')
+      const result = await response.json()
       
-      const mockMetrics: SystemMetric[] = [
-        {
-          name: 'Services en ligne',
-          value: mockServices.filter(s => s.status === 'up').length,
-          unit: '',
-          status: 'good',
-          trend: 'stable',
-          change: 0
-        },
-        {
-          name: 'Temps de réponse moyen',
-          value: Math.round(mockServices.reduce((acc, s) => acc + s.responseTime, 0) / mockServices.length),
-          unit: 'ms',
-          status: 'good',
-          trend: 'down',
-          change: -5.2
-        },
-        {
-          name: 'Uptime global',
-          value: Math.round(mockServices.reduce((acc, s) => acc + s.uptime, 0) / mockServices.length * 100) / 100,
-          unit: '%',
-          status: 'good',
-          trend: 'up',
-          change: 0.1
-        },
-        {
-          name: 'Incidents actifs',
-          value: mockServices.filter(s => s.status === 'down').length,
-          unit: '',
-          status: mockServices.filter(s => s.status === 'down').length > 0 ? 'critical' : 'good',
-          trend: 'stable',
-          change: 0
-        }
-      ]
-      
-      setServices(mockServices)
-      setMetrics(mockMetrics)
-      setLastUpdate(new Date())
+      if (result.success) {
+        setServices(result.data.services)
+        setMetrics(result.data.metrics)
+        setLastUpdate(new Date())
+      } else {
+        console.error('Monitoring API error:', result.error)
+        setServices([])
+        setMetrics([])
+      }
       
     } catch (error) {
       console.error('Failed to fetch monitoring data:', error)
+      setServices([])
+      setMetrics([])
     } finally {
       setLoading(false)
       setRefreshing(false)
