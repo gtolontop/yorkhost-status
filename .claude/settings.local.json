@@ -9,7 +9,9 @@
       "Bash(grep:*)",
       "Bash(npm run build:*)",
       "Bash(find:*)",
-      "Bash(npx prisma migrate dev:*)"
+      "Bash(npx prisma migrate dev:*)",
+      "WebFetch(domain:yorkhost-status.vercel.app)",
+      "Bash(npm run dev:*)"
     ],
     "deny": []
   }

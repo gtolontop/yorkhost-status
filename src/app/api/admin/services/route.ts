@@ -11,6 +11,42 @@ const createServiceSchema = z.object({
   icon: z.string().optional()
 })
 
+export async function GET(request: NextRequest) {
+  try {
+    const auth = await requireAuth(request)
+
+    if (!auth.authorized) {
+      return NextResponse.json({
+        success: false,
+        error: auth.error || 'Unauthorized'
+      }, { status: 401 })
+    }
+
+    const services = await prisma.service.findMany({
+      include: {
+        machine: true,
+        checks: {
+          orderBy: { timestamp: 'desc' },
+          take: 1
+        }
+      },
+      orderBy: { name: 'asc' }
+    })
+
+    return NextResponse.json({
+      success: true,
+      data: services
+    })
+  } catch (error) {
+    console.error('Admin services fetch error:', error)
+    
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to fetch services'
+    }, { status: 500 })
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const auth = await requireAuth(request)

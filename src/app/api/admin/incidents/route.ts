@@ -21,6 +21,59 @@ const updateIncidentSchema = z.object({
   message: z.string().min(1)
 })
 
+export async function GET(request: NextRequest) {
+  try {
+    const auth = await requireAuth(request)
+
+    if (!auth.authorized) {
+      return NextResponse.json({
+        success: false,
+        error: auth.error || 'Unauthorized'
+      }, { status: 401 })
+    }
+
+    const incidents = await prisma.incident.findMany({
+      include: {
+        updates: {
+          orderBy: { createdAt: 'desc' }
+        },
+        service: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        machine: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        creator: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+
+    return NextResponse.json({
+      success: true,
+      data: incidents
+    })
+  } catch (error) {
+    console.error('Admin incidents fetch error:', error)
+    
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to fetch incidents'
+    }, { status: 500 })
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const auth = await requireAuth(request)

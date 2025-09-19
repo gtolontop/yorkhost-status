@@ -227,8 +227,7 @@ export default function AdminPage() {
                   <button 
                     className={styles.actionBtn}
                     onClick={() => {
-                      // Pour l'instant, on affiche une alerte car les pages détaillées ne sont pas créées
-                      alert(`Fonctionnalité "${action.title}" en cours de développement`)
+                      window.location.href = action.href
                     }}
                   >
                     Accéder
