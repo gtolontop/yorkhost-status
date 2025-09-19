@@ -2,13 +2,53 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Moon, Sun, Menu, X } from 'lucide-react'
+import { Moon, Sun, Menu, X, LogIn, User, LogOut } from 'lucide-react'
 import { useTheme } from '@/lib/hooks/useTheme'
 import styles from './Header.module.scss'
 
+interface User {
+  id: string
+  username: string
+  avatar?: string
+}
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
   const { theme, toggleTheme } = useTheme()
+
+  useEffect(() => {
+    checkAuth()
+  }, [])
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch('/api/auth/me')
+      const result = await response.json()
+      if (result.success && result.data) {
+        setUser(result.data)
+      }
+    } catch (error) {
+      console.error('Auth check error:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleLogin = () => {
+    window.location.href = '/api/auth/discord'
+  }
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      setUser(null)
+      window.location.reload()
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
