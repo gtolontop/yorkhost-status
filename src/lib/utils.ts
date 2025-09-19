@@ -129,3 +129,68 @@ export function formatBytes(bytes: number, decimals: number = 2): string {
 export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
+
+/**
+ * Get severity color for incidents
+ */
+export function getSeverityColor(severity: string): string {
+  switch (severity) {
+    case 'low':
+      return 'var(--color-info)'
+    case 'medium':
+      return 'var(--color-warning)'
+    case 'high':
+      return 'var(--color-danger)'
+    case 'critical':
+      return 'var(--color-danger)'
+    default:
+      return 'var(--color-secondary)'
+  }
+}
+
+/**
+ * Group array by key function
+ */
+export function groupBy<T, K extends string | number | symbol>(
+  array: T[],
+  keyFn: (item: T) => K
+): Record<K, T[]> {
+  return array.reduce((groups, item) => {
+    const key = keyFn(item)
+    if (!groups[key]) {
+      groups[key] = []
+    }
+    groups[key].push(item)
+    return groups
+  }, {} as Record<K, T[]>)
+}
+
+/**
+ * Safe localStorage wrapper for client-side usage
+ */
+export const localStorage = {
+  getItem: (key: string): string | null => {
+    if (typeof window === 'undefined') return null
+    try {
+      return window.localStorage.getItem(key)
+    } catch {
+      return null
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    if (typeof window === 'undefined') return
+    try {
+      window.localStorage.setItem(key, value)
+    } catch {
+      // Ignore localStorage errors
+    }
+  },
+  removeItem: (key: string): void => {
+    if (typeof window === 'undefined') return
+    try {
+      window.localStorage.removeItem(key)
+    } catch {
+      // Ignore localStorage errors
+    }
+  }
+}
