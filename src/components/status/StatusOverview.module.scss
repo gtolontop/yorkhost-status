@@ -64,7 +64,7 @@
   color: var(--text-primary);
   margin-bottom: var(--space-2);
   
-  @include respond-to('md') {
+  @media (min-width: 768px) {
     font-size: var(--text-3xl);
   }
 }
