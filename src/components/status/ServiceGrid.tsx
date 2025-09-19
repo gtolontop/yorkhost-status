@@ -24,7 +24,7 @@ export default function ServiceGrid({ services }: ServiceGridProps) {
   }
 
   // Group services by machine category
-  const servicesByCategory = groupBy(services, 'machine')
+  const servicesByCategory = groupBy(services, (service) => service.machine?.category || 'uncategorized')
   const categories = Object.keys(servicesByCategory)
 
   if (services.length === 0) {
