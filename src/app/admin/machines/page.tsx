@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
 import CreateMachineModal from '@/components/admin/CreateMachineModal'
+import EditMachineModal from '@/components/admin/EditMachineModal'
 import '../admin.css'
 import { 
   Plus, 
