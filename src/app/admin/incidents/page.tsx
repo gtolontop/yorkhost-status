@@ -29,8 +29,8 @@ interface Incident {
   serviceId?: string
   machineId?: string
   tags: string[]
-  createdAt: string
-  updatedAt: string
+  startTime: string
+  endTime?: string
   creator: {
     username: string
     avatar?: string
@@ -386,7 +386,7 @@ export default function AdminIncidentsPage() {
                     
                     <div className={styles.incidentDate}>
                       <Clock size={14} />
-                      <span>{new Date(incident.createdAt).toLocaleDateString('fr-FR')}</span>
+                      <span>{new Date(incident.startTime).toLocaleDateString('fr-FR')}</span>
                     </div>
                     
                     {incident.service && (
