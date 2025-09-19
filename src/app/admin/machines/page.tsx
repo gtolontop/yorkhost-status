@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
+import CreateMachineModal from '@/components/admin/CreateMachineModal'
 import '../admin.css'
 import { 
   Plus, 
@@ -618,6 +619,13 @@ export default function AdminMachinesPage() {
             ))
           )}
         </div>
+
+        {/* Create Machine Modal */}
+        <CreateMachineModal 
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={fetchMachines}
+        />
 
         {/* Delete Confirmation Modal */}
         {showDeleteConfirm && (
