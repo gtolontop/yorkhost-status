@@ -77,6 +77,45 @@ export default function Header() {
         </nav>
 
         <div className={styles.actions}>
+          {!loading && (
+            <div className={styles.auth}>
+              {user ? (
+                <div className={styles.userMenu}>
+                  <div className={styles.userInfo}>
+                    {user.avatar ? (
+                      <img 
+                        src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`}
+                        alt={user.username}
+                        className={styles.avatar}
+                      />
+                    ) : (
+                      <div className={styles.avatarFallback}>
+                        <User size={16} />
+                      </div>
+                    )}
+                    <span className={styles.username}>{user.username}</span>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className={styles.logoutBtn}
+                    aria-label="Déconnexion"
+                  >
+                    <LogOut size={16} />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleLogin}
+                  className={styles.loginBtn}
+                  aria-label="Connexion Discord"
+                >
+                  <LogIn size={16} />
+                  <span>Discord</span>
+                </button>
+              )}
+            </div>
+          )}
+
           <button
             onClick={toggleTheme}
             className={styles.themeToggle}
