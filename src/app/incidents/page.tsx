@@ -219,7 +219,7 @@ export default function IncidentsPage() {
                             {formatRelativeTime(new Date(update.timestamp))}
                           </div>
                           <div className={styles.updateContent}>
-                            {update.description}
+                            {update.message}
                           </div>
                         </div>
                       ))}
