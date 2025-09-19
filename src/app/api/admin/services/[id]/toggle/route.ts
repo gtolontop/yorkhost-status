@@ -34,11 +34,11 @@ export async function POST(
     }
 
     // Toggle all checks for this service
-    const newActiveState = service.checks.length > 0 ? !service.checks[0].active : true
+    const newActiveState = service.checks.length > 0 ? !service.checks[0].isActive : true
 
     await prisma.check.updateMany({
       where: { serviceId: serviceId },
-      data: { active: newActiveState }
+      data: { isActive: newActiveState }
     })
 
     // Create audit log
