@@ -1,46 +1,41 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { validateUserSession } from '@/lib/auth/jwt'
+import { NextRequest, NextResponse } from "next/server"
+import { verifyToken } from "@/lib/auth/jwt"
 
 export async function GET(request: NextRequest) {
   try {
-    const token = request.cookies.get('auth-token')?.value
+    const token = request.cookies.get("auth-token")?.value
 
-    if (!token) {
+    if (\!token) {
       return NextResponse.json({
         success: false,
-        error: 'Not authenticated'
+        error: "Not authenticated"
       }, { status: 401 })
     }
 
-    const session = await validateUserSession(token)
-
-    if (!session.valid) {
+    const payload = await verifyToken(token)
+    if (\!payload) {
       return NextResponse.json({
         success: false,
-        error: 'Invalid session'
+        error: "Invalid token"
       }, { status: 401 })
     }
 
     return NextResponse.json({
       success: true,
       data: {
-        user: {
-          id: session.user.id,
-          discordId: session.user.discordId,
-          username: session.user.username,
-          avatar: session.user.avatar,
-          email: session.user.email,
-          role: session.payload?.role,
-          permissions: session.payload?.permissions
-        }
+        id: payload.userId,
+        username: payload.username,
+        avatar: payload.avatar
       }
     })
   } catch (error) {
-    console.error('Auth me error:', error)
+    console.error("Auth check error:", error)
     
     return NextResponse.json({
       success: false,
-      error: 'Internal server error'
+      error: "Authentication error"
     }, { status: 500 })
   }
 }
+
+export const dynamic = "force-dynamic"
