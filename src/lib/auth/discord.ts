@@ -160,6 +160,7 @@ export class DiscordAuth {
     hasAccess: boolean
     dbUser?: any
   }> {
+    this.checkConfig()
     try {
       // Exchange code for token
       const tokenData = await this.exchangeCodeForToken(code)
@@ -252,6 +253,7 @@ export class DiscordAuth {
     refresh_token: string
     expires_in: number
   }> {
+    this.checkConfig()
     try {
       const response = await axios.post(
         'https://discord.com/api/oauth2/token',
