@@ -604,9 +604,13 @@ export default function AdminMachinesPage() {
                     <button 
                       className="btn btn-secondary"
                       style={{ fontSize: '0.8rem', padding: '0.5rem 0.75rem' }}
+                      onClick={() => {
+                        setEditingMachine(machine)
+                        setShowEditModal(true)
+                      }}
                     >
                       <Edit size={14} />
-                      Modifier
+                      Edit
                     </button>
                     <button 
                       className="btn btn-danger"
