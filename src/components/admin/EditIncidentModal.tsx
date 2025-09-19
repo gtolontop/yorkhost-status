@@ -100,17 +100,17 @@ export default function EditIncidentModal({ isOpen, onClose, onSuccess, incident
   if (!isOpen) return null
 
   const severityOptions = [
-    { value: 'low', label: 'Faible', color: '#10b981' },
-    { value: 'medium', label: 'Moyen', color: '#f59e0b' },
-    { value: 'high', label: 'Élevé', color: '#f97316' },
-    { value: 'critical', label: 'Critique', color: '#ef4444' }
+    { value: 'low', label: 'Low', color: '#10b981' },
+    { value: 'medium', label: 'Medium', color: '#f59e0b' },
+    { value: 'high', label: 'High', color: '#f97316' },
+    { value: 'critical', label: 'Critical', color: '#ef4444' }
   ]
 
   const statusOptions = [
-    { value: 'investigating', label: 'En investigation' },
-    { value: 'identified', label: 'Identifié' },
-    { value: 'monitoring', label: 'Surveillance' },
-    { value: 'resolved', label: 'Résolu' }
+    { value: 'investigating', label: 'Investigating' },
+    { value: 'identified', label: 'Identified' },
+    { value: 'monitoring', label: 'Monitoring' },
+    { value: 'resolved', label: 'Resolved' }
   ]
 
   return (
@@ -142,7 +142,7 @@ export default function EditIncidentModal({ isOpen, onClose, onSuccess, incident
           marginBottom: '1.5rem'
         }}>
           <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
-            Modifier l'incident
+            Edit Incident
           </h2>
           <button
             onClick={onClose}
@@ -181,7 +181,7 @@ export default function EditIncidentModal({ isOpen, onClose, onSuccess, incident
               marginBottom: '0.5rem',
               color: '#374151'
             }}>
-              Titre de l'incident *
+              Incident Title *
             </label>
             <input
               type="text"
@@ -231,7 +231,7 @@ export default function EditIncidentModal({ isOpen, onClose, onSuccess, incident
               marginBottom: '0.5rem',
               color: '#374151'
             }}>
-              Sévérité *
+              Severity *
             </label>
             <select
               value={formData.severity}
@@ -261,7 +261,7 @@ export default function EditIncidentModal({ isOpen, onClose, onSuccess, incident
               marginBottom: '0.5rem',
               color: '#374151'
             }}>
-              Statut *
+              Status *
             </label>
             <select
               value={formData.status}
@@ -291,7 +291,7 @@ export default function EditIncidentModal({ isOpen, onClose, onSuccess, incident
               marginBottom: '0.5rem',
               color: '#374151'
             }}>
-              Service affecté
+              Affected Service
             </label>
             <select
               value={formData.serviceId}
@@ -304,7 +304,7 @@ export default function EditIncidentModal({ isOpen, onClose, onSuccess, incident
                 fontSize: '0.875rem'
               }}
             >
-              <option value="">Aucun service spécifique</option>
+              <option value="">No specific service</option>
               {services.map((service) => (
                 <option key={service.id} value={service.id}>
                   {service.name}
@@ -332,7 +332,7 @@ export default function EditIncidentModal({ isOpen, onClose, onSuccess, incident
                 cursor: 'pointer'
               }}
             >
-              Annuler
+              Cancel
             </button>
             <button
               type="submit"
@@ -348,7 +348,7 @@ export default function EditIncidentModal({ isOpen, onClose, onSuccess, incident
                 cursor: loading ? 'not-allowed' : 'pointer'
               }}
             >
-              {loading ? 'Mise à jour...' : 'Mettre à jour'}
+              {loading ? 'Updating...' : 'Update'}
             </button>
           </div>
         </form>
