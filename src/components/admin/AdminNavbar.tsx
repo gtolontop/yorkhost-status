@@ -82,26 +82,6 @@ export default function AdminNavbar({ title, subtitle, onMenuToggle }: AdminNavb
         </div>
       </div>
 
-      <div className={styles.navbarCenter}>
-        <div className={styles.searchContainer}>
-          <Search size={18} />
-          <input
-            type="text"
-            placeholder="Rechercher services, incidents..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button 
-              className={styles.clearSearch}
-              onClick={() => setSearchQuery('')}
-            >
-              ×
-            </button>
-          )}
-        </div>
-      </div>
-
       <div className={styles.navbarRight}>
         <div className={styles.statusIndicator}>
           <div className={styles.statusDot}></div>
