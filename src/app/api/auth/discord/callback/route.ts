@@ -31,13 +31,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Create JWT session
-    const token = await createUserSession(authResult.dbUser)
+    const sessionData = await createUserSession(authResult.dbUser)
 
     // Create response with redirect to admin dashboard
     const response = NextResponse.redirect(new URL('/admin', request.url))
 
     // Set secure HTTP-only cookie with JWT
-    response.cookies.set('auth-token', token, {
+    response.cookies.set('auth-token', sessionData.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
