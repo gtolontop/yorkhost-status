@@ -250,3 +250,120 @@ export async function getStatusOverview() {
     lastUpdated: new Date()
   }
 }
+
+/**
+ * Get dashboard statistics for admin panel
+ */
+export async function getDashboardStats() {
+  const now = new Date()
+  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+
+  const [
+    totalServices,
+    totalChecks,
+    activeIncidents,
+    checksLast24h,
+    failedChecksLast24h,
+    allServices
+  ] = await Promise.all([
+    prisma.service.count(),
+    prisma.check.count(),
+    prisma.incident.count({
+      where: {
+        status: {
+          in: ['investigating', 'identified', 'monitoring']
+        }
+      }
+    }),
+    prisma.checkResult.count({
+      where: {
+        timestamp: { gte: yesterday }
+      }
+    }),
+    prisma.checkResult.count({
+      where: {
+        timestamp: { gte: yesterday },
+        success: false
+      }
+    }),
+    prisma.service.findMany({
+      include: {
+        checks: {
+          include: {
+            results: {
+              where: {
+                timestamp: { gte: yesterday }
+              }
+            }
+          }
+        }
+      }
+    })
+  ])
+
+  // Calculate average uptime
+  let totalUptime = 0
+  let serviceCount = 0
+
+  for (const service of allServices) {
+    const stats = await getServiceStats(service.id)
+    totalUptime += stats.uptimePercent24h
+    serviceCount++
+  }
+
+  const averageUptime = serviceCount > 0 ? totalUptime / serviceCount : 100
+
+  // Calculate response time P95
+  const allResponseTimes = await prisma.checkResult.findMany({
+    where: {
+      timestamp: { gte: yesterday },
+      success: true,
+      responseTime: { not: null }
+    },
+    select: {
+      responseTime: true
+    },
+    orderBy: {
+      responseTime: 'asc'
+    }
+  })
+
+  const responseTimeP95 = allResponseTimes.length > 0
+    ? allResponseTimes[Math.floor(allResponseTimes.length * 0.95)]?.responseTime || 0
+    : 0
+
+  // Calculate MTTR (Mean Time To Recovery)
+  const resolvedIncidents = await prisma.incident.findMany({
+    where: {
+      status: 'resolved',
+      endTime: { not: null },
+      startTime: { gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) }
+    },
+    select: {
+      startTime: true,
+      endTime: true
+    }
+  })
+
+  let totalRecoveryTime = 0
+  resolvedIncidents.forEach(incident => {
+    if (incident.endTime) {
+      totalRecoveryTime += incident.endTime.getTime() - incident.startTime.getTime()
+    }
+  })
+
+  const mttr = resolvedIncidents.length > 0
+    ? totalRecoveryTime / resolvedIncidents.length / (1000 * 60) // Convert to minutes
+    : 0
+
+  return {
+    totalServices,
+    totalChecks,
+    activeIncidents,
+    averageUptime: Math.round(averageUptime * 100) / 100,
+    checksLast24h,
+    failedChecksLast24h,
+    responseTimeP95: Math.round(responseTimeP95),
+    mttr: Math.round(mttr)
+  }
+}
