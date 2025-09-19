@@ -365,6 +365,10 @@ export default function AdminMonitorsPage() {
                             <button 
                               className="btn btn-secondary"
                               style={{ fontSize: '0.8rem', padding: '0.5rem 0.75rem' }}
+                              onClick={() => {
+                                setEditingMonitor(monitor)
+                                setShowEditModal(true)
+                              }}
                             >
                               <Edit size={14} />
                             </button>
@@ -392,6 +396,23 @@ export default function AdminMonitorsPage() {
           onClose={() => setShowCreateModal(false)}
           onSuccess={fetchMonitors}
         />
+
+        {/* Edit Monitor Modal */}
+        {editingMonitor && (
+          <EditMonitorModal 
+            isOpen={showEditModal}
+            onClose={() => {
+              setShowEditModal(false)
+              setEditingMonitor(null)
+            }}
+            onSuccess={() => {
+              fetchMonitors()
+              setShowEditModal(false)
+              setEditingMonitor(null)
+            }}
+            monitor={editingMonitor}
+          />
+        )}
 
         {/* Create Group Modal */}
         {showCreateGroupModal && (
