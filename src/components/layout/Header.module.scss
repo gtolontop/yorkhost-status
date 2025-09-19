@@ -110,6 +110,113 @@
   gap: var(--space-3);
 }
 
+.auth {
+  display: flex;
+  align-items: center;
+}
+
+.loginBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: linear-gradient(135deg, #5865f2, #7289da);
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: var(--transition-all);
+  
+  &:hover {
+    background: linear-gradient(135deg, #4752c4, #5b6cd9);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
+  }
+  
+  &:focus {
+    outline: 2px solid #5865f2;
+    outline-offset: 2px;
+  }
+  
+  @media (max-width: 640px) {
+    span {
+      display: none;
+    }
+  }
+}
+
+.userMenu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  transition: var(--transition-colors);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-2);
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatarFallback {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+}
+
+.username {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  
+  @media (max-width: 640px) {
+    display: none;
+  }
+}
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background-color: transparent;
+  color: var(--text-tertiary);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-all);
+  
+  &:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--color-danger);
+  }
+  
+  &:focus {
+    outline: 2px solid var(--color-danger);
+    outline-offset: 2px;
+  }
+}
+
 .themeToggle {
   display: flex;
   align-items: center;
