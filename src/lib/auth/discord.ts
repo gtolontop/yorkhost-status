@@ -53,6 +53,7 @@ export class DiscordAuth {
     refresh_token: string
     expires_in: number
   }> {
+    this.checkConfig()
     try {
       const response = await axios.post(
         'https://discord.com/api/oauth2/token',
@@ -78,6 +79,7 @@ export class DiscordAuth {
   }
 
   async getUser(accessToken: string): Promise<DiscordUser> {
+    this.checkConfig()
     try {
       const response = await axios.get('https://discord.com/api/users/@me', {
         headers: {
