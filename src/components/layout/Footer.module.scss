@@ -1,4 +1,4 @@
-@import '@/styles/tokens.scss';
+/* Using CSS variables defined in globals.css */
 
 .footer {
   background-color: var(--bg-secondary);
@@ -17,7 +17,7 @@
   gap: var(--space-12);
   margin-bottom: var(--space-12);
   
-  @include respond-to('md') {
+  @media (min-width: 768px) {
     grid-template-columns: 1fr 2fr;
     gap: var(--space-16);
   }
@@ -43,7 +43,7 @@
   display: grid;
   gap: var(--space-8);
   
-  @include respond-to('sm') {
+  @media (min-width: 640px) {
     grid-template-columns: repeat(3, 1fr);
   }
 }
@@ -92,7 +92,7 @@
   padding-top: var(--space-8);
   border-top: 1px solid var(--border-color);
   
-  @include respond-to('md') {
+  @media (min-width: 768px) {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;

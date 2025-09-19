@@ -1,4 +1,4 @@
-@import '@/styles/tokens.scss';
+/* Removed global imports - using CSS variables defined in globals.css */
 
 .header {
   background-color: var(--bg-primary);
@@ -42,7 +42,7 @@
 }
 
 .logoText {
-  @include respond-to('sm') {
+  @media (min-width: 640px) {
     display: inline;
   }
 }

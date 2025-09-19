@@ -1,4 +1,4 @@
-@import '@/styles/tokens.scss';
+/* Using CSS variables defined in globals.css */
 
 .layout {
   min-height: 100vh;
@@ -12,11 +12,11 @@
   flex: 1;
   padding: var(--space-6) 0;
   
-  @include respond-to('md') {
+  @media (min-width: 768px) {
     padding: var(--space-8) 0;
   }
   
-  @include respond-to('lg') {
+  @media (min-width: 1024px) {
     padding: var(--space-12) 0;
   }
 }
