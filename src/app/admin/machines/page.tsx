@@ -634,6 +634,23 @@ export default function AdminMachinesPage() {
           onSuccess={fetchMachines}
         />
 
+        {/* Edit Machine Modal */}
+        {editingMachine && (
+          <EditMachineModal 
+            isOpen={showEditModal}
+            onClose={() => {
+              setShowEditModal(false)
+              setEditingMachine(null)
+            }}
+            onSuccess={() => {
+              fetchMachines()
+              setShowEditModal(false)
+              setEditingMachine(null)
+            }}
+            machine={editingMachine}
+          />
+        )}
+
         {/* Delete Confirmation Modal */}
         {showDeleteConfirm && (
           <div style={{

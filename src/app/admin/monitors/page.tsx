@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
 import CreateMonitorModal from '@/components/admin/CreateMonitorModal'
+import EditMonitorModal from '@/components/admin/EditMonitorModal'
 import '../admin.css'
 import { 
   Plus, 
