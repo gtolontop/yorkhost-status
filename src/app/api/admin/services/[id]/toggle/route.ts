@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await requireAuth(request)
@@ -16,7 +16,7 @@ export async function POST(
       }, { status: 401 })
     }
 
-    const serviceId = params.id
+    const { id: serviceId } = await params
 
     // Get current service
     const service = await prisma.service.findUnique({
