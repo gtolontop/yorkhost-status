@@ -409,17 +409,7 @@ export default function AdminMonitoringPage() {
               border: '1px solid #e5e7eb',
               borderRadius: '16px',
               padding: '1.5rem',
-              transition: 'all 0.2s ease',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)'
-              e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = 'none'
+              position: 'relative'
             }}
             >
               {/* Status indicator */}

@@ -456,16 +456,7 @@ export default function AdminIncidentsPage() {
                 background: 'white',
                 border: '1px solid #e5e7eb',
                 borderRadius: '16px',
-                padding: '2rem',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-1px)'
-                e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = 'none'
+                padding: '2rem'
               }}
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.5rem' }}>
