@@ -11,7 +11,7 @@ export interface JWTPayload {
   exp?: number
 }
 
-export function createToken(payload: Omit<JWTPayload, "iat"  < /dev/null |  "exp">): string {
+export function createToken(payload: Omit<JWTPayload, "iat" | "exp">): string {
   return jwt.sign(payload, JWT_SECRET, {
     expiresIn: "7d"
   })
@@ -33,7 +33,7 @@ export function requireAuth(allowedRoles?: string[]) {
       const authHeader = request.headers.get("authorization")
       const token = authHeader?.replace("Bearer ", "")
 
-      if (\!token) {
+      if (!token) {
         return new Response(JSON.stringify({
           success: false,
           error: "Authentication required"
@@ -44,7 +44,7 @@ export function requireAuth(allowedRoles?: string[]) {
       }
 
       const payload = await verifyToken(token)
-      if (\!payload) {
+      if (!payload) {
         return new Response(JSON.stringify({
           success: false,
           error: "Invalid token"
