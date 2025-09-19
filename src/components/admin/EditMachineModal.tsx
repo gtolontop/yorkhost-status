@@ -82,17 +82,17 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
   if (!isOpen) return null
 
   const categoryOptions = [
-    { value: 'web', label: 'Serveur Web' },
-    { value: 'database', label: 'Base de données' },
+    { value: 'web', label: 'Web Server' },
+    { value: 'database', label: 'Database' },
     { value: 'api', label: 'API Server' },
     { value: 'cache', label: 'Cache/Redis' },
     { value: 'cdn', label: 'CDN' },
     { value: 'monitoring', label: 'Monitoring' },
     { value: 'backup', label: 'Backup' },
-    { value: 'storage', label: 'Stockage' },
-    { value: 'network', label: 'Réseau' },
-    { value: 'security', label: 'Sécurité' },
-    { value: 'other', label: 'Autre' }
+    { value: 'storage', label: 'Storage' },
+    { value: 'network', label: 'Network' },
+    { value: 'security', label: 'Security' },
+    { value: 'other', label: 'Other' }
   ]
 
   return (
@@ -124,7 +124,7 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
           marginBottom: '1.5rem'
         }}>
           <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
-            Modifier la machine
+            Edit Machine
           </h2>
           <button
             onClick={onClose}
@@ -163,7 +163,7 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
               marginBottom: '0.5rem',
               color: '#374151'
             }}>
-              Nom de la machine *
+              Machine Name *
             </label>
             <input
               type="text"
@@ -188,7 +188,7 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
               marginBottom: '0.5rem',
               color: '#374151'
             }}>
-              Catégorie *
+              Category *
             </label>
             <select
               value={formData.category}
@@ -202,7 +202,7 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
                 fontSize: '0.875rem'
               }}
             >
-              <option value="">Sélectionner une catégorie</option>
+              <option value="">Select a category</option>
               {categoryOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -219,13 +219,13 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
               marginBottom: '0.5rem',
               color: '#374151'
             }}>
-              Localisation
+              Location
             </label>
             <input
               type="text"
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              placeholder="Ex: Datacenter Paris, AWS eu-west-1"
+              placeholder="Ex: Paris Datacenter, AWS eu-west-1"
               style={{
                 width: '100%',
                 padding: '0.75rem',
@@ -244,7 +244,7 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
               marginBottom: '0.5rem',
               color: '#374151'
             }}>
-              Adresse IP
+              IP Address
             </label>
             <input
               type="text"
@@ -275,7 +275,7 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              placeholder="Description de la machine et de son rôle..."
+              placeholder="Machine description and role..."
               style={{
                 width: '100%',
                 padding: '0.75rem',
@@ -302,7 +302,7 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
                 onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                 style={{ marginRight: '0.5rem' }}
               />
-              Machine active
+              Active machine
             </label>
           </div>
 
@@ -325,7 +325,7 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
                 cursor: 'pointer'
               }}
             >
-              Annuler
+              Cancel
             </button>
             <button
               type="submit"
@@ -341,7 +341,7 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
                 cursor: loading ? 'not-allowed' : 'pointer'
               }}
             >
-              {loading ? 'Mise à jour...' : 'Mettre à jour'}
+              {loading ? 'Updating...' : 'Update'}
             </button>
           </div>
         </form>
