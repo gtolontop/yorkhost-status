@@ -94,12 +94,12 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
   ]
 
   const intervalOptions = [
-    { value: 30, label: '30 secondes' },
+    { value: 30, label: '30 seconds' },
     { value: 60, label: '1 minute' },
     { value: 300, label: '5 minutes' },
     { value: 600, label: '10 minutes' },
     { value: 1800, label: '30 minutes' },
-    { value: 3600, label: '1 heure' }
+    { value: 3600, label: '1 hour' }
   ]
 
   return (
@@ -131,7 +131,7 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
           marginBottom: '1.5rem'
         }}>
           <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
-            Modifier le monitor
+            Edit Monitor
           </h2>
           <button
             onClick={onClose}
@@ -170,7 +170,7 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
               marginBottom: '0.5rem',
               color: '#374151'
             }}>
-              Nom du monitor *
+              Monitor Name *
             </label>
             <input
               type="text"
@@ -195,7 +195,7 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
               marginBottom: '0.5rem',
               color: '#374151'
             }}>
-              Type de monitoring *
+              Monitoring Type *
             </label>
             <select
               value={formData.type}
@@ -225,7 +225,7 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
               marginBottom: '0.5rem',
               color: '#374151'
             }}>
-              Cible *
+              Target *
             </label>
             <input
               type="text"
@@ -257,13 +257,13 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
                 marginBottom: '0.5rem',
                 color: '#374151'
               }}>
-                Port {formData.type === 'TCP' ? '*' : '(optionnel)'}
+                Port {formData.type === 'TCP' ? '*' : '(optional)'}
               </label>
               <input
                 type="number"
                 value={formData.port}
                 onChange={(e) => setFormData({ ...formData, port: e.target.value })}
-                placeholder={formData.type === 'HTTP' ? '80 ou 443' : '22, 3306, 5432...'}
+                placeholder={formData.type === 'HTTP' ? '80 or 443' : '22, 3306, 5432...'}
                 min="1"
                 max="65535"
                 required={formData.type === 'TCP'}
@@ -286,7 +286,7 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
               marginBottom: '0.5rem',
               color: '#374151'
             }}>
-              Timeout (secondes)
+              Timeout (seconds)
             </label>
             <input
               type="number"
@@ -312,7 +312,7 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
               marginBottom: '0.5rem',
               color: '#374151'
             }}>
-              Intervalle de vérification
+              Check Interval
             </label>
             <select
               value={formData.interval}
@@ -348,7 +348,7 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
                 onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                 style={{ marginRight: '0.5rem' }}
               />
-              Monitor actif
+              Active monitor
             </label>
           </div>
 
@@ -371,7 +371,7 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
                 cursor: 'pointer'
               }}
             >
-              Annuler
+              Cancel
             </button>
             <button
               type="submit"
@@ -387,7 +387,7 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
                 cursor: loading ? 'not-allowed' : 'pointer'
               }}
             >
-              {loading ? 'Mise à jour...' : 'Mettre à jour'}
+              {loading ? 'Updating...' : 'Update'}
             </button>
           </div>
         </form>
