@@ -8,32 +8,13 @@ export default function ContactPage() {
   return (
     <Layout>
       <div className="container">
-        <div style={{ 
-          textAlign: 'center', 
-          padding: '60px 20px',
-          maxWidth: '800px',
-          margin: '0 auto'
-        }}>
-          <MessageCircle size={64} style={{ color: 'var(--color-primary)', marginBottom: '24px' }} />
-          
-          <h1 style={{
-            fontSize: '2.5rem',
-            fontWeight: '700',
-            color: 'var(--text-primary)',
-            marginBottom: '16px'
-          }}>
-            Get in Touch
-          </h1>
-          
-          <p style={{
-            fontSize: '1.125rem',
-            color: 'var(--text-secondary)',
-            marginBottom: '48px',
-            lineHeight: '1.6'
-          }}>
-            Need help or have questions about our services? We're here to help.
-          </p>
+        <PageHeader
+          icon={<MessageCircle size={96} />}
+          title="Get in Touch"
+          subtitle="Need help or have questions about our services? We're here to help."
+        />
 
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <div style={{
             display: 'grid',
             gap: '24px',
