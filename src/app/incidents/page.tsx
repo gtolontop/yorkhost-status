@@ -66,15 +66,15 @@ export default function IncidentsPage() {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'INVESTIGATING':
-        return 'En investigation'
+        return 'Investigating'
       case 'IDENTIFIED':
-        return 'Identifié'
+        return 'Identified'
       case 'MONITORING':
-        return 'Surveillance'
+        return 'Monitoring'
       case 'RESOLVED':
-        return 'Résolu'
+        return 'Resolved'
       case 'SCHEDULED':
-        return 'Planifié'
+        return 'Scheduled'
       default:
         return status
     }
@@ -83,13 +83,13 @@ export default function IncidentsPage() {
   const getSeverityLabel = (severity: string) => {
     switch (severity) {
       case 'LOW':
-        return 'Faible'
+        return 'Low'
       case 'MEDIUM':
-        return 'Moyen'
+        return 'Medium'
       case 'HIGH':
-        return 'Élevé'
+        return 'High'
       case 'CRITICAL':
-        return 'Critique'
+        return 'Critical'
       default:
         return severity
     }
@@ -101,7 +101,7 @@ export default function IncidentsPage() {
         <div className="container">
           <div className={styles.loading}>
             <div className={styles.spinner}></div>
-            <p>Chargement des incidents...</p>
+            <p>Loading incidents...</p>
           </div>
         </div>
       </Layout>
@@ -113,10 +113,10 @@ export default function IncidentsPage() {
       <Layout>
         <div className="container">
           <div className={styles.error}>
-            <h2>Erreur de chargement</h2>
+            <h2>Loading Error</h2>
             <p>{error}</p>
             <button onClick={fetchIncidents} className="btn btn-primary">
-              Réessayer
+              Try Again
             </button>
           </div>
         </div>
@@ -128,15 +128,15 @@ export default function IncidentsPage() {
     <Layout>
       <div className="container">
         <div className={styles.header}>
-          <h1>Historique des incidents</h1>
-          <p>Suivi des incidents et maintenances sur les services Yorkhost</p>
+          <h1>Incident History</h1>
+          <p>Track incidents and maintenance on Yorkhost services</p>
         </div>
 
         <div className={styles.filters}>
           <div className={styles.searchBox}>
             <input
               type="text"
-              placeholder="Rechercher un incident..."
+              placeholder="Search incidents..."
               value={filter.search || ''}
               onChange={(e) => setFilter(prev => ({ ...prev, search: e.target.value }))}
               className={styles.searchInput}
@@ -145,7 +145,7 @@ export default function IncidentsPage() {
           
           <div className={styles.filterTags}>
             <div className={styles.filterGroup}>
-              <span>Statut:</span>
+              <span>Status:</span>
               {['INVESTIGATING', 'IDENTIFIED', 'MONITORING', 'RESOLVED'].map(status => (
                 <button
                   key={status}
@@ -169,8 +169,8 @@ export default function IncidentsPage() {
         <div className={styles.incidents}>
           {incidents.length === 0 ? (
             <div className={styles.empty}>
-              <h3>Aucun incident trouvé</h3>
-              <p>Aucun incident ne correspond aux critères de recherche.</p>
+              <h3>No incidents found</h3>
+              <p>No incidents match the search criteria.</p>
             </div>
           ) : (
             incidents.map((incident) => (
@@ -206,13 +206,13 @@ export default function IncidentsPage() {
                   
                   {incident.service && (
                     <div className={styles.affectedService}>
-                      <span>Service affecté: <strong>{incident.service.name}</strong></span>
+                      <span>Affected service: <strong>{incident.service.name}</strong></span>
                     </div>
                   )}
 
                   {incident.updates && incident.updates.length > 0 && (
                     <div className={styles.updates}>
-                      <h4>Mises à jour:</h4>
+                      <h4>Updates:</h4>
                       {incident.updates.slice(0, 3).map((update) => (
                         <div key={update.id} className={styles.update}>
                           <div className={styles.updateTime}>
@@ -225,7 +225,7 @@ export default function IncidentsPage() {
                       ))}
                       {incident.updates.length > 3 && (
                         <div className={styles.moreUpdates}>
-                          +{incident.updates.length - 3} autres mises à jour
+                          +{incident.updates.length - 3} more updates
                         </div>
                       )}
                     </div>
@@ -234,9 +234,9 @@ export default function IncidentsPage() {
 
                 <div className={styles.incidentFooter}>
                   <div className={styles.timeline}>
-                    <span>Début: {new Date(incident.startTime).toLocaleDateString('fr-FR')}</span>
+                    <span>Started: {new Date(incident.startTime).toLocaleDateString('en-US')}</span>
                     {incident.endTime && (
-                      <span>Fin: {new Date(incident.endTime).toLocaleDateString('fr-FR')}</span>
+                      <span>Ended: {new Date(incident.endTime).toLocaleDateString('en-US')}</span>
                     )}
                   </div>
                 </div>

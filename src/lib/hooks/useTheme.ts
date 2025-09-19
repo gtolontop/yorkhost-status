@@ -6,29 +6,20 @@ import { localStorage } from '@/lib/utils'
 export type Theme = 'light' | 'dark'
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>('light')
+  const [theme, setTheme] = useState<Theme>('dark')
 
   useEffect(() => {
-    // Get theme from localStorage or system preference
+    // Get theme from localStorage or default to dark
     const savedTheme = localStorage.getItem('theme') as Theme
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    const initialTheme = savedTheme || systemTheme
+    const initialTheme = savedTheme || 'dark'
 
     setTheme(initialTheme)
     applyTheme(initialTheme)
 
-    // Listen for system theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem('theme')) {
-        const newTheme = e.matches ? 'dark' : 'light'
-        setTheme(newTheme)
-        applyTheme(newTheme)
-      }
+    // Save initial theme to localStorage if not already saved
+    if (!savedTheme) {
+      localStorage.setItem('theme', initialTheme)
     }
-
-    mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
   }, [])
 
   const applyTheme = (newTheme: Theme) => {
