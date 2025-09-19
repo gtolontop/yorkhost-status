@@ -232,7 +232,7 @@ export async function getStatusOverview() {
 
   let overallStatus: 'operational' | 'degraded' | 'outage' = 'operational'
   
-  if (activeIncidents.some(i => i.severity === 'critical')) {
+  if (activeIncidents.some(i => i.severity === 'CRITICAL')) {
     overallStatus = 'outage'
   } else if (activeIncidents.length > 0 || averageUptime < 99) {
     overallStatus = 'degraded'
