@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
 import CreateServiceModal from '@/components/admin/CreateServiceModal'
 import CreateGroupModal from '@/components/admin/CreateGroupModal'
+import EditServiceModal from '@/components/admin/EditServiceModal'
 import '../admin.css'
 import { 
   Plus, 
@@ -62,6 +63,8 @@ export default function AdminServicesPage() {
   const [selectedGroup, setSelectedGroup] = useState<string>('all')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingService, setEditingService] = useState<Service | null>(null)
   const [selectedServices, setSelectedServices] = useState<string[]>([])
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
 
@@ -529,6 +532,10 @@ export default function AdminServicesPage() {
                           <button 
                             className="btn btn-secondary"
                             style={{ fontSize: '0.8rem', padding: '0.5rem 0.75rem' }}
+                            onClick={() => {
+                              setEditingService(service)
+                              setShowEditModal(true)
+                            }}
                           >
                             <Edit size={14} />
                             Modifier
@@ -581,6 +588,23 @@ export default function AdminServicesPage() {
             fetchGroups()
           }}
         />
+
+        {/* Edit Service Modal */}
+        {editingService && (
+          <EditServiceModal 
+            isOpen={showEditModal}
+            onClose={() => {
+              setShowEditModal(false)
+              setEditingService(null)
+            }}
+            onSuccess={() => {
+              fetchServices()
+              setShowEditModal(false)
+              setEditingService(null)
+            }}
+            service={editingService}
+          />
+        )}
 
         {/* Delete Confirmation Modal */}
         {showDeleteConfirm && (
