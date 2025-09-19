@@ -88,7 +88,10 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
     uptimeData.push({
       date: dateKey,
       uptime: Math.round(uptime * 100) / 100,
-      incidents: incidents
+      incidents: incidents.map(incident => ({
+        ...incident,
+        endTime: incident.endTime || undefined
+      }))
     })
   }
 
@@ -190,7 +193,7 @@ export async function getStatusOverview() {
     prisma.incident.findMany({
       where: {
         status: {
-          in: ['investigating', 'identified', 'monitoring']
+          in: ['INVESTIGATING', 'IDENTIFIED', 'MONITORING']
         }
       },
       include: {
@@ -271,7 +274,7 @@ export async function getDashboardStats() {
     prisma.incident.count({
       where: {
         status: {
-          in: ['investigating', 'identified', 'monitoring']
+          in: ['INVESTIGATING', 'IDENTIFIED', 'MONITORING']
         }
       }
     }),
@@ -335,7 +338,7 @@ export async function getDashboardStats() {
   // Calculate MTTR (Mean Time To Recovery)
   const resolvedIncidents = await prisma.incident.findMany({
     where: {
-      status: 'resolved',
+      status: 'RESOLVED',
       endTime: { not: null },
       startTime: { gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) }
     },
