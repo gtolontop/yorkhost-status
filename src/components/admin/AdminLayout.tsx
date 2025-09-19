@@ -78,8 +78,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className={styles.authCard}>
           <h2>Accès non autorisé</h2>
           <p>Vous devez être connecté pour accéder au panel admin.</p>
-          <button onClick={() => window.location.href = '/admin'}>
-            Retour à l'accueil
+          <button onClick={() => window.location.href = '/login'}>
+            Se connecter
           </button>
         </div>
       </div>
