@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const serviceId = params.id
+    const { id: serviceId } = await params
     const searchParams = request.nextUrl.searchParams
     const days = parseInt(searchParams.get('days') || '30')
     const from = searchParams.get('from')
