@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ServiceWithStats } from '@/types'
 import ServiceCard from './ServiceCard'
-import { Plus, GripVertical } from 'lucide-react'
+import { Plus, GripVertical, X } from 'lucide-react'
 
 interface ServiceGroup {
   id: string
@@ -17,11 +17,25 @@ interface ServiceGridWithGroupsProps {
 
 export default function ServiceGridWithGroups({ services }: ServiceGridWithGroupsProps) {
   const [expandedServices, setExpandedServices] = useState<Set<string>>(new Set())
-  const [groups, setGroups] = useState<ServiceGroup[]>([])
+  const [groups, setGroups] = useState<ServiceGroup[]>(() => {
+    // Load groups from localStorage on mount
+    if (typeof window !== 'undefined') {
+      const savedGroups = localStorage.getItem('serviceGroups')
+      return savedGroups ? JSON.parse(savedGroups) : []
+    }
+    return []
+  })
   const [draggedService, setDraggedService] = useState<string | null>(null)
   const [dragOverGroup, setDragOverGroup] = useState<string | null>(null)
   const [isCreatingGroup, setIsCreatingGroup] = useState(false)
   const [newGroupName, setNewGroupName] = useState('')
+
+  // Save groups to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('serviceGroups', JSON.stringify(groups))
+    }
+  }, [groups])
 
   const toggleService = (serviceId: string) => {
     const newExpanded = new Set(expandedServices)
@@ -115,7 +129,7 @@ export default function ServiceGridWithGroups({ services }: ServiceGridWithGroup
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
       {/* Create Group Button */}
       <div className="flex justify-end">
         {isCreatingGroup ? (
@@ -172,9 +186,10 @@ export default function ServiceGridWithGroups({ services }: ServiceGridWithGroup
             <h3 className="text-lg font-semibold text-gray-900">{group.name}</h3>
             <button
               onClick={() => deleteGroup(group.id)}
-              className="text-red-600 hover:text-red-800 text-sm"
+              className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50 transition-colors"
+              title="Delete Group"
             >
-              Delete Group
+              <X size={18} />
             </button>
           </div>
           
@@ -192,8 +207,8 @@ export default function ServiceGridWithGroups({ services }: ServiceGridWithGroup
                   className="cursor-move"
                 >
                   <div className="flex items-center gap-2">
-                    <GripVertical className="text-gray-400" size={20} />
-                    <div className="flex-1">
+                    <GripVertical className="text-gray-400 flex-shrink-0 cursor-move" size={20} />
+                    <div className="flex-1 w-full">
                       <ServiceCard
                         service={service}
                         isExpanded={expandedServices.has(service.id)}
