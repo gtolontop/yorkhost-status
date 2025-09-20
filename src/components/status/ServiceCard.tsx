@@ -214,19 +214,6 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
               <p className="text-xs text-gray-500 uppercase">Last Check</p>
             </div>
           </div>
-
-          {/* Uptime Chart */}
-          {loadingHistory ? (
-            <div className="flex justify-center items-center h-48">
-              <div className="animate-spin w-8 h-8 border-3 border-gray-200 border-t-primary rounded-full"></div>
-            </div>
-          ) : (
-            uptimeHistory.length > 0 && (
-              <div>
-                <UptimeChart data={uptimeHistory} />
-              </div>
-            )
-          )}
         </div>
       )}
     </div>
