@@ -421,6 +421,15 @@ export default function AdminServicesPage() {
             <div style={{ display: 'flex', gap: '1rem' }}>
               <button 
                 className="btn btn-secondary"
+                onClick={handleCheckAllServices}
+                disabled={checking}
+                style={{ opacity: checking ? 0.6 : 1 }}
+              >
+                <Activity size={16} />
+                {checking ? 'Checking...' : 'Check All'}
+              </button>
+              <button 
+                className="btn btn-secondary"
                 onClick={() => setShowCreateGroupModal(true)}
               >
                 <FolderPlus size={16} />
