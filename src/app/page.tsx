@@ -64,12 +64,12 @@ export default function HomePage() {
     return (
       <Layout>
         <div className="container">
-          <div className="card" style={{ textAlign: 'center', padding: '48px 24px' }}>
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm text-center py-12 px-6">
             <h2 className="text-xl font-semibold text-danger mb-4">Error Loading Status</h2>
-            <p className="text-secondary mb-6">{error}</p>
+            <p className="text-gray-600 mb-6">{error}</p>
             <button 
               onClick={fetchStatus}
-              className="btn btn-primary"
+              className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white rounded-md font-medium hover:bg-primary-hover transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
             >
               Try Again
             </button>
