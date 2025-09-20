@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth/jwt'
 import { prisma } from '@/lib/db'
+import { performCheck } from '@/lib/monitoring/checker'
 
 export async function POST(
   request: NextRequest,
@@ -56,35 +57,21 @@ export async function POST(
       }, { status: 400 })
     }
 
-    // Perform manual check
-    const startTime = Date.now()
-    let success = false
-    let responseTime = 0
-    let error: string | null = null
-
+    // Perform the actual check using the proper monitoring logic
+    let checkResult
     try {
-      if (service.url) {
-        const response = await fetch(service.url, {
-          method: 'GET',
-          signal: AbortSignal.timeout(30000) // 30 second timeout
-        })
-        
-        responseTime = Date.now() - startTime
-        success = response.ok
-        
-        if (!response.ok) {
-          error = `HTTP ${response.status} ${response.statusText}`
-        }
-      } else {
-        // No URL - can't check the service
-        responseTime = Date.now() - startTime
-        success = false
-        error = 'No URL configured for this service'
-      }
+      checkResult = await performCheck(
+        check.type,
+        check.target,
+        check.port,
+        check.timeout
+      )
     } catch (err) {
-      responseTime = Date.now() - startTime
-      success = false
-      error = err instanceof Error ? err.message : 'Unknown error'
+      checkResult = {
+        success: false,
+        responseTime: 0,
+        error: err instanceof Error ? err.message : 'Check failed'
+      }
     }
 
     // Save check result
