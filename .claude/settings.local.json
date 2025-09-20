@@ -28,7 +28,8 @@
       "Bash(curl:*)",
       "Bash(npm install:*)",
       "Bash(npx tailwindcss init:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(timeout 30 npm run build)"
     ],
     "deny": []
   }
