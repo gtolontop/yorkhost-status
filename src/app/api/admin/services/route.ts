@@ -8,10 +8,19 @@ const createServiceSchema = z.object({
   description: z.string().optional(),
   type: z.enum(['HTTP', 'HTTPS', 'TCP', 'ICMP', 'DNS']),
   target: z.string().min(1),
-  port: z.number().int().min(1).max(65535).optional(),
+  port: z.union([z.number().int().min(1).max(65535), z.null()]).optional(),
   interval: z.number().int().min(10).default(60),
   timeout: z.number().int().min(1).max(300).default(10),
   group: z.string().default('other')
+}).refine((data) => {
+  // TCP requires a port
+  if (data.type === 'TCP' && !data.port) {
+    return false
+  }
+  return true
+}, {
+  message: "Port is required for TCP monitoring",
+  path: ["port"]
 })
 
 export async function GET(request: NextRequest) {
