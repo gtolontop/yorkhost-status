@@ -16,6 +16,7 @@ import {
   CheckCircle
 } from 'lucide-react'
 import styles from './AdminNavbar.module.scss'
+import { useTheme } from '@/contexts/ThemeContext'
 
 interface AdminNavbarProps {
   title: string
@@ -26,7 +27,7 @@ interface AdminNavbarProps {
 export default function AdminNavbar({ title, subtitle, onMenuToggle }: AdminNavbarProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [showNotifications, setShowNotifications] = useState(false)
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const { theme, toggleTheme } = useTheme()
 
   const notifications = [
     {
@@ -98,10 +99,10 @@ export default function AdminNavbar({ title, subtitle, onMenuToggle }: AdminNavb
 
         <button 
           className={styles.themeToggle}
-          onClick={() => setIsDarkMode(!isDarkMode)}
-          title={isDarkMode ? 'Mode clair' : 'Mode sombre'}
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
         >
-          {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
 
         <div className={styles.notificationContainer}>

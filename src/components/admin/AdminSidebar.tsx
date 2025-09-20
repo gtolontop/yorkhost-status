@@ -107,12 +107,18 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       <div className={styles.userProfile}>
         <div className={styles.userAvatar}>
           {user.avatar ? (
-            <img src={user.avatar} alt={user.username} />
-          ) : (
-            <div className={styles.avatarPlaceholder}>
-              {user.username.charAt(0).toUpperCase()}
-            </div>
-          )}
+            <img 
+              src={user.avatar.startsWith('http') ? user.avatar : `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`} 
+              alt={user.username} 
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+          ) : null}
+          <div className={`${styles.avatarPlaceholder} ${user.avatar ? 'hidden' : ''}`}>
+            {user.username.charAt(0).toUpperCase()}
+          </div>
           <div className={styles.statusDot}></div>
         </div>
         {!isCollapsed && (

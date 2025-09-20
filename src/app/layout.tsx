@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import '@/styles/globals.css'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 
 export const metadata: Metadata = {
   title: 'Yorkhost Status',
@@ -26,9 +27,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div id="__next">
-          {children}
-        </div>
+        <ThemeProvider>
+          <div id="__next">
+            {children}
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   )
