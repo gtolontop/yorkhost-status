@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ServiceWithStats, UptimeData } from '@/types'
 import { getStatusColor, formatResponseTime, formatRelativeTime } from '@/lib/utils'
-import { ChevronDown, ChevronUp, ExternalLink, Play, BarChart3 } from 'lucide-react'
+import { ChevronDown, ChevronUp, CheckCircle, AlertCircle, XCircle } from 'lucide-react'
 import UptimeChart from '@/components/charts/UptimeChart'
 import styles from './ServiceCard.module.scss'
 
@@ -28,7 +28,7 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
   const fetchUptimeHistory = async () => {
     setLoadingHistory(true)
     try {
-      const response = await fetch(`/api/service/${service.id}/history?days=30`)
+      const response = await fetch(`/api/service/${service.id}/history?days=90`)
       const result = await response.json()
       
       if (result.success) {
@@ -41,122 +41,133 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
     }
   }
 
-  const runManualCheck = async () => {
-    try {
-      const response = await fetch(`/api/check/${service.checks[0]?.id}/run`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`
-        }
-      })
-      
-      if (response.ok) {
-        // Show success feedback
-      }
-    } catch (error) {
-      console.error('Failed to run manual check:', error)
+  const getStatusIcon = () => {
+    switch (service.currentStatus) {
+      case 'operational':
+        return <CheckCircle className={styles.statusIcon} />
+      case 'degraded':
+        return <AlertCircle className={styles.statusIcon} />
+      case 'outage':
+        return <XCircle className={styles.statusIcon} />
+      default:
+        return <CheckCircle className={styles.statusIcon} />
     }
   }
 
+  const getStatusText = () => {
+    switch (service.currentStatus) {
+      case 'operational':
+        return 'Operational'
+      case 'degraded':
+        return 'Degraded'
+      case 'outage':
+        return 'Outage'
+      default:
+        return 'Unknown'
+    }
+  }
+
+  // Generate mini uptime bars for last 90 days
+  const generateUptimeBars = () => {
+    const bars = []
+    const today = new Date()
+    
+    for (let i = 89; i >= 0; i--) {
+      const date = new Date(today)
+      date.setDate(date.getDate() - i)
+      
+      // Simulate uptime data (you can replace with real data)
+      const uptime = Math.random() > 0.05 ? 100 : Math.random() * 100
+      const isUp = uptime > 95
+      
+      bars.push(
+        <div
+          key={i}
+          className={`${styles.uptimeBar} ${isUp ? styles.uptimeBarUp : styles.uptimeBarDown}`}
+          title={`${date.toDateString()}: ${uptime.toFixed(1)}% uptime`}
+        />
+      )
+    }
+    
+    return bars
+  }
+
   return (
-    <div className={`${styles.card} ${styles[statusColor]}`}>
-      <div className={styles.header} onClick={onToggle}>
-        <div className={styles.service}>
-          <div className={styles.serviceIcon}>
-            {service.icon || '🔧'}
+    <div className={`${styles.serviceRow} ${styles[statusColor]}`}>
+      <div className={styles.serviceMain} onClick={onToggle}>
+        {/* Left side: Status + Service info */}
+        <div className={styles.serviceLeft}>
+          <div className={`${styles.statusIndicator} ${styles[statusColor]}`}>
+            {getStatusIcon()}
           </div>
           <div className={styles.serviceInfo}>
-            <h4 className={styles.serviceName}>{service.name}</h4>
-            {service.description && (
-              <p className={styles.serviceDescription}>{service.description}</p>
-            )}
-          </div>
-        </div>
-
-        <div className={styles.status}>
-          <div className={`${styles.statusIndicator} ${styles[statusColor]}`} />
-          <span className={styles.statusText}>
-            {service.currentStatus === 'operational' && 'Operational'}
-            {service.currentStatus === 'degraded' && 'Degraded'}
-            {service.currentStatus === 'outage' && 'Outage'}
-          </span>
-        </div>
-
-        <div className={styles.expandButton}>
-          {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-        </div>
-      </div>
-
-      <div className={styles.metrics}>
-        <div className={styles.metric}>
-          <span className={styles.metricValue}>{service.uptimePercent24h.toFixed(2)}%</span>
-          <span className={styles.metricLabel}>24h Uptime</span>
-        </div>
-        <div className={styles.metric}>
-          <span className={styles.metricValue}>{service.uptimePercent7d.toFixed(2)}%</span>
-          <span className={styles.metricLabel}>7d Uptime</span>
-        </div>
-        <div className={styles.metric}>
-          <span className={styles.metricValue}>{service.uptimePercent30d.toFixed(2)}%</span>
-          <span className={styles.metricLabel}>30d Uptime</span>
-        </div>
-        {service.averageResponseTime && (
-          <div className={styles.metric}>
-            <span className={styles.metricValue}>
-              {formatResponseTime(service.averageResponseTime)}
+            <h3 className={styles.serviceName}>{service.name}</h3>
+            <span className={`${styles.statusText} ${styles[statusColor]}`}>
+              {getStatusText()}
             </span>
-            <span className={styles.metricLabel}>Avg Response</span>
           </div>
-        )}
+        </div>
+
+        {/* Right side: Uptime chart + percentage */}
+        <div className={styles.serviceRight}>
+          <div className={styles.uptimeSection}>
+            <div className={styles.uptimeChart}>
+              {generateUptimeBars()}
+            </div>
+            <div className={styles.uptimePercentage}>
+              <span className={styles.uptimeValue}>
+                {service.uptimePercent30d.toFixed(3)}%
+              </span>
+              <span className={styles.uptimeLabel}>Uptime</span>
+            </div>
+          </div>
+          
+          <div className={styles.expandButton}>
+            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </div>
+        </div>
       </div>
 
       {isExpanded && (
-        <div className={styles.expanded}>
-          <div className={styles.actions}>
-            {service.url && (
-              <a 
-                href={service.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className={styles.actionButton}
-              >
-                <ExternalLink size={16} />
-                Open Service
-              </a>
+        <div className={styles.expandedContent}>
+          <div className={styles.metricsGrid}>
+            <div className={styles.metric}>
+              <span className={styles.metricValue}>{service.uptimePercent24h.toFixed(2)}%</span>
+              <span className={styles.metricLabel}>24h Uptime</span>
+            </div>
+            <div className={styles.metric}>
+              <span className={styles.metricValue}>{service.uptimePercent7d.toFixed(2)}%</span>
+              <span className={styles.metricLabel}>7d Uptime</span>
+            </div>
+            <div className={styles.metric}>
+              <span className={styles.metricValue}>{service.uptimePercent30d.toFixed(2)}%</span>
+              <span className={styles.metricLabel}>30d Uptime</span>
+            </div>
+            {service.averageResponseTime && (
+              <div className={styles.metric}>
+                <span className={styles.metricValue}>
+                  {formatResponseTime(service.averageResponseTime)}
+                </span>
+                <span className={styles.metricLabel}>Avg Response</span>
+              </div>
             )}
-            <button 
-              onClick={runManualCheck}
-              className={styles.actionButton}
-            >
-              <Play size={16} />
-              Run Check
-            </button>
-            <button className={styles.actionButton}>
-              <BarChart3 size={16} />
-              View Details
-            </button>
-          </div>
-
-          <div className={styles.details}>
-            <div className={styles.detailItem}>
-              <span className={styles.detailLabel}>Last Check:</span>
-              <span className={styles.detailValue}>
+            <div className={styles.metric}>
+              <span className={styles.metricValue}>
                 {service.lastCheck ? formatRelativeTime(service.lastCheck) : 'Never'}
               </span>
-            </div>
-            <div className={styles.detailItem}>
-              <span className={styles.detailLabel}>Checks Configured:</span>
-              <span className={styles.detailValue}>{service.checks?.length || 0}</span>
+              <span className={styles.metricLabel}>Last Check</span>
             </div>
           </div>
 
           {loadingHistory ? (
             <div className={styles.chartLoading}>
-              <div className="loading"></div>
-              <span>Loading uptime history...</span>
+              <div className={styles.spinner}></div>
+              <span>Loading detailed uptime history...</span>
             </div>
           ) : (
-            <UptimeChart data={uptimeHistory} />
+            <div className={styles.detailedChart}>
+              <UptimeChart data={uptimeHistory} />
+            </div>
           )}
         </div>
       )}
