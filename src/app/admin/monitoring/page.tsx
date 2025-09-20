@@ -156,6 +156,26 @@ export default function AdminMonitoringPage() {
     return `${seconds}s`
   }
 
+  const triggerCheckAll = async () => {
+    try {
+      setRefreshing(true)
+      const response = await fetch('/api/admin/services/check-all', {
+        method: 'POST'
+      })
+
+      if (response.ok) {
+        // Refresh monitoring data to show updated status
+        await fetchMonitoringData()
+      } else {
+        console.error('Failed to trigger bulk check')
+      }
+    } catch (error) {
+      console.error('Bulk check error:', error)
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
   const triggerManualCheck = async (serviceId: string) => {
     try {
       const response = await fetch(`/api/admin/services/${serviceId}/check`, {
@@ -210,6 +230,15 @@ export default function AdminMonitoringPage() {
               >
                 {isLiveMode ? <PauseCircle size={16} /> : <PlayCircle size={16} />}
                 {isLiveMode ? 'Pause' : 'Reprendre'}
+              </button>
+              
+              <button 
+                className="btn btn-secondary"
+                onClick={triggerCheckAll}
+                disabled={refreshing}
+              >
+                <Activity size={16} />
+                Check All
               </button>
               
               <button 
