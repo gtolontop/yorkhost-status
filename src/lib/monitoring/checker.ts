@@ -71,10 +71,13 @@ async function performHttpCheck(target: string, timeout: number): Promise<CheckR
     const timeoutId = setTimeout(() => controller.abort(), timeout)
     
     const response = await fetch(url, {
-      method: 'HEAD', // Use HEAD instead of GET for faster response
+      method: 'GET', // Use GET instead of HEAD for better compatibility
       signal: controller.signal,
       headers: {
-        'User-Agent': 'Yorkhost-Status-Monitor/1.0'
+        'User-Agent': 'Yorkhost-Status-Monitor/1.0',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Encoding': 'gzip, deflate',
+        'Connection': 'keep-alive'
       }
     })
     
@@ -103,10 +106,13 @@ async function performHttpCheck(target: string, timeout: number): Promise<CheckR
         const timeoutId = setTimeout(() => controller.abort(), timeout)
         
         const response = await fetch(httpUrl, {
-          method: 'HEAD',
+          method: 'GET',
           signal: controller.signal,
           headers: {
-            'User-Agent': 'Yorkhost-Status-Monitor/1.0'
+            'User-Agent': 'Yorkhost-Status-Monitor/1.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate',
+            'Connection': 'keep-alive'
           }
         })
         
