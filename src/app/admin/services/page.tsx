@@ -310,6 +310,28 @@ export default function AdminServicesPage() {
     }
   }
 
+  const testService = async (serviceId: string) => {
+    try {
+      // For now, use the service check endpoint
+      const response = await fetch(`/api/admin/services/${serviceId}/check`, {
+        method: 'POST'
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        alert(`Test successful!\nResponse time: ${result.data?.responseTime || 'N/A'}ms\nStatus: ${result.data?.success ? 'UP' : 'DOWN'}`)
+        // Refresh services to show updated status
+        fetchServices()
+      } else {
+        alert(`Test failed: ${result.error}`)
+      }
+    } catch (error) {
+      console.error('Test service error:', error)
+      alert('Failed to test service')
+    }
+  }
+
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          service.description?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -604,6 +626,15 @@ export default function AdminServicesPage() {
                           >
                             <Edit size={14} />
                             Edit
+                          </button>
+
+                          <button 
+                            className="btn btn-primary"
+                            style={{ fontSize: '0.8rem', padding: '0.5rem 0.75rem' }}
+                            onClick={() => testService(service.id)}
+                          >
+                            <Activity size={14} />
+                            Test Now
                           </button>
                           
                           {service.url && (
