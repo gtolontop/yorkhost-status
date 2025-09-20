@@ -6,11 +6,24 @@ import { X } from 'lucide-react'
 interface Machine {
   id: string
   name: string
-  category: string
-  location: string | null
-  description: string | null
-  ipAddress: string | null
-  isActive: boolean
+  description?: string
+  category: 'web' | 'database' | 'api' | 'storage' | 'network' | 'monitoring' | 'other'
+  location?: string
+  tags: string[]
+  status: 'online' | 'offline' | 'maintenance'
+  specs: {
+    cpu: string
+    memory: string
+    storage: string
+    network: string
+  }
+  metrics: {
+    cpuUsage: number
+    memoryUsage: number
+    diskUsage: number
+    uptime: number
+  }
+  lastUpdate: string
 }
 
 interface EditMachineModalProps {
@@ -25,9 +38,7 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
     name: '',
     category: '',
     location: '',
-    description: '',
-    ipAddress: '',
-    isActive: true
+    description: ''
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
