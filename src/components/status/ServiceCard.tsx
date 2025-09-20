@@ -5,32 +5,6 @@ import { ServiceWithStats, UptimeData } from '@/types'
 import { getStatusColor, formatResponseTime, formatRelativeTime } from '@/lib/utils'
 import { ChevronDown, ChevronUp, CheckCircle, AlertTriangle, XCircle } from 'lucide-react'
 import UptimeChart from '@/components/charts/UptimeChart'
-// import styles from './ServiceCard.module.scss' // Temporarily disabled for Tailwind migration
-// Temporary styles object for basic layout
-const styles: Record<string, string> = {
-  serviceLeft: "flex items-center gap-3 flex-1",
-  statusIcon: "flex-shrink-0",
-  serviceInfo: "min-w-0",
-  serviceName: "font-medium text-gray-900 truncate",
-  statusText: "text-sm",
-  serviceRight: "flex items-center gap-4",
-  uptimeStats: "text-right",
-  uptimePercent: "text-lg font-semibold",
-  uptimeLabel: "text-xs text-gray-500 uppercase",
-  uptimeBars: "flex gap-1",
-  expandIcon: "flex-shrink-0 transition-transform",
-  expandedContent: "border-t border-gray-100 p-4 bg-gray-50",
-  detailsGrid: "grid grid-cols-2 md:grid-cols-5 gap-4 mb-4",
-  statItem: "text-center",
-  statValue: "text-lg font-semibold text-gray-900",
-  statLabel: "text-xs text-gray-500 uppercase",
-  loadingChart: "flex justify-center items-center h-12",
-  spinner: "animate-spin w-6 h-6 border-2 border-gray-200 border-t-primary rounded-full",
-  chartContainer: "mt-4",
-  success: "text-success",
-  warning: "text-warning", 
-  danger: "text-danger"
-}
 
 interface ServiceCardProps {
   service: ServiceWithStats
@@ -69,13 +43,13 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
   const getStatusIcon = () => {
     switch (service.currentStatus) {
       case 'operational':
-        return <CheckCircle className="w-5 h-5 text-success" />
+        return <CheckCircle className="w-5 h-5 text-green-600" />
       case 'degraded':
-        return <AlertTriangle className="w-5 h-5 text-warning" />
+        return <AlertTriangle className="w-5 h-5 text-yellow-600" />
       case 'outage':
-        return <XCircle className="w-5 h-5 text-danger" />
+        return <XCircle className="w-5 h-5 text-red-600" />
       default:
-        return <CheckCircle className="w-5 h-5 text-success" />
+        return <CheckCircle className="w-5 h-5 text-green-600" />
     }
   }
 
@@ -92,7 +66,20 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
     }
   }
 
-  // Generate 90 uptime bars (like Flare)
+  const getStatusTextColor = () => {
+    switch (service.currentStatus) {
+      case 'operational':
+        return 'text-green-600'
+      case 'degraded':
+        return 'text-yellow-600'
+      case 'outage':
+        return 'text-red-600'
+      default:
+        return 'text-gray-600'
+    }
+  }
+
+  // Generate 90 uptime bars
   const generateUptimeBars = () => {
     const bars = []
     const today = new Date()
@@ -112,15 +99,15 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
       }
       
       const getBarColor = () => {
-        if (uptime >= 98) return 'bg-success'
-        if (uptime >= 90) return 'bg-warning'
-        return 'bg-danger'
+        if (uptime >= 98) return 'bg-green-600'
+        if (uptime >= 90) return 'bg-yellow-600'
+        return 'bg-red-600'
       }
       
       bars.push(
         <div
           key={i}
-          className={`h-8 w-full rounded border ${getBarColor()}`}
+          className={`h-6 w-0.5 rounded-full ${getBarColor()}`}
           title={`${date.toLocaleDateString()}: ${uptime.toFixed(1)}% uptime`}
         />
       )
@@ -130,78 +117,95 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-4">
-      <div className="p-4 cursor-pointer hover:bg-gray-50 transition-colors" onClick={onToggle}>
-        {/* LEFT: Icon + Service Name + Status */}
-        <div className={styles.serviceLeft}>
-          <div className={`${styles.statusIcon} ${styles[statusColor]}`}>
+    <div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+      {/* Card Header */}
+      <div 
+        className="p-6 cursor-pointer"
+        onClick={onToggle}
+      >
+        <div className="flex items-center justify-between">
+          {/* Left Side: Icon + Service Name + Status */}
+          <div className="flex items-center gap-3">
             {getStatusIcon()}
-          </div>
-          <div className={styles.serviceInfo}>
-            <h3 className={styles.serviceName}>{service.name}</h3>
-            <div className={`${styles.statusText} ${styles[statusColor]}`}>
-              {getStatusText()}
+            <div>
+              <h3 className="font-semibold text-gray-900 text-lg">{service.name}</h3>
+              <p className={`text-sm ${getStatusTextColor()}`}>
+                {getStatusText()}
+              </p>
             </div>
+          </div>
+
+          {/* Right Side: Uptime % */}
+          <div className="text-right">
+            <div className="text-2xl font-bold text-gray-900">
+              {service.uptimePercent24h.toFixed(2)}%
+            </div>
+            <p className="text-xs text-gray-500 uppercase">Uptime</p>
           </div>
         </div>
 
-        {/* RIGHT: Uptime % + Bars */}
-        <div className={styles.serviceRight}>
-          <div className={styles.uptimeStats}>
-            <div className={styles.uptimePercent}>
-              {service.uptimePercent30d.toFixed(3)}%
-            </div>
-            <div className={styles.uptimeLabel}>Uptime</div>
-          </div>
-          <div className={styles.uptimeBars}>
+        {/* Uptime Bars */}
+        <div className="mt-4">
+          <div className="flex gap-0.5 items-center justify-between">
             {generateUptimeBars()}
           </div>
-          <div className={styles.expandIcon}>
-            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          <div className="flex justify-between text-xs text-gray-400 mt-1">
+            <span>90 days ago</span>
+            <span>Today</span>
           </div>
         </div>
       </div>
 
+      {/* Expanded Content */}
       {isExpanded && (
-        <div className={styles.expandedContent}>
-          <div className={styles.detailsGrid}>
-            <div className={styles.statItem}>
-              <span className={styles.statValue}>{service.uptimePercent24h.toFixed(2)}%</span>
-              <span className={styles.statLabel}>24h Uptime</span>
+        <div className="border-t border-gray-100 p-6 bg-gray-50">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+            <div className="text-center">
+              <p className="text-2xl font-semibold text-gray-900">
+                {service.uptimePercent24h.toFixed(2)}%
+              </p>
+              <p className="text-xs text-gray-500 uppercase">24h Uptime</p>
             </div>
-            <div className={styles.statItem}>
-              <span className={styles.statValue}>{service.uptimePercent7d.toFixed(2)}%</span>
-              <span className={styles.statLabel}>7d Uptime</span>
+            <div className="text-center">
+              <p className="text-2xl font-semibold text-gray-900">
+                {service.uptimePercent7d.toFixed(2)}%
+              </p>
+              <p className="text-xs text-gray-500 uppercase">7d Uptime</p>
             </div>
-            <div className={styles.statItem}>
-              <span className={styles.statValue}>{service.uptimePercent30d.toFixed(2)}%</span>
-              <span className={styles.statLabel}>30d Uptime</span>
+            <div className="text-center">
+              <p className="text-2xl font-semibold text-gray-900">
+                {service.uptimePercent30d.toFixed(2)}%
+              </p>
+              <p className="text-xs text-gray-500 uppercase">30d Uptime</p>
             </div>
-            {service.averageResponseTime && (
-              <div className={styles.statItem}>
-                <span className={styles.statValue}>
-                  {formatResponseTime(service.averageResponseTime)}
-                </span>
-                <span className={styles.statLabel}>Avg Response</span>
+            {service.responseTime && (
+              <div className="text-center">
+                <p className="text-2xl font-semibold text-gray-900">
+                  {formatResponseTime(service.responseTime)}
+                </p>
+                <p className="text-xs text-gray-500 uppercase">Response Time</p>
               </div>
             )}
-            <div className={styles.statItem}>
-              <span className={styles.statValue}>
-                {service.lastCheck ? formatRelativeTime(service.lastCheck) : 'Never'}
-              </span>
-              <span className={styles.statLabel}>Last Check</span>
+            <div className="text-center">
+              <p className="text-2xl font-semibold text-gray-900">
+                {service.lastCheckedAt ? formatRelativeTime(service.lastCheckedAt) : 'Never'}
+              </p>
+              <p className="text-xs text-gray-500 uppercase">Last Check</p>
             </div>
           </div>
 
+          {/* Uptime Chart */}
           {loadingHistory ? (
-            <div className={styles.loadingChart}>
-              <div className={styles.spinner}></div>
-              <span>Loading detailed history...</span>
+            <div className="flex justify-center items-center h-48">
+              <div className="animate-spin w-8 h-8 border-3 border-gray-200 border-t-primary rounded-full"></div>
             </div>
           ) : (
-            <div className={styles.chartContainer}>
-              <UptimeChart data={uptimeHistory} />
-            </div>
+            uptimeHistory.length > 0 && (
+              <div>
+                <UptimeChart data={uptimeHistory} />
+              </div>
+            )
           )}
         </div>
       )}
