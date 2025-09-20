@@ -5,6 +5,13 @@ import { executeCheck } from '@/lib/monitoring/checker'
 let workerInterval: NodeJS.Timeout | null = null
 let isWorkerRunning = false
 
+export async function GET() {
+  return NextResponse.json({
+    success: true,
+    isRunning: isWorkerRunning
+  })
+}
+
 export async function POST() {
   try {
     if (isWorkerRunning) {
@@ -16,24 +23,24 @@ export async function POST() {
 
     console.log('🚀 STARTING AUTOMATIC CHECKS WORKER...')
     
-    // Start worker that runs every 60 seconds
+    // Start worker that runs every 30 seconds to check which services need checking
     workerInterval = setInterval(async () => {
       try {
-        await runAllChecks()
+        await runScheduledChecks()
       } catch (error) {
         console.error('❌ Worker error:', error)
       }
-    }, 60000) // 60 seconds
+    }, 30000) // 30 seconds
     
     isWorkerRunning = true
     
     // Run initial check immediately
-    await runAllChecks()
+    await runScheduledChecks()
     
     return NextResponse.json({
       success: true,
-      message: 'Worker started successfully - checks will run every 60 seconds',
-      interval: '60 seconds'
+      message: 'Worker started successfully - checks will run based on individual intervals',
+      interval: '30 seconds check interval'
     })
     
   } catch (error) {
@@ -67,25 +74,49 @@ export async function DELETE() {
   }
 }
 
-async function runAllChecks() {
-  console.log('⏰ Running automatic checks...')
+async function runScheduledChecks() {
+  console.log('⏰ Checking for scheduled checks...')
   
   try {
-    // Get all active checks
+    // Get all active checks with their last result
     const checks = await prisma.check.findMany({
       where: { isActive: true },
       include: {
-        service: true
+        service: true,
+        results: {
+          take: 1,
+          orderBy: { timestamp: 'desc' }
+        }
       }
     })
     
     console.log(`Found ${checks.length} active checks`)
     
+    const now = new Date()
+    const checksToRun = checks.filter(check => {
+      // If no previous check, run it
+      if (check.results.length === 0) return true
+      
+      // Check if enough time has passed since last check
+      const lastCheck = check.results[0].timestamp
+      const timeSinceLastCheck = (now.getTime() - lastCheck.getTime()) / 1000 // in seconds
+      
+      // Run if interval has passed
+      return timeSinceLastCheck >= check.interval
+    })
+    
+    if (checksToRun.length === 0) {
+      console.log('No checks need to run at this time')
+      return
+    }
+    
+    console.log(`Running ${checksToRun.length} scheduled checks`)
+    
     let successCount = 0
     let failedCount = 0
     
-    // Run all checks in parallel for speed
-    const checkPromises = checks.map(async (check) => {
+    // Run scheduled checks in parallel for speed
+    const checkPromises = checksToRun.map(async (check) => {
       try {
         console.log(`🔍 Checking ${check.service.name} (${check.type}) -> ${check.target}`)
         
