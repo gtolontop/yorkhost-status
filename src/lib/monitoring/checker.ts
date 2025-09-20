@@ -13,49 +13,65 @@ export async function executeCheck(
   port?: number | null,
   timeout: number = 10000
 ): Promise<CheckResult> {
-  const startTime = Date.now()
+  console.log(`[CHECKER] Starting ${type} check for ${target}${port ? `:${port}` : ''}`)
   
   try {
+    let result: CheckResult
+    
     switch (type) {
       case 'HTTP':
       case 'HTTPS':
-        return await performHttpCheck(target, timeout)
+        result = await performHttpCheck(target, timeout)
+        break
       
       case 'TCP':
         if (!port) throw new Error('Port is required for TCP checks')
-        return await performTcpCheck(target, port, timeout)
+        result = await performTcpCheck(target, port, timeout)
+        break
       
       case 'ICMP':
-        return await performPingCheck(target, timeout)
+        result = await performPingCheck(target, timeout)
+        break
       
       case 'UDP':
-        return await performDnsCheck(target, timeout) // UDP can be used for DNS checks
+        result = await performDnsCheck(target, timeout)
+        break
       
       default:
         throw new Error(`Unsupported check type: ${type}`)
     }
+    
+    console.log(`[CHECKER] ${type} check result:`, result)
+    return result
+    
   } catch (error) {
-    const responseTime = Date.now() - startTime
+    console.error(`[CHECKER] ${type} check error:`, error)
     return {
       success: false,
-      responseTime,
+      responseTime: 0,
       error: error instanceof Error ? error.message : 'Unknown error'
     }
   }
 }
 
+// HTTP/HTTPS CHECK - SIMPLE ET FIABLE
 async function performHttpCheck(target: string, timeout: number): Promise<CheckResult> {
   const startTime = Date.now()
   
   try {
-    // Ensure target has protocol
-    const url = target.startsWith('http://') || target.startsWith('https://') ? target : `https://${target}`
+    // Fix URL format
+    let url = target
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = `https://${target}`
+    }
+    
+    console.log(`[HTTP] Testing: ${url}`)
     
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), timeout)
     
     const response = await fetch(url, {
-      method: 'GET',
+      method: 'HEAD', // Use HEAD instead of GET for faster response
       signal: controller.signal,
       headers: {
         'User-Agent': 'Yorkhost-Status-Monitor/1.0'
@@ -65,22 +81,60 @@ async function performHttpCheck(target: string, timeout: number): Promise<CheckR
     clearTimeout(timeoutId)
     const responseTime = Date.now() - startTime
     
+    const success = response.status >= 200 && response.status < 400
+    
     return {
-      success: response.ok,
+      success,
       responseTime,
       statusCode: response.status,
-      error: response.ok ? undefined : `HTTP ${response.status} ${response.statusText}`
+      error: success ? undefined : `HTTP ${response.status} ${response.statusText}`
     }
-  } catch (error) {
+    
+  } catch (error: any) {
     const responseTime = Date.now() - startTime
+    
+    // If HTTPS fails, try HTTP as fallback
+    if (target.includes('https://') || (!target.includes('http://') && !target.includes('https://'))) {
+      try {
+        const httpUrl = target.replace('https://', 'http://').replace(/^(?!http:\/\/)/, 'http://')
+        console.log(`[HTTP] HTTPS failed, trying HTTP: ${httpUrl}`)
+        
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), timeout)
+        
+        const response = await fetch(httpUrl, {
+          method: 'HEAD',
+          signal: controller.signal,
+          headers: {
+            'User-Agent': 'Yorkhost-Status-Monitor/1.0'
+          }
+        })
+        
+        clearTimeout(timeoutId)
+        const httpResponseTime = Date.now() - startTime
+        const success = response.status >= 200 && response.status < 400
+        
+        return {
+          success,
+          responseTime: httpResponseTime,
+          statusCode: response.status,
+          error: success ? undefined : `HTTP ${response.status} ${response.statusText}`
+        }
+        
+      } catch (httpError) {
+        // Both HTTPS and HTTP failed
+      }
+    }
+    
     return {
       success: false,
       responseTime,
-      error: error instanceof Error ? error.message : 'Network error'
+      error: error.message || 'Connection failed'
     }
   }
 }
 
+// TCP CHECK - SIMPLE ET DIRECT
 async function performTcpCheck(target: string, port: number, timeout: number): Promise<CheckResult> {
   const startTime = Date.now()
   
@@ -93,7 +147,7 @@ async function performTcpCheck(target: string, port: number, timeout: number): P
       resolve({
         success: false,
         responseTime: Date.now() - startTime,
-        error: 'Connection timeout'
+        error: `TCP connection timeout to ${target}:${port}`
       })
     }, timeout)
     
@@ -112,89 +166,69 @@ async function performTcpCheck(target: string, port: number, timeout: number): P
       resolve({
         success: false,
         responseTime: Date.now() - startTime,
-        error: error.message
+        error: `TCP connection failed: ${error.message}`
       })
     })
   })
 }
 
+// PING CHECK - UTILISE HTTP/TCP COMME FALLBACK
 async function performPingCheck(target: string, timeout: number): Promise<CheckResult> {
-  const startTime = Date.now()
+  console.log(`[PING] Testing ${target}`)
   
+  // Try TCP on common ports first
+  const ports = [80, 443, 22]
+  
+  for (const port of ports) {
+    try {
+      const result = await performTcpCheck(target, port, Math.min(timeout / 3, 3000))
+      if (result.success) {
+        console.log(`[PING] Success via TCP:${port}`)
+        return result
+      }
+    } catch (e) {
+      continue
+    }
+  }
+  
+  // Try HTTP fallback
   try {
-    // Use TCP connection test instead of ICMP ping for better Vercel compatibility
-    // Try common ports: 80 (HTTP), 443 (HTTPS), 22 (SSH), 53 (DNS)
-    const ports = [80, 443, 22, 53]
-    
-    for (const port of ports) {
-      try {
-        const result = await performTcpCheck(target, port, timeout)
-        if (result.success) {
-          return {
-            success: true,
-            responseTime: result.responseTime,
-            error: undefined
-          }
-        }
-      } catch (e) {
-        // Continue to next port
-        continue
-      }
+    const httpResult = await performHttpCheck(target, timeout)
+    if (httpResult.success) {
+      console.log(`[PING] Success via HTTP`)
+      return httpResult
     }
-    
-    // If no port is reachable, try HTTP as fallback
-    try {
-      const httpResult = await performHttpCheck(`http://${target}`, timeout)
-      if (httpResult.success) {
-        return httpResult
-      }
-    } catch (e) {
-      // Continue to HTTPS fallback
-    }
-    
-    // Final fallback: HTTPS
-    try {
-      const httpsResult = await performHttpCheck(`https://${target}`, timeout)
-      return httpsResult
-    } catch (e) {
-      // All methods failed
-      const responseTime = Date.now() - startTime
-      return {
-        success: false,
-        responseTime,
-        error: 'Host unreachable on all tested ports and protocols'
-      }
-    }
-    
-  } catch (error) {
-    const responseTime = Date.now() - startTime
-    return {
-      success: false,
-      responseTime,
-      error: error instanceof Error ? error.message : 'Ping check failed'
-    }
+  } catch (e) {
+    // Continue to final error
+  }
+  
+  return {
+    success: false,
+    responseTime: timeout,
+    error: `Host ${target} is not reachable via TCP or HTTP`
   }
 }
 
+// DNS CHECK - SIMPLE LOOKUP
 async function performDnsCheck(target: string, timeout: number): Promise<CheckResult> {
   const startTime = Date.now()
   
   try {
-    // Use DNS resolution
     const dns = require('dns').promises
-    await dns.lookup(target)
+    await Promise.race([
+      dns.lookup(target),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('DNS timeout')), timeout))
+    ])
     
-    const responseTime = Date.now() - startTime
     return {
       success: true,
-      responseTime
+      responseTime: Date.now() - startTime
     }
-  } catch (error) {
-    const responseTime = Date.now() - startTime
+  } catch (error: any) {
     return {
       success: false,
-      responseTime,
-      error: error instanceof Error ? error.message : 'DNS resolution failed'
+      responseTime: Date.now() - startTime,
+      error: `DNS lookup failed: ${error.message}`
     }
   }
 }
