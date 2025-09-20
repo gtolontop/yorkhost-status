@@ -75,12 +75,12 @@ export async function POST(
     }
 
     // Save check result
-    const checkResult = await prisma.checkResult.create({
+    const savedResult = await prisma.checkResult.create({
       data: {
         checkId: check.id,
-        success,
-        responseTime,
-        error,
+        success: checkResult.success,
+        responseTime: checkResult.responseTime,
+        error: checkResult.error,
         timestamp: new Date()
       }
     })
@@ -95,8 +95,8 @@ export async function POST(
         details: {
           name: service.name,
           action: 'manual_check',
-          success,
-          responseTime
+          success: checkResult.success,
+          responseTime: checkResult.responseTime
         }
       }
     })
@@ -105,10 +105,10 @@ export async function POST(
       success: true,
       data: {
         checkResult: {
-          success,
-          responseTime,
-          error,
-          timestamp: checkResult.timestamp
+          success: checkResult.success,
+          responseTime: checkResult.responseTime,
+          error: checkResult.error,
+          timestamp: savedResult.timestamp
         }
       }
     })
