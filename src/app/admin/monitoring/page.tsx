@@ -57,6 +57,7 @@ export default function AdminMonitoringPage() {
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
   const [selectedFilter, setSelectedFilter] = useState<string>('all')
   const [refreshing, setRefreshing] = useState(false)
+  const [workerRunning, setWorkerRunning] = useState(false)
 
   useEffect(() => {
     fetchMonitoringData()
@@ -409,10 +410,11 @@ export default function AdminMonitoringPage() {
                   <div style={{ 
                     fontSize: '1.25rem', 
                     fontWeight: 600,
-                    color: service.responseTime > 500 ? '#ef4444' : 
+                    color: service.status === 'down' ? '#6b7280' :
+                           service.responseTime > 500 ? '#ef4444' : 
                            service.responseTime > 200 ? '#f59e0b' : '#10b981'
                   }}>
-                    {service.responseTime}ms
+                    {service.status === 'down' ? '--' : `${service.responseTime}ms`}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
                     Réponse
