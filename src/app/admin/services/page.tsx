@@ -331,8 +331,8 @@ export default function AdminServicesPage() {
         <div className="page-header">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <h1>Gestion des Services</h1>
-              <p>Surveillez et gérez vos services organisés par groupes</p>
+              <h1>Service Management</h1>
+              <p>Monitor and manage your services organized by groups</p>
             </div>
             <div style={{ display: 'flex', gap: '1rem' }}>
               <button 
