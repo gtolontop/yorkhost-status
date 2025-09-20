@@ -14,7 +14,8 @@
       "Bash(npm run dev:*)",
       "Bash(npx next build:*)",
       "Bash(npm run start:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }

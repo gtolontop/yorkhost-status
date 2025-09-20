@@ -6,7 +6,7 @@ interface CheckResult {
 }
 
 export function calculateServiceStatus(results: CheckResult[]): 'operational' | 'degraded' | 'outage' {
-  if (results.length === 0) return 'operational'
+  if (results.length === 0) return 'outage' // No data = can't verify it's operational
   
   // Check last 5 results for more accurate status
   const recentResults = results.slice(0, 5)
@@ -18,7 +18,7 @@ export function calculateServiceStatus(results: CheckResult[]): 'operational' | 
 }
 
 export function calculateUptime(results: CheckResult[]): number {
-  if (results.length === 0) return 100
+  if (results.length === 0) return 0 // No data = can't calculate uptime
   
   const successfulChecks = results.filter(r => r.success).length
   return Math.round((successfulChecks / results.length) * 10000) / 100
