@@ -1,5 +1,18 @@
 import Link from 'next/link'
-import styles from './Footer.module.scss'
+// import styles from './Footer.module.scss' // Converted to Tailwind
+const styles = {
+  footer: "bg-gray-50 border-t border-gray-200 mt-auto",
+  container: "py-8",
+  content: "grid md:grid-cols-4 gap-8",
+  brand: "md:col-span-1",
+  brandTitle: "text-lg font-semibold text-gray-900 mb-2",
+  brandDescription: "text-gray-600 text-sm",
+  section: "space-y-3",
+  sectionTitle: "font-medium text-gray-900 mb-3",
+  linkList: "space-y-2",
+  link: "text-gray-600 hover:text-gray-900 transition-colors text-sm",
+  bottom: "border-t border-gray-200 pt-6 mt-6 text-center text-gray-500 text-sm"
+}
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()

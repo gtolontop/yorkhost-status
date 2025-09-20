@@ -4,7 +4,19 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Moon, Sun, Menu, X } from 'lucide-react'
 import { useTheme } from '@/lib/hooks/useTheme'
-import styles from './Header.module.scss'
+// import styles from './Header.module.scss' // Converted to Tailwind
+const styles = {
+  header: "bg-white border-b border-gray-200 sticky top-0 z-50",
+  container: "flex items-center justify-between h-16",
+  brand: "flex items-center gap-3",
+  logo: "text-xl font-bold text-primary",
+  nav: "hidden md:flex items-center gap-6",
+  navLink: "text-gray-600 hover:text-gray-900 transition-colors",
+  mobileMenuButton: "md:hidden p-2",
+  mobileMenu: "md:hidden bg-white border-t border-gray-200 absolute top-full left-0 right-0",
+  mobileNav: "flex flex-col gap-4 p-4",
+  themeToggle: "p-2 text-gray-600 hover:text-gray-900 transition-colors"
+}
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)

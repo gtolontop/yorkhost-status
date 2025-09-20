@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import Header from './Header'
 import Footer from './Footer'
 import { Toaster } from 'react-hot-toast'
-import styles from './Layout.module.scss'
+// import styles from './Layout.module.scss' // Converted to Tailwind
 
 interface LayoutProps {
   children: React.ReactNode
@@ -13,10 +13,10 @@ interface LayoutProps {
 
 export default function Layout({ children, className }: LayoutProps) {
   return (
-    <div className={styles.layout}>
+    <div className="min-h-screen flex flex-col bg-white transition-colors">
       <Header />
       
-      <main className={`${styles.main} ${className || ''}`}>
+      <main className={`flex-1 py-6 md:py-8 lg:py-12 ${className || ''}`}>
         {children}
       </main>
       
