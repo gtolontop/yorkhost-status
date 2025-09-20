@@ -142,9 +142,15 @@ export async function getServiceStats(serviceId: string) {
   }
 
   const getCurrentStatus = (results: any[]) => {
-    if (results.length === 0) return 'operational'
+    if (results.length === 0) return 'unknown'
     
-    // Check last few results
+    // Get the most recent result
+    const lastResult = results[results.length - 1]
+    
+    // If the last check failed, it's an outage
+    if (!lastResult.success) return 'outage'
+    
+    // Check last few results for degraded performance
     const recentResults = results.slice(-5)
     const successRate = recentResults.filter(r => r.success).length / recentResults.length
     
