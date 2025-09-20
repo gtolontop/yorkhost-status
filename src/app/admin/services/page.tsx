@@ -361,7 +361,10 @@ export default function AdminServicesPage() {
       const result = await response.json()
       
       if (result.success) {
-        alert(`Test successful!\nResponse time: ${result.data?.responseTime || 'N/A'}ms\nStatus: ${result.data?.success ? 'UP' : 'DOWN'}`)
+        const checkResult = result.data?.checkResult || result.data
+        const status = checkResult?.success ? 'UP' : 'DOWN'
+        const responseTime = checkResult?.responseTime || 'N/A'
+        alert(`Test successful!\nResponse time: ${responseTime}ms\nStatus: ${status}`)
         // Refresh services to show updated status
         fetchServices()
       } else {
