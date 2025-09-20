@@ -6,10 +6,21 @@ import { X } from 'lucide-react'
 interface Incident {
   id: string
   title: string
-  description: string | null
+  description: string
   severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
   status: 'INVESTIGATING' | 'IDENTIFIED' | 'MONITORING' | 'RESOLVED' | 'SCHEDULED'
-  serviceId: string | null
+  isScheduled: boolean
+  startTime: string
+  endTime?: string
+  eta?: string
+  serviceId?: string
+  machineId?: string
+  tags: string[]
+  creator: {
+    id: string
+    username: string
+    avatar?: string
+  }
   service?: {
     id: string
     name: string
