@@ -8,7 +8,7 @@ interface Service {
   name: string
   description: string | null
   url: string | null
-  machineId: string | null
+  machineId?: string | null
   isActive: boolean
   machine?: {
     id: string
