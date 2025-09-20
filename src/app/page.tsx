@@ -49,10 +49,10 @@ export default function HomePage() {
     return (
       <Layout>
         <div className="container">
-          <div className="flex items-center justify-center" style={{ minHeight: '400px' }}>
+          <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <div className="loading" style={{ width: '40px', height: '40px', border: '3px solid var(--border-color)', borderTop: '3px solid var(--color-primary)', borderRadius: '50%', margin: '0 auto 16px' }}></div>
-              <p className="text-secondary">Loading status...</p>
+              <div className="w-10 h-10 border-3 border-gray-200 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading status...</p>
             </div>
           </div>
         </div>
