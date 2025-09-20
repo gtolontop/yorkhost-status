@@ -203,7 +203,12 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
             </label>
             <select
               value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+              onChange={(e) => setFormData({ 
+                ...formData, 
+                type: e.target.value,
+                // Clear port when switching to types that don't need it
+                port: ['ICMP', 'DNS'].includes(e.target.value) ? '' : formData.port
+              })}
               required
               style={{
                 width: '100%',
