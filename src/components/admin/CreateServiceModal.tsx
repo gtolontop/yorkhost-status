@@ -29,7 +29,6 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
     { value: 'DNS', label: 'DNS Query' }
   ]
 
-
   const intervalOptions = [
     { value: 30, label: '30 seconds' },
     { value: 60, label: '1 minute' },
