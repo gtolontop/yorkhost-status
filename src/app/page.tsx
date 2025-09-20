@@ -7,6 +7,7 @@ import IncidentBanner from '@/components/incidents/IncidentBanner'
 import PageHeader from '@/components/ui/PageHeader'
 import { StatusOverview as StatusOverviewType } from '@/types'
 import { useStatusUpdates } from '@/lib/pusher/client'
+import { UptimeHistoryProvider } from '@/contexts/UptimeHistoryContext'
 
 export default function HomePage() {
   const [status, setStatus] = useState<StatusOverviewType | null>(null)
@@ -142,7 +143,9 @@ export default function HomePage() {
         />
 
         {/* Service Grid */}
-        <ServiceGrid services={status?.services || []} />
+        <UptimeHistoryProvider>
+          <ServiceGrid services={status?.services || []} />
+        </UptimeHistoryProvider>
       </div>
     </Layout>
   )
