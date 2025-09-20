@@ -43,7 +43,13 @@ export async function GET(request: NextRequest) {
         machine: true,
         checks: {
           orderBy: { createdAt: 'desc' },
-          take: 1
+          take: 1,
+          include: {
+            results: {
+              orderBy: { timestamp: 'desc' },
+              take: 1
+            }
+          }
         }
       },
       orderBy: { name: 'asc' }
