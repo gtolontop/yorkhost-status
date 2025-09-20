@@ -25,7 +25,13 @@ export function calculateUptime(results: CheckResult[]): number {
 }
 
 export function getLatestResponseTime(results: CheckResult[]): number {
+  if (results.length === 0) return 0
+  
   const latestResult = results[0]
+  
+  // If the latest check failed, return 0 instead of a high value
+  if (!latestResult.success) return 0
+  
   return latestResult?.responseTime || 0
 }
 

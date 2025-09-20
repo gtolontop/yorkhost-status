@@ -64,9 +64,14 @@ export async function GET(request: NextRequest) {
     // Calculate system metrics
     const totalServices = services.length
     const servicesUp = monitoringServices.filter(s => s.status === 'up').length
-    const avgResponseTime = monitoringServices.length > 0 
-      ? Math.round(monitoringServices.reduce((sum, s) => sum + s.responseTime, 0) / monitoringServices.length)
+    
+    // Calculate average response time only for services that are up
+    const upServices = monitoringServices.filter(s => s.status === 'up' && s.responseTime > 0)
+    const avgResponseTime = upServices.length > 0 
+      ? Math.round(upServices.reduce((sum, s) => sum + s.responseTime, 0) / upServices.length)
       : 0
+    
+    // Calculate global uptime
     const globalUptime = monitoringServices.length > 0
       ? Math.round(monitoringServices.reduce((sum, s) => sum + s.uptime, 0) / monitoringServices.length * 100) / 100
       : 100
