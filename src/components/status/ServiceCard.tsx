@@ -90,26 +90,46 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
       
       // Simulate uptime data based on service status
       let uptime = 100
+      let hasIssues = false
+      
       if (service.currentStatus === 'degraded') {
-        uptime = Math.random() > 0.1 ? 100 : 85 + Math.random() * 10
+        hasIssues = Math.random() > 0.9
+        uptime = hasIssues ? (85 + Math.random() * 10) : 100
       } else if (service.currentStatus === 'outage') {
-        uptime = Math.random() > 0.05 ? 100 : Math.random() * 50
+        hasIssues = Math.random() > 0.95
+        uptime = hasIssues ? (Math.random() * 50) : 100
       } else {
-        uptime = Math.random() > 0.02 ? 100 : 90 + Math.random() * 10
+        hasIssues = Math.random() > 0.98
+        uptime = hasIssues ? (90 + Math.random() * 10) : 100
       }
       
       const getBarColor = () => {
-        if (uptime >= 98) return 'bg-green-600'
-        if (uptime >= 90) return 'bg-yellow-600'
-        return 'bg-red-600'
+        if (uptime >= 99.9) return 'bg-green-500'
+        if (uptime >= 90) return 'bg-yellow-500'
+        return 'bg-red-500'
+      }
+
+      const getStatus = () => {
+        if (uptime >= 99.9) return 'Fully operational'
+        if (uptime >= 90) return 'Minor issues'
+        return 'Major outage'
       }
       
       bars.push(
         <div
           key={i}
-          className={`h-6 w-0.5 rounded-full ${getBarColor()}`}
-          title={`${date.toLocaleDateString()}: ${uptime.toFixed(1)}% uptime`}
-        />
+          className={`h-8 flex-1 ${getBarColor()} hover:opacity-80 transition-opacity cursor-pointer relative group`}
+          title={`${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}: ${uptime.toFixed(1)}% uptime - ${getStatus()}`}
+        >
+          {/* Tooltip on hover */}
+          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+            <div className="font-medium">{date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+            <div>{uptime.toFixed(1)}% - {getStatus()}</div>
+            <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+              <div className="border-4 border-transparent border-t-gray-900"></div>
+            </div>
+          </div>
+        </div>
       )
     }
     
