@@ -17,7 +17,8 @@
       "Bash(node:*)",
       "Bash(ls:*)",
       "Bash(npm run typecheck:*)",
-      "Bash(telnet:*)"
+      "Bash(telnet:*)",
+      "Bash(npm run:*)"
     ],
     "deny": []
   }
