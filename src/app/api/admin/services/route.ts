@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
     const check = await prisma.check.create({
       data: {
         name: `${data.name} Monitor`,
-        type: data.type,
+        type: data.type as any, // Convert string to CheckType enum
         target: data.target,
         port: data.port,
         timeout: data.timeout,
