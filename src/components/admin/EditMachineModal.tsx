@@ -49,9 +49,7 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
         name: machine.name,
         category: machine.category,
         location: machine.location || '',
-        description: machine.description || '',
-        ipAddress: machine.ipAddress || '',
-        isActive: machine.isActive
+        description: machine.description || ''
       })
     }
   }, [isOpen, machine])
