@@ -142,7 +142,7 @@ export default function HomePage() {
         />
 
         {/* Service Grid */}
-        <ServiceGridWithGroups services={status?.services || []} />
+        <ServiceGrid services={status?.services || []} />
       </div>
     </Layout>
   )
