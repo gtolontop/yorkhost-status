@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { IncidentWithDetails } from '@/types'
 import { getSeverityColor, formatRelativeTime } from '@/lib/utils'
-import { AlertTriangle, XCircle, Clock, ExternalLink } from 'lucide-react'
+import { AlertTriangle, XCircle, Clock, ExternalLink, Wrench, Info } from 'lucide-react'
 
 interface IncidentBannerProps {
   incidents: IncidentWithDetails[]
@@ -35,22 +35,28 @@ export default function IncidentBanner({ incidents }: IncidentBannerProps) {
   const primaryIncident = sortedIncidents[0]
   const additionalCount = safeIncidents.length - 1
 
-  const getSeverityIcon = (severity: string) => {
-    switch (severity) {
+  const getSeverityIcon = (incident: IncidentWithDetails) => {
+    if (incident.type === 'MAINTENANCE') {
+      return Wrench
+    }
+    switch (incident.severity) {
       case 'CRITICAL':
         return XCircle
       case 'HIGH':
         return AlertTriangle
+      case 'MEDIUM':
+        return Info
       default:
         return Clock
     }
   }
 
-  const SeverityIcon = getSeverityIcon(primaryIncident.severity)
-  const severityColor = getSeverityColor(primaryIncident.severity)
+  const SeverityIcon = getSeverityIcon(primaryIncident)
+  const severityColor = primaryIncident.type === 'MAINTENANCE' ? 'info' : getSeverityColor(primaryIncident.severity)
 
   return (
     <div className={`mb-8 rounded-lg shadow-lg overflow-hidden animate-fade-in ${
+      severityColor === 'info' ? 'bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-300 text-blue-900' :
       severityColor === 'success' ? 'bg-gradient-to-br from-success-light to-success border border-success text-success-dark' :
       severityColor === 'warning' ? 'bg-gradient-to-br from-warning-light to-warning border border-warning text-warning-dark' :
       'bg-gradient-to-br from-danger-light to-danger border border-danger text-danger-dark'
@@ -65,7 +71,7 @@ export default function IncidentBanner({ incidents }: IncidentBannerProps) {
             <h3 className="text-lg md:text-xl font-bold mb-2">{primaryIncident.title}</h3>
             <div className="flex items-center gap-3 flex-wrap">
               <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wide bg-white bg-opacity-30">
-                {primaryIncident.severity}
+                {primaryIncident.type === 'MAINTENANCE' ? 'Maintenance' : primaryIncident.severity}
               </span>
               <span className="text-sm opacity-90">
                 Started {formatRelativeTime(primaryIncident.startTime)}
@@ -92,7 +98,7 @@ export default function IncidentBanner({ incidents }: IncidentBannerProps) {
         
         <div className="flex flex-col gap-2 items-end flex-shrink-0 sm:flex-row sm:gap-3">
           <Link 
-            href={`/incidents/${primaryIncident.id}`}
+            href={`/incident/${primaryIncident.slug}`}
             className="flex items-center gap-2 px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-md text-sm font-medium transition-all whitespace-nowrap hover:bg-opacity-30 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:ring-offset-2"
           >
             <span>View Details</span>
