@@ -14,11 +14,12 @@ interface ServiceCardProps {
 }
 
 export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCardProps) {
-  const { serviceHistory, loading: loadingHistory } = useUptimeHistory(service.id)
+  const historyContext = useUptimeHistory(service.id)
   const statusColor = getStatusColor(service.uptimePercent24h)
 
   // Use context data instead of local state
-  const uptimeHistory = serviceHistory || []
+  const uptimeHistory = 'serviceHistory' in historyContext ? historyContext.serviceHistory : []
+  const loadingHistory = historyContext.loading
 
   const getStatusIcon = () => {
     switch (service.currentStatus) {
@@ -75,7 +76,7 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
       date.setDate(date.getDate() - i)
       
       // Find actual uptime data for this date if available
-      const dayData = uptimeHistory.find(d => {
+      const dayData = uptimeHistory.find((d: UptimeData) => {
         const dataDate = new Date(d.date)
         return dataDate.toDateString() === date.toDateString()
       })
