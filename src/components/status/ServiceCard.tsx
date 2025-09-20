@@ -118,7 +118,7 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
       bars.push(
         <div
           key={i}
-          className={`h-8 flex-1 ${getBarColor()} hover:opacity-80 transition-opacity cursor-pointer relative group`}
+          className={`h-8 flex-1 ${getBarColor()} hover:opacity-80 transition-opacity cursor-pointer relative group rounded-sm`}
           title={`${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}: ${uptime.toFixed(1)}% uptime - ${getStatus()}`}
         >
           {/* Tooltip on hover */}
@@ -165,8 +165,8 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
         </div>
 
         {/* Uptime Bars */}
-        <div className="mt-4">
-          <div className="flex gap-0.5 items-center justify-between">
+        <div className="mt-6">
+          <div className="flex items-center h-8 gap-0.5">
             {generateUptimeBars()}
           </div>
           <div className="flex justify-between text-xs text-gray-400 mt-1">
