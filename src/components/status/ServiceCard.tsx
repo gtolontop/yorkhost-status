@@ -79,7 +79,7 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
     }
   }
 
-  // Generate 90 uptime bars
+  // Generate 90 uptime bars based on real data
   const generateUptimeBars = () => {
     const bars = []
     const today = new Date()
@@ -88,20 +88,15 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
       const date = new Date(today)
       date.setDate(date.getDate() - i)
       
-      // Simulate uptime data based on service status
-      let uptime = 100
-      let hasIssues = false
+      // Find actual uptime data for this date if available
+      const dayData = uptimeHistory.find(d => {
+        const dataDate = new Date(d.date)
+        return dataDate.toDateString() === date.toDateString()
+      })
       
-      if (service.currentStatus === 'degraded') {
-        hasIssues = Math.random() > 0.9
-        uptime = hasIssues ? (85 + Math.random() * 10) : 100
-      } else if (service.currentStatus === 'outage') {
-        hasIssues = Math.random() > 0.95
-        uptime = hasIssues ? (Math.random() * 50) : 100
-      } else {
-        hasIssues = Math.random() > 0.98
-        uptime = hasIssues ? (90 + Math.random() * 10) : 100
-      }
+      // Use real data if available, otherwise assume 100% uptime
+      const uptime = dayData ? dayData.uptime : 100
+      const incidents = dayData?.incidents || []
       
       const getBarColor = () => {
         if (uptime >= 99.9) return 'bg-green-500'
@@ -110,6 +105,9 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
       }
 
       const getStatus = () => {
+        if (incidents.length > 0) {
+          return `${incidents.length} incident${incidents.length > 1 ? 's' : ''}`
+        }
         if (uptime >= 99.9) return 'Fully operational'
         if (uptime >= 90) return 'Minor issues'
         return 'Major outage'
@@ -125,6 +123,11 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
             <div className="font-medium">{date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
             <div>{uptime.toFixed(1)}% - {getStatus()}</div>
+            {incidents.length > 0 && (
+              <div className="text-xs text-gray-300 mt-0.5">
+                {incidents.map(inc => inc.title).join(', ')}
+              </div>
+            )}
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
               <div className="border-4 border-transparent border-t-gray-900"></div>
             </div>
