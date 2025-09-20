@@ -99,7 +99,8 @@ export async function PUT(
         name: body.name,
         description: body.description,
         url: body.url,
-        icon: body.icon
+        machineId: body.machineId,
+        isActive: body.isActive
       },
       include: {
         machine: true,

@@ -65,7 +65,7 @@ export default function CreateIncidentModal({ isOpen, onClose, onSuccess }: Crea
         },
         body: JSON.stringify({
           ...formData,
-          serviceId: formData.serviceId || null
+          serviceId: formData.serviceId || undefined
         })
       })
 
@@ -199,6 +199,7 @@ export default function CreateIncidentModal({ isOpen, onClose, onSuccess }: Crea
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              required
               rows={4}
               style={{
                 width: '100%',

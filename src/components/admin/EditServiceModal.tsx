@@ -79,7 +79,7 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
         },
         body: JSON.stringify({
           ...formData,
-          machineId: formData.machineId || null
+          machineId: formData.machineId || undefined
         })
       })
 
