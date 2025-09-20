@@ -28,8 +28,8 @@ export async function executeCheck(
       case 'ICMP':
         return await performPingCheck(target, timeout)
       
-      // case 'DNS':
-      //   return await performDnsCheck(target, timeout)
+      case 'UDP':
+        return await performDnsCheck(target, timeout) // UDP can be used for DNS checks
       
       default:
         throw new Error(`Unsupported check type: ${type}`)
@@ -55,7 +55,7 @@ async function performHttpCheck(target: string, timeout: number): Promise<CheckR
     const timeoutId = setTimeout(() => controller.abort(), timeout)
     
     const response = await fetch(url, {
-      method: 'HEAD',
+      method: 'GET',
       signal: controller.signal,
       headers: {
         'User-Agent': 'Yorkhost-Status-Monitor/1.0'
@@ -122,24 +122,20 @@ async function performPingCheck(target: string, timeout: number): Promise<CheckR
   const startTime = Date.now()
   
   try {
-    // Simplified ping using HTTP HEAD request to the host
-    // In a real implementation, you'd use ICMP
-    const url = `http://${target}`
+    // Use the ping package for real ICMP ping
+    const ping = require('ping')
     
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), timeout)
-    
-    const response = await fetch(url, {
-      method: 'HEAD',
-      signal: controller.signal
+    const result = await ping.promise.probe(target, {
+      timeout: timeout / 1000, // ping expects seconds, not milliseconds
+      min_reply: 1
     })
     
-    clearTimeout(timeoutId)
-    const responseTime = Date.now() - startTime
+    const responseTime = result.alive ? result.time : Date.now() - startTime
     
     return {
-      success: true,
-      responseTime
+      success: result.alive,
+      responseTime: responseTime,
+      error: result.alive ? undefined : `Ping failed: ${result.output || 'Host unreachable'}`
     }
   } catch (error) {
     const responseTime = Date.now() - startTime
