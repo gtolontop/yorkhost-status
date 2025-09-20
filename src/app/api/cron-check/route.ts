@@ -26,7 +26,14 @@ export async function GET() {
     
     let successCount = 0
     let failedCount = 0
-    const results = []
+    const results: Array<{
+      service: string
+      type: string
+      target: string
+      success: boolean
+      responseTime: number
+      error?: string
+    }> = []
     
     // Run all checks in parallel
     const checkPromises = checks.map(async (check) => {
