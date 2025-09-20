@@ -5,6 +5,7 @@ import { ServiceWithStats, UptimeData } from '@/types'
 import { getStatusColor, formatResponseTime, formatRelativeTime } from '@/lib/utils'
 import { ChevronDown, ChevronUp, CheckCircle, AlertTriangle, XCircle, HelpCircle } from 'lucide-react'
 import UptimeChart from '@/components/charts/UptimeChart'
+import { useUptimeHistory } from '@/contexts/UptimeHistoryContext'
 
 interface ServiceCardProps {
   service: ServiceWithStats
@@ -13,33 +14,11 @@ interface ServiceCardProps {
 }
 
 export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCardProps) {
-  const [uptimeHistory, setUptimeHistory] = useState<UptimeData[]>([])
-  const [loadingHistory, setLoadingHistory] = useState(false)
-
+  const { serviceHistory, loading: loadingHistory } = useUptimeHistory(service.id)
   const statusColor = getStatusColor(service.uptimePercent24h)
 
-  useEffect(() => {
-    // Always fetch uptime history to show real bar colors
-    if (uptimeHistory.length === 0) {
-      fetchUptimeHistory()
-    }
-  }, [])
-
-  const fetchUptimeHistory = async () => {
-    setLoadingHistory(true)
-    try {
-      const response = await fetch(`/api/service/${service.id}/history?days=90`)
-      const result = await response.json()
-      
-      if (result.success) {
-        setUptimeHistory(result.data)
-      }
-    } catch (error) {
-      console.error('Failed to fetch uptime history:', error)
-    } finally {
-      setLoadingHistory(false)
-    }
-  }
+  // Use context data instead of local state
+  const uptimeHistory = serviceHistory || []
 
   const getStatusIcon = () => {
     switch (service.currentStatus) {
