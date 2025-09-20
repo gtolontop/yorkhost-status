@@ -76,9 +76,10 @@ export async function POST(
           error = `HTTP ${response.status} ${response.statusText}`
         }
       } else {
-        // For services without URL, just mark as successful
-        success = true
-        responseTime = Math.random() * 50 + 10 // Simulate response time
+        // No URL - can't check the service
+        responseTime = Date.now() - startTime
+        success = false
+        error = 'No URL configured for this service'
       }
     } catch (err) {
       responseTime = Date.now() - startTime
