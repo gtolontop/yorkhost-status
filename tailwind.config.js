@@ -52,7 +52,6 @@ module.exports = {
         mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
       },
       animation: {
-        'spin': 'spin 1s linear infinite',
         'fade-in': 'fadeIn 0.3s ease-out',
       },
       keyframes: {
@@ -66,6 +65,9 @@ module.exports = {
             transform: 'translateY(0)',
           },
         },
+      },
+      borderWidth: {
+        '3': '3px',
       },
     },
   },
