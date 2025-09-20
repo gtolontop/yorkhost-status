@@ -26,7 +26,8 @@
       "Bash(pkill:*)",
       "Bash(ping:*)",
       "Bash(curl:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss init:*)"
     ],
     "deny": []
   }
