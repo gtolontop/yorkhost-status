@@ -25,7 +25,8 @@
       "Bash(npx tsc:*)",
       "Bash(pkill:*)",
       "Bash(ping:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npm install:*)"
     ],
     "deny": []
   }
