@@ -86,28 +86,39 @@ export default function UsersPage() {
 
   if (loading) {
     return (
-      <AdminLayout 
-        title="Users" 
-        subtitle="Access management"
-      >
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '200px' 
-        }}>
-          <div>Loading users...</div>
+      <AdminLayout>
+        <div className="admin-page">
+          <div className="page-header">
+            <div>
+              <h1>Users</h1>
+              <p>Access management</p>
+            </div>
+          </div>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            height: '200px' 
+          }}>
+            <div>Loading users...</div>
+          </div>
         </div>
       </AdminLayout>
     )
   }
 
   return (
-    <AdminLayout 
-      title="Users" 
-      subtitle="Access management"
-    >
-      <div style={{ padding: '2rem' }}>
+    <AdminLayout>
+      <div className="admin-page">
+        {/* Page Header */}
+        <div className="page-header">
+          <div>
+            <h1>Users</h1>
+            <p>Access management</p>
+          </div>
+        </div>
+
+        <div style={{ padding: '2rem' }}>
         {error && (
           <div style={{
             background: '#fef2f2',
