@@ -399,6 +399,7 @@ export default function UsersPage() {
             Users are automatically created when they log in via Discord OAuth. 
             Role management and user permissions will be available in a future update.
           </div>
+          </div>
         </div>
       </div>
     </AdminLayout>
