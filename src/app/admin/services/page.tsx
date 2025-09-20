@@ -671,34 +671,6 @@ export default function AdminServicesPage() {
                           </div>
                         </div>
                         
-                        <div style={{ marginBottom: '1rem' }}>
-                          <label style={{ 
-                            display: 'block', 
-                            fontSize: '0.75rem', 
-                            fontWeight: 500, 
-                            marginBottom: '0.5rem',
-                            color: '#6b7280'
-                          }}>
-                            Group
-                          </label>
-                          <select
-                            value={service.group}
-                            onChange={(e) => changeServiceGroup(service.id, e.target.value)}
-                            style={{
-                              width: '100%',
-                              padding: '0.5rem',
-                              border: '1px solid #d1d5db',
-                              borderRadius: '6px',
-                              fontSize: '0.8rem',
-                              background: 'white'
-                            }}
-                          >
-                            {groups.map(group => (
-                              <option key={group.id} value={group.id}>{group.name}</option>
-                            ))}
-                          </select>
-                        </div>
-                        
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                           <button 
                             className="btn btn-secondary"

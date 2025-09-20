@@ -48,7 +48,7 @@ export default function HomePage() {
   if (loading) {
     return (
       <Layout>
-        <div className="container">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
               <div className="w-10 h-10 border-3 border-gray-200 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
@@ -63,7 +63,7 @@ export default function HomePage() {
   if (error) {
     return (
       <Layout>
-        <div className="container">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="bg-white border border-gray-200 rounded-lg shadow-sm text-center py-12 px-6">
             <h2 className="text-xl font-semibold text-danger mb-4">Error Loading Status</h2>
             <p className="text-gray-600 mb-6">{error}</p>
@@ -81,7 +81,7 @@ export default function HomePage() {
 
   return (
     <Layout>
-      <div className="container">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         {/* Incident Banner */}
         {status?.activeIncidents && status.activeIncidents.length > 0 && (
           <IncidentBanner incidents={status.activeIncidents} />
