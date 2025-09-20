@@ -19,10 +19,11 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
   const statusColor = getStatusColor(service.uptimePercent24h)
 
   useEffect(() => {
-    if (isExpanded && uptimeHistory.length === 0) {
+    // Always fetch uptime history to show real bar colors
+    if (uptimeHistory.length === 0) {
       fetchUptimeHistory()
     }
-  }, [isExpanded])
+  }, [])
 
   const fetchUptimeHistory = async () => {
     setLoadingHistory(true)
