@@ -30,7 +30,8 @@
       "Bash(npx tailwindcss init:*)",
       "Bash(npm uninstall:*)",
       "Bash(timeout 30 npm run build)",
-      "Bash(timeout 15 npm run dev)"
+      "Bash(timeout 15 npm run dev)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }
