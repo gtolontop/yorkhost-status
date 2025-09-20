@@ -5,7 +5,7 @@ import { ServiceWithStats, UptimeData } from '@/types'
 import { getStatusColor, formatResponseTime, formatRelativeTime } from '@/lib/utils'
 import { ChevronDown, ChevronUp, CheckCircle, AlertTriangle, XCircle } from 'lucide-react'
 import UptimeChart from '@/components/charts/UptimeChart'
-import styles from './ServiceCard.module.scss'
+// import styles from './ServiceCard.module.scss' // Temporarily disabled for Tailwind migration
 
 interface ServiceCardProps {
   service: ServiceWithStats

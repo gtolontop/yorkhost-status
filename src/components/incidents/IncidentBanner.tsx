@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { IncidentWithDetails } from '@/types'
 import { getSeverityColor, formatRelativeTime } from '@/lib/utils'
 import { AlertTriangle, XCircle, Clock, ExternalLink } from 'lucide-react'
-import styles from './IncidentBanner.module.scss'
 
 interface IncidentBannerProps {
   incidents: IncidentWithDetails[]
@@ -51,46 +50,50 @@ export default function IncidentBanner({ incidents }: IncidentBannerProps) {
   const severityColor = getSeverityColor(primaryIncident.severity)
 
   return (
-    <div className={`${styles.banner} ${styles[severityColor]}`}>
-      <div className={styles.content}>
-        <div className={styles.icon}>
+    <div className={`mb-8 rounded-lg shadow-lg overflow-hidden animate-fade-in ${
+      severityColor === 'success' ? 'bg-gradient-to-br from-success-light to-success border border-success text-success-dark' :
+      severityColor === 'warning' ? 'bg-gradient-to-br from-warning-light to-warning border border-warning text-warning-dark' :
+      'bg-gradient-to-br from-danger-light to-danger border border-danger text-danger-dark'
+    }`}>
+      <div className="flex items-start gap-4 p-6 md:p-8 md:gap-6">
+        <div className="flex-shrink-0 mt-1 opacity-90">
           <SeverityIcon size={24} />
         </div>
         
-        <div className={styles.info}>
-          <div className={styles.header}>
-            <h3 className={styles.title}>{primaryIncident.title}</h3>
-            <div className={styles.meta}>
-              <span className={`${styles.severity} ${styles[severityColor]}`}>
+        <div className="flex-1 min-w-0">
+          <div className="mb-3">
+            <h3 className="text-lg md:text-xl font-bold mb-2">{primaryIncident.title}</h3>
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wide bg-white bg-opacity-30">
                 {primaryIncident.severity}
               </span>
-              <span className={styles.time}>
+              <span className="text-sm opacity-90">
                 Started {formatRelativeTime(primaryIncident.startTime)}
               </span>
             </div>
           </div>
           
-          <p className={styles.description}>
+          <p className="mb-3 leading-relaxed opacity-90">
             {primaryIncident.description}
           </p>
           
           {primaryIncident.updates && primaryIncident.updates.length > 0 && (
-            <div className={styles.latestUpdate}>
-              <strong>Latest Update:</strong> {primaryIncident.updates[0].message}
+            <div className="mb-2 p-3 bg-white bg-opacity-20 rounded-md text-sm leading-relaxed">
+              <strong className="font-semibold">Latest Update:</strong> {primaryIncident.updates[0].message}
             </div>
           )}
           
           {additionalCount > 0 && (
-            <p className={styles.additional}>
+            <p className="text-sm font-medium opacity-80 m-0">
               +{additionalCount} additional incident{additionalCount > 1 ? 's' : ''}
             </p>
           )}
         </div>
         
-        <div className={styles.actions}>
+        <div className="flex flex-col gap-2 items-end flex-shrink-0 sm:flex-row sm:gap-3">
           <Link 
             href={`/incidents/${primaryIncident.id}`}
-            className={styles.detailsLink}
+            className="flex items-center gap-2 px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-md text-sm font-medium transition-all whitespace-nowrap hover:bg-opacity-30 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:ring-offset-2"
           >
             <span>View Details</span>
             <ExternalLink size={16} />
@@ -99,7 +102,7 @@ export default function IncidentBanner({ incidents }: IncidentBannerProps) {
           {additionalCount > 0 && (
             <Link 
               href="/incidents"
-              className={styles.allIncidentsLink}
+              className="px-3 py-2 text-sm font-medium opacity-80 transition-all rounded-md whitespace-nowrap hover:opacity-100 hover:bg-white hover:bg-opacity-10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:ring-offset-2"
             >
               View All Incidents
             </Link>

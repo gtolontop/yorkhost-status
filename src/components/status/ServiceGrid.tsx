@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { ServiceWithStats } from '@/types'
 import { groupBy } from '@/lib/utils'
 import ServiceCard from './ServiceCard'
-import styles from './ServiceGrid.module.scss'
+// import styles from './ServiceGrid.module.scss' // Temporarily disabled for Tailwind migration
 
 interface ServiceGridProps {
   services: ServiceWithStats[]
@@ -32,7 +32,7 @@ export default function ServiceGrid({ services }: ServiceGridProps) {
 
   if (safeServices.length === 0) {
     return (
-      <div className={styles.empty}>
+      <div className="text-center py-12 text-gray-500">
         <h2>No Services Found</h2>
         <p>No monitoring services are currently configured.</p>
       </div>
@@ -40,10 +40,10 @@ export default function ServiceGrid({ services }: ServiceGridProps) {
   }
 
   return (
-    <div className={styles.grid}>
-      <div className={styles.header}>
-        <h2 className={styles.title}>Service Status</h2>
-        <p className={styles.subtitle}>
+    <div className="space-y-8">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Service Status</h2>
+        <p className="text-gray-600">
           Real-time monitoring of all Yorkhost services
         </p>
       </div>
@@ -53,27 +53,27 @@ export default function ServiceGrid({ services }: ServiceGridProps) {
         const machine = categoryServices[0]?.machine
 
         return (
-          <div key={category} className={styles.category}>
-            <div className={styles.categoryHeader}>
-              <h3 className={styles.categoryTitle}>
+          <div key={category} className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">
                 {machine?.name || 'Unknown Machine'}
               </h3>
               {machine?.description && (
-                <p className={styles.categoryDescription}>
+                <p className="text-gray-600 text-sm mb-3">
                   {machine.description}
                 </p>
               )}
-              <div className={styles.categoryMeta}>
-                <span className={styles.categoryLocation}>
+              <div className="flex items-center gap-4 text-sm text-gray-500">
+                <span>
                   📍 {machine?.location || 'Unknown'}
                 </span>
-                <span className={styles.categoryServices}>
+                <span>
                   {categoryServices.length} service{categoryServices.length !== 1 ? 's' : ''}
                 </span>
               </div>
             </div>
 
-            <div className={styles.services}>
+            <div className="space-y-4">
               {categoryServices.map((service) => (
                 <ServiceCard
                   key={service.id}
