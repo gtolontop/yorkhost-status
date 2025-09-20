@@ -45,8 +45,8 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
         type: monitor.type,
         target: monitor.target,
         port: monitor.port?.toString() || '',
-        timeout: monitor.timeout,
-        interval: monitor.interval,
+        timeout: monitor.timeout || 10,
+        interval: monitor.interval || 60,
         isActive: monitor.isActive
       })
     }
