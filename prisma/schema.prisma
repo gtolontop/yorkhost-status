@@ -124,12 +124,19 @@ model CheckResult {
   @@map("check_results")
 }
 
+enum IncidentType {
+  INCIDENT
+  MAINTENANCE
+}
+
 enum IncidentStatus {
   INVESTIGATING
   IDENTIFIED
   MONITORING
   RESOLVED
   SCHEDULED
+  IN_PROGRESS
+  COMPLETED
 }
 
 enum IncidentSeverity {
@@ -141,17 +148,23 @@ enum IncidentSeverity {
 
 model Incident {
   id            String           @id @default(cuid())
+  slug          String           @unique
   title         String
   description   String
+  type          IncidentType     @default(INCIDENT)
   status        IncidentStatus   @default(INVESTIGATING)
   severity      IncidentSeverity @default(MEDIUM)
   isScheduled   Boolean          @default(false)
   scheduledFor  DateTime?
+  scheduledEnd  DateTime?
   startTime     DateTime         @default(now())
   endTime       DateTime?
+  resolvedAt    DateTime?
   eta           DateTime?
+  impact        String?
   tags          String[]         @default([])
   affectedUsers Int?
+  affectedServices String[]      @default([])
   
   // Relationships
   machineId     String?
@@ -164,19 +177,25 @@ model Incident {
   updates       IncidentUpdate[]
   notifications Notification[]
   
+  @@index([type, status])
+  @@index([startTime])
   @@map("incidents")
 }
 
 model IncidentUpdate {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   incidentId  String
   title       String?
   message     String
-  timestamp   DateTime @default(now())
+  status      IncidentStatus?
+  timestamp   DateTime       @default(now())
   authorId    String?
+  authorName  String?
+  isStatusChange Boolean     @default(false)
   
   incident    Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
   
+  @@index([incidentId, timestamp])
   @@map("incident_updates")
 }
 
