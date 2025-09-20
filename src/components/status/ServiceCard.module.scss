@@ -1,78 +1,77 @@
-/* Flare-style service row design */
+/* CLEAN FLARE-STYLE DESIGN */
 
-.serviceRow {
+.serviceContainer {
   background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  margin-bottom: 16px;
-  transition: all 0.2s ease;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  margin-bottom: 1px; /* Stacked like Flare */
   overflow: hidden;
+  transition: all 0.15s ease;
   
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-color: #d1d5db;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
 
-  &.success {
-    border-left: 4px solid #10b981;
+  &:first-child {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
   }
-  
-  &.warning {
-    border-left: 4px solid #f59e0b;
-  }
-  
-  &.danger {
-    border-left: 4px solid #ef4444;
+
+  &:last-child {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    margin-bottom: 0;
   }
 }
 
-.serviceMain {
+.serviceRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
+  padding: 24px 32px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.15s ease;
   
   &:hover {
-    background-color: #f9fafb;
+    background-color: #f8f9fa;
   }
 }
 
+/* LEFT SIDE: Icon + Service Info */
 .serviceLeft {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
   flex: 1;
   min-width: 0;
 }
 
-.statusIndicator {
-  width: 40px;
-  height: 40px;
+.statusIcon {
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   
+  svg {
+    width: 28px;
+    height: 28px;
+    color: white;
+  }
+  
   &.success {
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: #16a34a;
   }
   
   &.warning {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
+    background: #ea580c;
   }
   
   &.danger {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: #dc2626;
   }
-}
-
-.statusIcon {
-  width: 24px;
-  height: 24px;
-  color: white;
 }
 
 .serviceInfo {
@@ -81,10 +80,10 @@
 }
 
 .serviceName {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   color: #111827;
-  margin: 0 0 4px 0;
+  margin: 0 0 6px 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -93,15 +92,13 @@
 .statusText {
   font-size: 14px;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   
   &.success {
-    color: #059669;
+    color: #16a34a;
   }
   
   &.warning {
-    color: #d97706;
+    color: #ea580c;
   }
   
   &.danger {
@@ -109,60 +106,26 @@
   }
 }
 
+/* RIGHT SIDE: Uptime % + Bars */
 .serviceRight {
   display: flex;
   align-items: center;
   gap: 24px;
 }
 
-.uptimeSection {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.uptimeChart {
-  display: flex;
-  gap: 1px;
-  align-items: end;
-  height: 32px;
-  padding: 4px 0;
-}
-
-.uptimeBar {
-  width: 3px;
-  height: 100%;
-  border-radius: 1px;
-  transition: opacity 0.2s ease;
-  
-  &:hover {
-    opacity: 0.8;
-  }
-}
-
-.uptimeBarUp {
-  background: #10b981;
-}
-
-.uptimeBarDown {
-  background: #ef4444;
-}
-
-.uptimePercentage {
+.uptimeStats {
   text-align: right;
   min-width: 80px;
 }
 
-.uptimeValue {
-  display: block;
-  font-size: 16px;
+.uptimePercent {
+  font-size: 18px;
   font-weight: 700;
   color: #111827;
   line-height: 1.2;
 }
 
 .uptimeLabel {
-  display: block;
   font-size: 12px;
   color: #6b7280;
   text-transform: uppercase;
@@ -170,9 +133,41 @@
   margin-top: 2px;
 }
 
-.expandButton {
+.uptimeBars {
+  display: flex;
+  gap: 1px;
+  align-items: flex-end;
+  height: 34px;
+  padding: 4px 0;
+}
+
+.uptimeBar {
+  width: 4px;
+  height: 100%;
+  border-radius: 2px;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.barUp {
+  background: #16a34a; /* Clean green like Flare */
+}
+
+.barDegraded {
+  background: #ea580c; /* Orange for degraded */
+}
+
+.barDown {
+  background: #dc2626; /* Red for down */
+}
+
+.expandIcon {
   color: #9ca3af;
-  transition: color 0.2s ease;
+  transition: color 0.15s ease;
   padding: 4px;
   
   &:hover {
@@ -180,56 +175,57 @@
   }
 }
 
-/* Expanded content */
+/* EXPANDED CONTENT */
 .expandedContent {
   border-top: 1px solid #f3f4f6;
   background: #fafbfc;
-  padding: 24px;
+  padding: 32px;
 }
 
-.metricsGrid {
+.detailsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 24px;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
-.metric {
+.statItem {
   text-align: center;
-  padding: 16px;
+  padding: 20px;
   background: white;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.metricValue {
+.statValue {
   display: block;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #111827;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
-.metricLabel {
+.statLabel {
   font-size: 12px;
   color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.chartLoading {
+.loadingChart {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 48px;
+  gap: 16px;
+  padding: 64px;
   color: #6b7280;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .spinner {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border: 2px solid #e5e7eb;
   border-top: 2px solid #3b82f6;
   border-radius: 50%;
@@ -241,47 +237,73 @@
   100% { transform: rotate(360deg); }
 }
 
-.detailedChart {
+.chartContainer {
   background: white;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
-  padding: 20px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* Mobile responsive */
+/* MOBILE RESPONSIVE */
 @media (max-width: 768px) {
-  .serviceMain {
-    padding: 16px;
+  .serviceRow {
+    padding: 20px 16px;
   }
   
   .serviceLeft {
-    gap: 12px;
+    gap: 16px;
+  }
+  
+  .statusIcon {
+    width: 40px;
+    height: 40px;
+    
+    svg {
+      width: 24px;
+      height: 24px;
+    }
   }
   
   .serviceName {
-    font-size: 16px;
+    font-size: 18px;
   }
   
-  .uptimeSection {
-    flex-direction: column;
-    gap: 8px;
-    align-items: end;
+  .serviceRight {
+    gap: 16px;
   }
   
-  .uptimeChart {
-    height: 24px;
+  .uptimeBars {
+    height: 28px;
   }
   
   .uptimeBar {
-    width: 2px;
+    width: 3px;
   }
   
-  .metricsGrid {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  .detailsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 16px;
   }
   
   .expandedContent {
-    padding: 16px;
+    padding: 20px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .serviceRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .serviceRight {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .uptimeStats {
+    text-align: left;
   }
 }
