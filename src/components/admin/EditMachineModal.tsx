@@ -10,7 +10,7 @@ interface Machine {
   category: string
   location?: string
   ipAddress?: string
-  isActive: boolean
+  isActive?: boolean
 }
 
 interface EditMachineModalProps {
@@ -40,7 +40,7 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
         location: machine.location || '',
         description: machine.description || '',
         ipAddress: machine.ipAddress || '',
-        isActive: machine.isActive
+        isActive: machine.isActive ?? true
       })
     }
   }, [isOpen, machine])
