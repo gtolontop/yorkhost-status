@@ -232,14 +232,30 @@ export default function AdminServicesPage() {
   }
 
   const formatRelativeTime = (timestamp: string) => {
-    const diff = Date.now() - new Date(timestamp).getTime()
-    const minutes = Math.floor(diff / 60000)
-    const seconds = Math.floor((diff % 60000) / 1000)
-    
-    if (minutes > 0) {
-      return `Il y a ${minutes}min`
+    try {
+      if (!timestamp) return 'Never'
+      
+      const date = new Date(timestamp)
+      if (isNaN(date.getTime())) return 'Invalid date'
+      
+      const diff = Date.now() - date.getTime()
+      const minutes = Math.floor(diff / 60000)
+      const seconds = Math.floor((diff % 60000) / 1000)
+      const hours = Math.floor(diff / 3600000)
+      const days = Math.floor(diff / 86400000)
+      
+      if (days > 0) {
+        return `${days}d ago`
+      } else if (hours > 0) {
+        return `${hours}h ago`
+      } else if (minutes > 0) {
+        return `${minutes}m ago`
+      }
+      return `${Math.max(0, seconds)}s ago`
+    } catch (error) {
+      console.error('Date formatting error:', error)
+      return 'Unknown'
     }
-    return `Il y a ${seconds}s`
   }
 
   const toggleServiceStatus = async (serviceId: string) => {
@@ -554,7 +570,7 @@ export default function AdminServicesPage() {
                               {service.responseTime}ms
                             </div>
                             <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                              Réponse
+                              Response
                             </div>
                           </div>
                           
