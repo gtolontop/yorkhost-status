@@ -7,23 +7,10 @@ interface Machine {
   id: string
   name: string
   description?: string
-  category: 'web' | 'database' | 'api' | 'storage' | 'network' | 'monitoring' | 'other'
+  category: string
   location?: string
-  tags: string[]
-  status: 'online' | 'offline' | 'maintenance'
-  specs: {
-    cpu: string
-    memory: string
-    storage: string
-    network: string
-  }
-  metrics: {
-    cpuUsage: number
-    memoryUsage: number
-    diskUsage: number
-    uptime: number
-  }
-  lastUpdate: string
+  ipAddress?: string
+  isActive: boolean
 }
 
 interface EditMachineModalProps {
@@ -38,7 +25,9 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
     name: '',
     category: '',
     location: '',
-    description: ''
+    description: '',
+    ipAddress: '',
+    isActive: true
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -49,7 +38,9 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
         name: machine.name,
         category: machine.category,
         location: machine.location || '',
-        description: machine.description || ''
+        description: machine.description || '',
+        ipAddress: machine.ipAddress || '',
+        isActive: machine.isActive
       })
     }
   }, [isOpen, machine])
@@ -244,30 +235,6 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              marginBottom: '0.5rem',
-              color: '#374151'
-            }}>
-              IP Address
-            </label>
-            <input
-              type="text"
-              value={formData.ipAddress}
-              onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
-              placeholder="192.168.1.100"
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '0.875rem'
-              }}
-            />
-          </div>
 
           <div style={{ marginBottom: '1rem' }}>
             <label style={{
