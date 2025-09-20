@@ -4,11 +4,14 @@ import { prisma } from '@/lib/db'
 import { z } from 'zod'
 
 const createServiceSchema = z.object({
-  machineId: z.string().cuid(),
   name: z.string().min(1).max(100),
   description: z.string().optional(),
-  url: z.string().url().optional(),
-  icon: z.string().optional()
+  type: z.string(),
+  target: z.string(),
+  port: z.number().optional(),
+  interval: z.number().default(60),
+  timeout: z.number().default(10),
+  group: z.string().default('other')
 })
 
 export async function GET(request: NextRequest) {
@@ -63,23 +66,52 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const data = createServiceSchema.parse(body)
 
-    // Verify machine exists
-    const machine = await prisma.machine.findUnique({
-      where: { id: data.machineId }
+    // Create or find machine based on target and group
+    let machine = await prisma.machine.findFirst({
+      where: {
+        name: `${data.target} (${data.type})`,
+        category: data.group
+      }
     })
 
     if (!machine) {
-      return NextResponse.json({
-        success: false,
-        error: 'Machine not found'
-      }, { status: 404 })
+      machine = await prisma.machine.create({
+        data: {
+          name: `${data.target} (${data.type})`,
+          category: data.group,
+          location: null,
+          description: `Auto-created for ${data.name} monitoring`,
+          ipAddress: data.target,
+          isActive: true
+        }
+      })
     }
 
+    // Create service
     const service = await prisma.service.create({
-      data,
+      data: {
+        name: data.name,
+        description: data.description,
+        machineId: machine.id,
+        url: data.type === 'HTTP' ? data.target : null
+      },
       include: {
         machine: true,
         checks: true
+      }
+    })
+
+    // Create monitoring check
+    const check = await prisma.check.create({
+      data: {
+        name: `${data.name} Monitor`,
+        type: data.type,
+        target: data.target,
+        port: data.port,
+        timeout: data.timeout,
+        interval: data.interval,
+        serviceId: service.id,
+        isActive: true
       }
     })
 
