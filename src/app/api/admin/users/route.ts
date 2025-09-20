@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     const users = await prisma.user.findMany({
       include: {
-        roles: true
+        adminRole: true
       },
       orderBy: { createdAt: 'desc' }
     })
@@ -24,11 +24,11 @@ export async function GET(request: NextRequest) {
       id: user.id,
       username: user.username,
       email: user.email,
-      avatarUrl: user.avatarUrl,
+      avatarUrl: user.avatar,
       discordId: user.discordId,
-      roles: user.roles.map(role => role.name),
+      roles: user.adminRole ? [user.adminRole.role] : ['user'],
       createdAt: user.createdAt.toISOString(),
-      lastLogin: user.lastLogin?.toISOString() || null,
+      lastLogin: user.lastLoginAt?.toISOString() || null,
       isActive: true // We don't have an isActive field in the schema yet
     }))
 
