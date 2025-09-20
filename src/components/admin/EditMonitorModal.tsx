@@ -9,8 +9,8 @@ interface Monitor {
   type: string
   target: string
   port?: number
-  timeout: number
-  interval: number
+  timeout?: number
+  interval?: number
   isActive: boolean
   service?: {
     id: string
