@@ -21,8 +21,12 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    url: '',
-    machineId: ''
+    type: 'HTTP',
+    target: '',
+    port: '',
+    interval: 60,
+    timeout: 10,
+    group: 'other'
   })
 
   useEffect(() => {
