@@ -46,14 +46,7 @@ export default function ContactPage() {
                 href="https://discord.gg/yorkhost"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{
-                  color: 'var(--color-success)',
-                  textDecoration: 'none',
-                  fontWeight: '500',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}
+                className="text-success no-underline font-medium inline-flex items-center gap-1 hover:underline"
               >
                 Join Discord
                 <ExternalLink size={14} />
@@ -62,29 +55,14 @@ export default function ContactPage() {
 
           </div>
 
-          <div style={{
-            background: 'var(--bg-secondary)',
-            border: '1px solid var(--border-color)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '32px',
-            textAlign: 'left'
-          }}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '16px' }}>
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-left">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Emergency Contact
             </h3>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+            <p className="text-gray-600 mb-4">
               For critical issues affecting your services, please contact us immediately:
             </p>
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '12px',
-              background: 'var(--color-danger)',
-              color: 'white',
-              padding: '12px 16px',
-              borderRadius: 'var(--radius-md)',
-              fontWeight: '500'
-            }}>
+            <div className="flex items-center gap-3 bg-danger text-white px-4 py-3 rounded-md font-medium">
               <Phone size={20} />
               <span>Emergency Hotline: +33 1 XX XX XX XX</span>
             </div>
