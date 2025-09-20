@@ -28,7 +28,9 @@ export default function IncidentBanner({ incidents }: IncidentBannerProps) {
       return bSeverity - aSeverity
     }
     
-    return new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+    const bTime = new Date(b.startTime || 0).getTime()
+    const aTime = new Date(a.startTime || 0).getTime()
+    return bTime - aTime
   })
 
   const primaryIncident = sortedIncidents[0]
