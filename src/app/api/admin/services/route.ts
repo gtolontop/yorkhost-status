@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth, requirePermission } from '@/lib/auth/jwt'
 import { prisma } from '@/lib/db'
 import { z } from 'zod'
+import { calculateServiceStatus, calculateUptime, getLatestResponseTime, getLastCheckTime } from '@/lib/status-calculator'
 
 const createServiceSchema = z.object({
   name: z.string().min(1).max(100),
@@ -43,11 +44,10 @@ export async function GET(request: NextRequest) {
         machine: true,
         checks: {
           orderBy: { createdAt: 'desc' },
-          take: 1,
           include: {
             results: {
               orderBy: { timestamp: 'desc' },
-              take: 1
+              take: 20
             }
           }
         }
@@ -55,9 +55,33 @@ export async function GET(request: NextRequest) {
       orderBy: { name: 'asc' }
     })
 
+    // Transform services with consistent status calculation
+    const transformedServices = services.map(service => {
+      const allResults = service.checks.flatMap(check => check.results)
+      
+      // Use shared status calculation logic
+      const status = calculateServiceStatus(allResults)
+      const uptime = calculateUptime(allResults)
+      const responseTime = getLatestResponseTime(allResults)
+      const lastCheck = getLastCheckTime(allResults)
+
+      return {
+        ...service,
+        status,
+        uptime,
+        responseTime,
+        lastCheck,
+        // Keep original structure for compatibility
+        checks: service.checks.map(check => ({
+          ...check,
+          results: check.results.slice(0, 1) // Keep only latest for frontend compatibility
+        }))
+      }
+    })
+
     return NextResponse.json({
       success: true,
-      data: services
+      data: transformedServices
     })
   } catch (error) {
     console.error('Admin services fetch error:', error)
