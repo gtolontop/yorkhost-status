@@ -123,31 +123,80 @@ export default function AdminServicesPage() {
       // Mock groups - replace with real API
       const mockGroups: ServiceGroup[] = [
         {
-          id: 'frontend',
-          name: 'Frontend',
-          description: 'Services côté client et CDN',
+          id: 'web',
+          name: 'Web Servers',
+          description: 'Web servers and frontend services',
           color: '#3b82f6',
           services: []
         },
         {
-          id: 'backend',
-          name: 'Backend',
-          description: 'APIs et services métier',
+          id: 'api',
+          name: 'API Services',
+          description: 'Backend APIs and business services',
           color: '#10b981',
           services: []
         },
         {
           id: 'database',
-          name: 'Base de données',
-          description: 'Services de données',
+          name: 'Databases',
+          description: 'Database services and data storage',
           color: '#f59e0b',
           services: []
         },
         {
+          id: 'cache',
+          name: 'Cache',
+          description: 'Redis and caching services',
+          color: '#06b6d4',
+          services: []
+        },
+        {
+          id: 'monitoring',
+          name: 'Monitoring',
+          description: 'Monitoring and metrics services',
+          color: '#ef4444',
+          services: []
+        },
+        {
+          id: 'network',
+          name: 'Network',
+          description: 'Network and security services',
+          color: '#84cc16',
+          services: []
+        },
+        {
           id: 'storage',
-          name: 'Stockage',
-          description: 'Services de fichiers et stockage',
+          name: 'Storage',
+          description: 'File storage and backup services',
           color: '#8b5cf6',
+          services: []
+        },
+        {
+          id: 'cdn',
+          name: 'CDN',
+          description: 'Content delivery networks',
+          color: '#f97316',
+          services: []
+        },
+        {
+          id: 'backup',
+          name: 'Backup',
+          description: 'Backup and recovery services',
+          color: '#64748b',
+          services: []
+        },
+        {
+          id: 'security',
+          name: 'Security',
+          description: 'Security and authentication services',
+          color: '#dc2626',
+          services: []
+        },
+        {
+          id: 'other',
+          name: 'Other',
+          description: 'Miscellaneous services',
+          color: '#6b7280',
           services: []
         }
       ]
