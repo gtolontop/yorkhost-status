@@ -236,6 +236,30 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
             />
           </div>
 
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              marginBottom: '0.5rem',
+              color: '#374151'
+            }}>
+              IP Address
+            </label>
+            <input
+              type="text"
+              value={formData.ipAddress}
+              onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
+              placeholder="192.168.1.100"
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                fontSize: '0.875rem'
+              }}
+            />
+          </div>
 
           <div style={{ marginBottom: '1rem' }}>
             <label style={{
