@@ -140,3 +140,74 @@ export async function PUT(
     }, { status: 500 })
   }
 }
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const auth = await requireAuth(request)
+
+    if (!auth.authorized) {
+      return NextResponse.json({
+        success: false,
+        error: auth.error || 'Unauthorized'
+      }, { status: 401 })
+    }
+
+    const { id: serviceId } = await params
+    const body = await request.json()
+
+    // If changing group, update the machine category as well
+    if (body.group) {
+      const service = await prisma.service.findUnique({
+        where: { id: serviceId },
+        include: { machine: true }
+      })
+
+      if (service) {
+        // Update machine category to match new group
+        await prisma.machine.update({
+          where: { id: service.machineId },
+          data: { category: body.group }
+        })
+      }
+    }
+
+    // Update service with partial data
+    const updatedService = await prisma.service.update({
+      where: { id: serviceId },
+      data: body,
+      include: {
+        machine: true,
+        checks: true
+      }
+    })
+
+    // Create audit log
+    await prisma.auditLog.create({
+      data: {
+        userId: auth.user!.userId,
+        action: 'UPDATE',
+        resource: 'SERVICE',
+        resourceId: serviceId,
+        details: {
+          name: updatedService.name,
+          changes: body
+        }
+      }
+    })
+
+    return NextResponse.json({
+      success: true,
+      data: updatedService
+    })
+  } catch (error) {
+    console.error('Patch service error:', error)
+    
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to update service'
+    }, { status: 500 })
+  }
+}
