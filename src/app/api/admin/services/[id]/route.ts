@@ -99,7 +99,6 @@ export async function PUT(
         name: body.name,
         description: body.description,
         url: body.url,
-        machineId: body.machineId,
         isActive: body.isActive
       },
       include: {
@@ -158,22 +157,6 @@ export async function PATCH(
 
     const { id: serviceId } = await params
     const body = await request.json()
-
-    // If changing group, update the machine category as well
-    if (body.group) {
-      const service = await prisma.service.findUnique({
-        where: { id: serviceId },
-        include: { machine: true }
-      })
-
-      if (service) {
-        // Update machine category to match new group
-        await prisma.machine.update({
-          where: { id: service.machineId },
-          data: { category: body.group }
-        })
-      }
-    }
 
     // Update service with partial data
     const updatedService = await prisma.service.update({

@@ -11,8 +11,7 @@ const createServiceSchema = z.object({
   target: z.string().min(1),
   port: z.union([z.number().int().min(1).max(65535), z.null()]).optional(),
   interval: z.number().int().min(10).default(60),
-  timeout: z.number().int().min(1).max(300).default(10),
-  group: z.string().default('other')
+  timeout: z.number().int().min(1).max(300).default(10)
 }).refine((data) => {
   // TCP requires a port
   if (data.type === 'TCP' && (!data.port || data.port === null)) {
@@ -109,32 +108,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const data = createServiceSchema.parse(body)
 
-    // Create or find machine based on target and group
-    let machine = await prisma.machine.findFirst({
-      where: {
-        name: `${data.target} (${data.type})`,
-        category: data.group
-      }
-    })
-
-    if (!machine) {
-      machine = await prisma.machine.create({
-        data: {
-          name: `${data.target} (${data.type})`,
-          category: data.group,
-          location: data.target,
-          description: `Auto-created for ${data.name} monitoring`,
-          isActive: true
-        }
-      })
-    }
-
-    // Create service
+    // Create service without machine assignment
     const service = await prisma.service.create({
       data: {
         name: data.name,
         description: data.description,
-        machineId: machine.id,
         url: data.type === 'HTTP' ? data.target : null
       },
       include: {
@@ -165,8 +143,7 @@ export async function POST(request: NextRequest) {
         resource: 'SERVICE',
         resourceId: service.id,
         details: {
-          name: service.name,
-          machineId: service.machineId
+          name: service.name
         }
       }
     })
