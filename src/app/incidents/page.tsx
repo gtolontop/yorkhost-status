@@ -207,26 +207,26 @@ export default function IncidentsPage() {
                     <p className="text-gray-600 leading-relaxed mb-4">{incident.description}</p>
                     
                     {incident.service && (
-                      <div className={styles.affectedService}>
-                        <span>Affected service: <strong>{incident.service.name}</strong></span>
+                      <div className="bg-gray-100 p-3 rounded-md mb-4">
+                        <span className="text-sm text-gray-600">Affected service: <strong className="text-gray-900">{incident.service.name}</strong></span>
                       </div>
                     )}
 
                     {incident.updates && incident.updates.length > 0 && (
-                      <div className={styles.updates}>
-                        <h4>Updates:</h4>
+                      <div>
+                        <h4 className="text-base font-semibold text-gray-900 mb-3">Updates:</h4>
                         {incident.updates.slice(0, 3).map((update) => (
-                          <div key={update.id} className={styles.update}>
-                            <div className={styles.updateTime}>
+                          <div key={update.id} className="border-l-3 border-primary pl-3 mb-3">
+                            <div className="text-xs text-gray-500 mb-1">
                               {formatRelativeTime(new Date(update.timestamp))}
                             </div>
-                            <div className={styles.updateContent}>
+                            <div className="text-sm text-gray-600 leading-normal">
                               {update.message}
                             </div>
                           </div>
                         ))}
                         {incident.updates.length > 3 && (
-                          <div className={styles.moreUpdates}>
+                          <div className="text-sm text-primary italic mt-2">
                             +{incident.updates.length - 3} more updates
                           </div>
                         )}
@@ -234,8 +234,8 @@ export default function IncidentsPage() {
                     )}
                   </div>
 
-                  <div className={styles.incidentFooter}>
-                    <div className={styles.timeline}>
+                  <div className="px-6 py-4 bg-gray-100 border-t border-gray-100">
+                    <div className="flex justify-between items-center text-sm text-gray-500 md:flex-row flex-col md:gap-0 gap-1">
                       <span>Started: {new Date(incident.startTime).toLocaleDateString('en-US')}</span>
                       {incident.endTime && (
                         <span>Ended: {new Date(incident.endTime).toLocaleDateString('en-US')}</span>
