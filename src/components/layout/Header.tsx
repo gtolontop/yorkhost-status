@@ -4,19 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Moon, Sun, Menu, X } from 'lucide-react'
 import { useTheme } from '@/lib/hooks/useTheme'
-// import styles from './Header.module.scss' // Converted to Tailwind
-const styles = {
-  header: "bg-white border-b border-gray-200 sticky top-0 z-50",
-  container: "flex items-center justify-between h-16",
-  brand: "flex items-center gap-3",
-  logo: "text-xl font-bold text-primary",
-  nav: "hidden md:flex items-center gap-6",
-  navLink: "text-gray-600 hover:text-gray-900 transition-colors",
-  mobileMenuButton: "md:hidden p-2",
-  mobileMenu: "md:hidden bg-white border-t border-gray-200 absolute top-full left-0 right-0",
-  mobileNav: "flex flex-col gap-4 p-4",
-  themeToggle: "p-2 text-gray-600 hover:text-gray-900 transition-colors"
-}
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -27,48 +14,93 @@ export default function Header() {
   }
 
   return (
-    <header className={styles.header}>
-      <div className={`container ${styles.container}`}>
-        <div className={styles.brand}>
-          <Link href="/" className={styles.logo}>
-            <span className={styles.logoText}>Yorkhost</span>
-          </Link>
-        </div>
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Brand */}
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold">Y</span>
+              </div>
+              <span className="text-xl font-bold text-gray-900">Yorkhost Status</span>
+            </Link>
+          </div>
 
-        <nav className={`${styles.nav} ${isMenuOpen ? styles.navOpen : ''}`}>
-          <Link href="/" className={styles.navLink}>
-            Status
-          </Link>
-          <Link href="/maintenance" className={styles.navLink}>
-            Maintenance
-          </Link>
-          <Link href="/incidents" className={styles.navLink}>
-            Previous Incidents
-          </Link>
-        </nav>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-6">
+            <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
+              Status
+            </Link>
+            <Link href="/incidents" className="text-gray-600 hover:text-gray-900 transition-colors">
+              Incidents
+            </Link>
+            <Link href="/maintenance" className="text-gray-600 hover:text-gray-900 transition-colors">
+              Maintenance
+            </Link>
+            <Link href="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">
+              Contact
+            </Link>
+          </nav>
 
-        <div className={styles.actions}>
-          <button
-            onClick={toggleTheme}
-            className={styles.themeToggle}
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
+          {/* Right Actions */}
+          <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
 
-          <Link href="/contact" className={styles.contactBtn}>
-            Get in Touch
-          </Link>
-
-          <button
-            onClick={toggleMenu}
-            className={styles.menuToggle}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+            {/* Mobile Menu Button */}
+            <button
+              onClick={toggleMenu}
+              className="md:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors"
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-white border-t border-gray-200">
+          <nav className="container mx-auto px-4 py-4 space-y-3">
+            <Link 
+              href="/" 
+              className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Status
+            </Link>
+            <Link 
+              href="/incidents" 
+              className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Incidents
+            </Link>
+            <Link 
+              href="/maintenance" 
+              className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Maintenance
+            </Link>
+            <Link 
+              href="/contact" 
+              className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Contact
+            </Link>
+          </nav>
+        </div>
+      )}
     </header>
   )
 }
