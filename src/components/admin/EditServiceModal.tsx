@@ -6,8 +6,8 @@ import { X } from 'lucide-react'
 interface Service {
   id: string
   name: string
-  description: string | null
-  url: string | null
+  description?: string | null
+  url?: string | null
   machineId?: string | null
   isActive: boolean
   machine?: {
