@@ -340,14 +340,14 @@ export default function AdminServicesPage() {
                 onClick={() => setShowCreateGroupModal(true)}
               >
                 <FolderPlus size={16} />
-                Nouveau groupe
+                New group
               </button>
               <button 
                 className="btn btn-primary"
                 onClick={() => setShowCreateModal(true)}
               >
                 <Plus size={16} />
-                Nouveau service
+                New service
               </button>
             </div>
           </div>
@@ -360,7 +360,7 @@ export default function AdminServicesPage() {
               <Server size={24} />
             </div>
             <div className="stat-value">{services.length}</div>
-            <div className="stat-label">Services totaux</div>
+            <div className="stat-label">Total services</div>
           </div>
           
           <div className="stat-card">
@@ -368,7 +368,7 @@ export default function AdminServicesPage() {
               <CheckCircle size={24} />
             </div>
             <div className="stat-value">{services.filter(s => s.status === 'operational').length}</div>
-            <div className="stat-label">Services opérationnels</div>
+            <div className="stat-label">Operational services</div>
           </div>
           
           <div className="stat-card">
@@ -376,7 +376,7 @@ export default function AdminServicesPage() {
               <AlertTriangle size={24} />
             </div>
             <div className="stat-value">{services.filter(s => s.status !== 'operational').length}</div>
-            <div className="stat-label">Services en problème</div>
+            <div className="stat-label">Services with issues</div>
           </div>
           
           <div className="stat-card">
@@ -384,7 +384,7 @@ export default function AdminServicesPage() {
               <Activity size={24} />
             </div>
             <div className="stat-value">{services.filter(s => s.isActive).length}</div>
-            <div className="stat-label">Services actifs</div>
+            <div className="stat-label">Active services</div>
           </div>
         </div>
 
@@ -410,7 +410,7 @@ export default function AdminServicesPage() {
             }} />
             <input
               type="text"
-              placeholder="Rechercher des services..."
+              placeholder="Search services..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
