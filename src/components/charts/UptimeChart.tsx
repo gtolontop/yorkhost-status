@@ -13,7 +13,6 @@ import {
 import { Bar } from 'react-chartjs-2'
 import { UptimeData } from '@/types'
 import { formatDate } from '@/lib/utils'
-import styles from './UptimeChart.module.scss'
 
 ChartJS.register(
   CategoryScale,
@@ -153,14 +152,14 @@ export default function UptimeChart({ data }: UptimeChartProps) {
 
   if (data.length === 0) {
     return (
-      <div className={styles.empty}>
+      <div className="flex items-center justify-center h-50 bg-gray-50 border border-gray-100 rounded-lg mt-4 text-gray-500">
         <p>No uptime data available</p>
       </div>
     )
   }
 
   return (
-    <div className={styles.chart}>
+    <div className="h-[250px] p-4 bg-gray-50 border border-gray-100 rounded-lg mt-4">
       <Bar ref={chartRef} data={chartData} options={options} />
     </div>
   )
