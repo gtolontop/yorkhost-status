@@ -79,9 +79,8 @@ export async function POST(request: NextRequest) {
         data: {
           name: `${data.target} (${data.type})`,
           category: data.group,
-          location: null,
+          location: data.target,
           description: `Auto-created for ${data.name} monitoring`,
-          ipAddress: data.target,
           isActive: true
         }
       })
