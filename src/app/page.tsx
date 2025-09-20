@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Layout from '@/components/layout/Layout'
-import ServiceGridWithGroups from '@/components/status/ServiceGridWithGroups'
+import ServiceGrid from '@/components/status/ServiceGrid'
 import IncidentBanner from '@/components/incidents/IncidentBanner'
 import PageHeader from '@/components/ui/PageHeader'
 import { StatusOverview as StatusOverviewType } from '@/types'

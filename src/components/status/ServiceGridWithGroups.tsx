@@ -13,9 +13,10 @@ interface ServiceGroup {
 
 interface ServiceGridWithGroupsProps {
   services: ServiceWithStats[]
+  isAdmin?: boolean
 }
 
-export default function ServiceGridWithGroups({ services }: ServiceGridWithGroupsProps) {
+export default function ServiceGridWithGroups({ services, isAdmin = false }: ServiceGridWithGroupsProps) {
   const [expandedServices, setExpandedServices] = useState<Set<string>>(new Set())
   const [groups, setGroups] = useState<ServiceGroup[]>(() => {
     // Load groups from localStorage on mount
