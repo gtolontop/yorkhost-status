@@ -72,20 +72,6 @@ export default function Header() {
               Status
             </Link>
             <Link 
-              href="/incidents" 
-              className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Incidents
-            </Link>
-            <Link 
-              href="/maintenance" 
-              className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Maintenance
-            </Link>
-            <Link 
               href="/contact" 
               className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
