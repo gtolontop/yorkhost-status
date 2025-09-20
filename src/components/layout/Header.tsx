@@ -32,12 +32,6 @@ export default function Header() {
             <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
               Status
             </Link>
-            <Link href="/incidents" className="text-gray-600 hover:text-gray-900 transition-colors">
-              Incidents
-            </Link>
-            <Link href="/maintenance" className="text-gray-600 hover:text-gray-900 transition-colors">
-              Maintenance
-            </Link>
             <Link href="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">
               Contact
             </Link>
