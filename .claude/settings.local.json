@@ -23,7 +23,8 @@
       "Bash(npx tsx:*)",
       "mcp__ide__getDiagnostics",
       "Bash(npx tsc:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(ping:*)"
     ],
     "deny": []
   }
