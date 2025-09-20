@@ -14,13 +14,8 @@ export default function ContactPage() {
           subtitle="Need help or have questions about our services? We're here to help."
         />
 
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <div style={{
-            display: 'grid',
-            gap: '24px',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            marginBottom: '48px'
-          }}>
+        <div className="max-w-3xl mx-auto">
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2 mb-12">
             
             <div style={{
               background: 'var(--bg-secondary)',
@@ -30,11 +25,11 @@ export default function ContactPage() {
               textAlign: 'center',
               transition: 'var(--transition-all)'
             }}>
-              <Mail size={32} style={{ color: 'var(--color-primary)', marginBottom: '16px' }} />
-              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }}>
+              <Mail size={32} className="text-primary mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Email Support
               </h3>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+              <p className="text-gray-600 mb-4">
                 For general inquiries and support requests
               </p>
               <a 
