@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth/jwt'
 import { prisma } from '@/lib/db'
-import { performCheck } from '@/lib/monitoring/checker'
+import { executeCheck } from '@/lib/monitoring/checker'
 
 export async function POST(
   request: NextRequest,
@@ -60,7 +60,7 @@ export async function POST(
     // Perform the actual check using the proper monitoring logic
     let checkResult
     try {
-      checkResult = await performCheck(
+      checkResult = await executeCheck(
         check.type,
         check.target,
         check.port,
