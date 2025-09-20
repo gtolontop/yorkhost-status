@@ -48,13 +48,6 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       badge: '12'
     },
     {
-      icon: Monitor,
-      label: 'Machines',
-      href: '/admin/machines',
-      active: pathname.startsWith('/admin/machines'),
-      badge: '5'
-    },
-    {
       icon: AlertTriangle,
       label: 'Incidents',
       href: '/admin/incidents',
