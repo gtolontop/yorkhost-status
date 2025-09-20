@@ -79,8 +79,10 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
         return 'text-yellow-600'
       case 'outage':
         return 'text-red-600'
+      case 'unknown':
+        return 'text-gray-400'
       default:
-        return 'text-gray-600'
+        return 'text-gray-400'
     }
   }
 

@@ -136,7 +136,7 @@ export async function getServiceStats(serviceId: string) {
   ])
 
   const calculateUptime = (results: any[]) => {
-    if (results.length === 0) return 100
+    if (results.length === 0) return 0 // No data = 0% uptime
     const successful = results.filter(r => r.success).length
     return (successful / results.length) * 100
   }
