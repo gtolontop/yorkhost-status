@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
         // Perform the actual check using the proper monitoring logic
         let checkResult
         try {
-          checkResult = await performCheck(
+          checkResult = await executeCheck(
             check.type,
             check.target,
             check.port,
