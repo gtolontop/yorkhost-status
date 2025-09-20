@@ -8,7 +8,7 @@ interface Incident {
   title: string
   description: string | null
   severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
-  status: 'INVESTIGATING' | 'IDENTIFIED' | 'MONITORING' | 'RESOLVED'
+  status: 'INVESTIGATING' | 'IDENTIFIED' | 'MONITORING' | 'RESOLVED' | 'SCHEDULED'
   serviceId: string | null
   service?: {
     id: string
@@ -110,7 +110,8 @@ export default function EditIncidentModal({ isOpen, onClose, onSuccess, incident
     { value: 'INVESTIGATING', label: 'Investigating' },
     { value: 'IDENTIFIED', label: 'Identified' },
     { value: 'MONITORING', label: 'Monitoring' },
-    { value: 'RESOLVED', label: 'Resolved' }
+    { value: 'RESOLVED', label: 'Resolved' },
+    { value: 'SCHEDULED', label: 'Scheduled' }
   ]
 
   return (
