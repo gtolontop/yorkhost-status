@@ -100,6 +100,7 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
       const incidents = dayData?.incidents || []
       
       const getBarColor = () => {
+        if (!dayData || uptime === 100) return 'bg-gray-300' // No data = gray
         if (uptime >= 99.9) return 'bg-green-500'
         if (uptime >= 90) return 'bg-yellow-500'
         return 'bg-red-500'
