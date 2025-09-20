@@ -7,8 +7,8 @@ interface Incident {
   id: string
   title: string
   description: string | null
-  severity: 'low' | 'medium' | 'high' | 'critical'
-  status: 'investigating' | 'identified' | 'monitoring' | 'resolved'
+  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  status: 'INVESTIGATING' | 'IDENTIFIED' | 'MONITORING' | 'RESOLVED'
   serviceId: string | null
   service?: {
     id: string
