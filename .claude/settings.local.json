@@ -27,7 +27,8 @@
       "Bash(ping:*)",
       "Bash(curl:*)",
       "Bash(npm install:*)",
-      "Bash(npx tailwindcss init:*)"
+      "Bash(npx tailwindcss init:*)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": []
   }
