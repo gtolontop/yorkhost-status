@@ -20,7 +20,9 @@
       "Bash(telnet:*)",
       "Bash(npm run:*)",
       "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_RZyQB3eWhF1J@ep-round-bonus-ab3wnfp7-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require\" npx prisma db push)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(npx tsc:*)"
     ],
     "deny": []
   }
