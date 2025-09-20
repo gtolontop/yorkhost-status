@@ -68,8 +68,7 @@ export default function EditMachineModal({ isOpen, onClose, onSuccess, machine }
         body: JSON.stringify({
           ...formData,
           location: formData.location || null,
-          description: formData.description || null,
-          ipAddress: formData.ipAddress || null
+          description: formData.description || null
         })
       })
 
