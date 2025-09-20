@@ -6,7 +6,6 @@ import PageHeader from '@/components/ui/PageHeader'
 import { IncidentWithDetails, IncidentFilter } from '@/types'
 import { formatRelativeTime, getSeverityColor } from '@/lib/utils'
 import { Clock } from 'lucide-react'
-import styles from './incidents.module.scss'
 
 export default function IncidentsPage() {
   const [incidents, setIncidents] = useState<IncidentWithDetails[]>([])
@@ -101,9 +100,9 @@ export default function IncidentsPage() {
     return (
       <Layout>
         <div className="container">
-          <div className={styles.loading}>
-            <div className={styles.spinner}></div>
-            <p>Loading incidents...</p>
+          <div className="text-center py-12">
+            <div className="w-10 h-10 border-3 border-gray-200 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading incidents...</p>
           </div>
         </div>
       </Layout>
@@ -114,10 +113,10 @@ export default function IncidentsPage() {
     return (
       <Layout>
         <div className="container">
-          <div className={styles.error}>
-            <h2>Loading Error</h2>
-            <p>{error}</p>
-            <button onClick={fetchIncidents} className="btn btn-primary">
+          <div className="text-center py-12">
+            <h2 className="text-danger text-xl font-semibold mb-2">Loading Error</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <button onClick={fetchIncidents} className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white rounded-md font-medium hover:bg-primary-hover transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md">
               Try Again
             </button>
           </div>
@@ -135,25 +134,25 @@ export default function IncidentsPage() {
           subtitle="Track incidents and maintenance on Yorkhost services"
         />
 
-        <div className={styles.content}>
-          <div className={styles.filters}>
-          <div className={styles.searchBox}>
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8">
+          <div className="mb-4">
             <input
               type="text"
               placeholder="Search incidents..."
               value={filter.search || ''}
               onChange={(e) => setFilter(prev => ({ ...prev, search: e.target.value }))}
-              className={styles.searchInput}
+              className="w-full p-3 border border-gray-200 rounded-md bg-white text-gray-900 focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/10 placeholder:text-gray-500 transition-colors"
             />
           </div>
           
-          <div className={styles.filterTags}>
-            <div className={styles.filterGroup}>
-              <span>Status:</span>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-medium text-gray-600 mr-2">Status:</span>
               {['INVESTIGATING', 'IDENTIFIED', 'MONITORING', 'RESOLVED'].map(status => (
                 <button
                   key={status}
-                  className={`${styles.filterTag} ${filter.status?.includes(status as any) ? styles.active : ''}`}
+                  className={`px-3 py-1 border rounded-full bg-white text-gray-600 text-sm cursor-pointer transition-all duration-150 hover:bg-gray-100 hover:-translate-y-0.5 ${filter.status?.includes(status as any) ? 'bg-primary text-white border-primary' : 'border-gray-200'}`}
                   onClick={() => {
                     const currentStatus = filter.status || []
                     const newStatus = currentStatus.includes(status as any)
@@ -161,7 +160,6 @@ export default function IncidentsPage() {
                       : [...currentStatus, status as any]
                     setFilter(prev => ({ ...prev, status: newStatus }))
                   }}
-                  style={{ borderColor: getStatusColor(status) }}
                 >
                   {getStatusLabel(status)}
                 </button>
@@ -170,21 +168,21 @@ export default function IncidentsPage() {
           </div>
         </div>
 
-          <div className={styles.incidents}>
+          <div className="flex flex-col gap-6">
             {incidents.length === 0 ? (
-              <div className={styles.empty}>
-                <h3>No incidents found</h3>
-                <p>No incidents match the search criteria.</p>
+              <div className="text-center py-12">
+                <h3 className="text-xl text-gray-900 mb-2">No incidents found</h3>
+                <p className="text-gray-600">No incidents match the search criteria.</p>
               </div>
             ) : (
               incidents.map((incident) => (
-                <div key={incident.id} className={styles.incident}>
-                  <div className={styles.incidentHeader}>
-                    <div className={styles.incidentTitle}>
-                      <h3>{incident.title}</h3>
-                      <div className={styles.incidentMeta}>
+                <div key={incident.id} className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden transition-colors hover:border-gray-300 hover:shadow-md">
+                  <div className="p-6 border-b border-gray-100">
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">{incident.title}</h3>
+                      <div className="flex items-center gap-3 flex-wrap">
                         <span 
-                          className={styles.status}
+                          className="px-2 py-1 rounded-md text-xs font-semibold uppercase"
                           style={{ 
                             backgroundColor: getStatusColor(incident.status),
                             color: 'white'
@@ -193,20 +191,20 @@ export default function IncidentsPage() {
                           {getStatusLabel(incident.status)}
                         </span>
                         <span 
-                          className={styles.severity}
+                          className="text-sm font-medium capitalize"
                           style={{ color: getSeverityColor(incident.severity) }}
                         >
                           {getSeverityLabel(incident.severity)}
                         </span>
-                        <span className={styles.time}>
+                        <span className="text-sm text-gray-500">
                           {formatRelativeTime(new Date(incident.startTime))}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className={styles.incidentBody}>
-                    <p>{incident.description}</p>
+                  <div className="p-6">
+                    <p className="text-gray-600 leading-relaxed mb-4">{incident.description}</p>
                     
                     {incident.service && (
                       <div className={styles.affectedService}>
