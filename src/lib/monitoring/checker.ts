@@ -28,8 +28,8 @@ export async function executeCheck(
       case 'ICMP':
         return await performPingCheck(target, timeout)
       
-      case 'DNS':
-        return await performDnsCheck(target, timeout)
+      // case 'DNS':
+      //   return await performDnsCheck(target, timeout)
       
       default:
         throw new Error(`Unsupported check type: ${type}`)
@@ -106,7 +106,7 @@ async function performTcpCheck(target: string, port: number, timeout: number): P
       })
     })
     
-    socket.on('error', (error) => {
+    socket.on('error', (error: any) => {
       clearTimeout(timer)
       socket.destroy()
       resolve({
