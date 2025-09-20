@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth/jwt'
 import { prisma } from '@/lib/db'
+import { performCheck } from '@/lib/monitoring/checker'
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,48 +51,30 @@ export async function POST(request: NextRequest) {
           continue
         }
 
-        // Perform check
-        const startTime = Date.now()
-        let success = false
-        let responseTime = 0
-        let error: string | null = null
-
+        // Perform the actual check using the proper monitoring logic
+        let checkResult
         try {
-          if (service.url) {
-            const response = await fetch(service.url, {
-              method: 'GET',
-              signal: AbortSignal.timeout(10000) // 10 second timeout for bulk checks
-            })
-            
-            responseTime = Date.now() - startTime
-            success = response.ok
-            
-            if (!response.ok) {
-              error = `HTTP ${response.status} ${response.statusText}`
-            }
-          } else {
-            // Skip services without URL - don't create fake data
-            results.push({
-              serviceId: service.id,
-              serviceName: service.name,
-              success: false,
-              error: 'No URL configured for this service'
-            })
-            continue
-          }
+          checkResult = await performCheck(
+            check.type,
+            check.target,
+            check.port,
+            check.timeout
+          )
         } catch (err) {
-          responseTime = Date.now() - startTime
-          success = false
-          error = err instanceof Error ? err.message : 'Unknown error'
+          checkResult = {
+            success: false,
+            responseTime: 0,
+            error: err instanceof Error ? err.message : 'Check failed'
+          }
         }
 
         // Save check result
         await prisma.checkResult.create({
           data: {
             checkId: check.id,
-            success,
-            responseTime,
-            error,
+            success: checkResult.success,
+            responseTime: checkResult.responseTime,
+            error: checkResult.error,
             timestamp: new Date()
           }
         })
@@ -99,9 +82,9 @@ export async function POST(request: NextRequest) {
         results.push({
           serviceId: service.id,
           serviceName: service.name,
-          success,
-          responseTime,
-          error
+          success: checkResult.success,
+          responseTime: checkResult.responseTime,
+          error: checkResult.error
         })
 
       } catch (serviceError) {
