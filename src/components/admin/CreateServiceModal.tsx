@@ -80,7 +80,7 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
           description: formData.description || undefined,
           type: formData.type,
           target: formData.target,
-          port: formData.port ? parseInt(formData.port) : null,
+          port: (['ICMP', 'DNS'].includes(formData.type) || !formData.port) ? null : parseInt(formData.port),
           interval: formData.interval,
           timeout: formData.timeout,
           group: formData.group

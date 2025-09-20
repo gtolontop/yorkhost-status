@@ -332,17 +332,38 @@ export default function AdminServicesPage() {
     }
   }
 
+  const changeServiceGroup = async (serviceId: string, newGroup: string) => {
+    try {
+      const response = await fetch(`/api/admin/services/${serviceId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ group: newGroup })
+      })
+
+      if (response.ok) {
+        // Update service group locally and refresh groups
+        setServices(prev => prev.map(service => 
+          service.id === serviceId ? { ...service, group: newGroup } : service
+        ))
+        fetchGroups()
+      } else {
+        console.error('Failed to change service group')
+      }
+    } catch (error) {
+      console.error('Failed to change service group:', error)
+    }
+  }
+
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          service.description?.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesGroup = selectedGroup === 'all' || service.group === selectedGroup
-    return matchesSearch && matchesGroup
+    return matchesSearch
   })
 
   const groupedFilteredServices = groups.map(group => ({
     ...group,
     services: filteredServices.filter(service => service.group === group.id)
-  })).filter(group => group.services.length > 0 || selectedGroup === group.id)
+  })).filter(group => group.services.length > 0)
 
   // Remove loading screen
 
@@ -445,22 +466,6 @@ export default function AdminServicesPage() {
             />
           </div>
           
-          <select
-            value={selectedGroup}
-            onChange={(e) => setSelectedGroup(e.target.value)}
-            style={{
-              padding: '0.75rem 1rem',
-              border: '1px solid #d1d5db',
-              borderRadius: '10px',
-              fontSize: '0.875rem',
-              minWidth: '150px'
-            }}
-          >
-            <option value="all">Tous les groupes</option>
-            {groups.map(group => (
-              <option key={group.id} value={group.id}>{group.name}</option>
-            ))}
-          </select>
         </div>
 
         {/* Services by Groups */}
@@ -515,11 +520,11 @@ export default function AdminServicesPage() {
                 {group.services.length === 0 ? (
                   <div className="empty-state">
                     <Server size={48} />
-                    <h3>Aucun service dans ce groupe</h3>
-                    <p>Créez votre premier service pour ce groupe</p>
+                    <h3>No services in this group</h3>
+                    <p>Create your first service for this group</p>
                     <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
                       <Plus size={16} />
-                      Ajouter un service
+                      Add service
                     </button>
                   </div>
                 ) : (
@@ -606,6 +611,34 @@ export default function AdminServicesPage() {
                           </div>
                         </div>
                         
+                        <div style={{ marginBottom: '1rem' }}>
+                          <label style={{ 
+                            display: 'block', 
+                            fontSize: '0.75rem', 
+                            fontWeight: 500, 
+                            marginBottom: '0.5rem',
+                            color: '#6b7280'
+                          }}>
+                            Group
+                          </label>
+                          <select
+                            value={service.group}
+                            onChange={(e) => changeServiceGroup(service.id, e.target.value)}
+                            style={{
+                              width: '100%',
+                              padding: '0.5rem',
+                              border: '1px solid #d1d5db',
+                              borderRadius: '6px',
+                              fontSize: '0.8rem',
+                              background: 'white'
+                            }}
+                          >
+                            {groups.map(group => (
+                              <option key={group.id} value={group.id}>{group.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                        
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                           <button 
                             className="btn btn-secondary"
@@ -644,7 +677,7 @@ export default function AdminServicesPage() {
                               onClick={() => window.open(service.url, '_blank')}
                             >
                               <ExternalLink size={14} />
-                              Visiter
+                              Visit
                             </button>
                           )}
                           
@@ -654,7 +687,7 @@ export default function AdminServicesPage() {
                             onClick={() => setShowDeleteConfirm(service.id)}
                           >
                             <Trash2 size={14} />
-                            Supprimer
+                            Delete
                           </button>
                         </div>
                       </div>
@@ -738,11 +771,11 @@ export default function AdminServicesPage() {
               </div>
               
               <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem', fontWeight: 600 }}>
-                Supprimer le service
+                Delete Service
               </h3>
               
               <p style={{ margin: '0 0 2rem 0', color: '#6b7280' }}>
-                Êtes-vous sûr de vouloir supprimer ce service ? Cette action est irréversible.
+                Are you sure you want to delete this service? This action cannot be undone.
               </p>
               
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
@@ -750,13 +783,13 @@ export default function AdminServicesPage() {
                   className="btn btn-secondary"
                   onClick={() => setShowDeleteConfirm(null)}
                 >
-                  Annuler
+                  Cancel
                 </button>
                 <button 
                   className="btn btn-danger"
                   onClick={() => deleteService(showDeleteConfirm)}
                 >
-                  Supprimer
+                  Delete
                 </button>
               </div>
             </div>

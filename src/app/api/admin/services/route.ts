@@ -14,12 +14,16 @@ const createServiceSchema = z.object({
   group: z.string().default('other')
 }).refine((data) => {
   // TCP requires a port
-  if (data.type === 'TCP' && !data.port) {
+  if (data.type === 'TCP' && (!data.port || data.port === null)) {
+    return false
+  }
+  // ICMP and DNS don't need ports
+  if ((data.type === 'ICMP' || data.type === 'DNS') && data.port) {
     return false
   }
   return true
 }, {
-  message: "Port is required for TCP monitoring",
+  message: "Invalid port configuration for selected monitor type",
   path: ["port"]
 })
 
