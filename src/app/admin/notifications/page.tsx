@@ -155,22 +155,37 @@ export default function NotificationsPage() {
 
   if (loading) {
     return (
-      <AdminLayout title="Notifications" subtitle="Alert channels and rules">
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '200px' 
-        }}>
-          <div>Loading notifications...</div>
+      <AdminLayout>
+        <div className="admin-page">
+          <div className="page-header">
+            <div>
+              <h1>Notifications</h1>
+              <p>Alert channels and rules</p>
+            </div>
+          </div>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            height: '200px' 
+          }}>
+            <div>Loading notifications...</div>
+          </div>
         </div>
       </AdminLayout>
     )
   }
 
   return (
-    <AdminLayout title="Notifications" subtitle="Alert channels and rules">
-      <div style={{ padding: '2rem' }}>
+    <AdminLayout>
+      <div className="admin-page">
+        {/* Page Header */}
+        <div className="page-header">
+          <div>
+            <h1>Notifications</h1>
+            <p>Alert channels and rules</p>
+          </div>
+        </div>
         {error && (
           <div style={{
             background: '#fef2f2',
