@@ -169,7 +169,7 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
           {/* Right Side: Uptime % */}
           <div className="text-right">
             <div className="text-2xl font-bold text-gray-900">
-              {service.uptimePercent24h.toFixed(2)}%
+              {service.currentStatus === 'unknown' ? '--' : `${service.uptimePercent24h.toFixed(2)}%`}
             </div>
             <p className="text-xs text-gray-500 uppercase">Uptime</p>
           </div>
