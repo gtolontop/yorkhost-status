@@ -100,17 +100,17 @@ export default function EditIncidentModal({ isOpen, onClose, onSuccess, incident
   if (!isOpen) return null
 
   const severityOptions = [
-    { value: 'low', label: 'Low', color: '#10b981' },
-    { value: 'medium', label: 'Medium', color: '#f59e0b' },
-    { value: 'high', label: 'High', color: '#f97316' },
-    { value: 'critical', label: 'Critical', color: '#ef4444' }
+    { value: 'LOW', label: 'Low', color: '#10b981' },
+    { value: 'MEDIUM', label: 'Medium', color: '#f59e0b' },
+    { value: 'HIGH', label: 'High', color: '#f97316' },
+    { value: 'CRITICAL', label: 'Critical', color: '#ef4444' }
   ]
 
   const statusOptions = [
-    { value: 'investigating', label: 'Investigating' },
-    { value: 'identified', label: 'Identified' },
-    { value: 'monitoring', label: 'Monitoring' },
-    { value: 'resolved', label: 'Resolved' }
+    { value: 'INVESTIGATING', label: 'Investigating' },
+    { value: 'IDENTIFIED', label: 'Identified' },
+    { value: 'MONITORING', label: 'Monitoring' },
+    { value: 'RESOLVED', label: 'Resolved' }
   ]
 
   return (
