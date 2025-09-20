@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Layout from '@/components/layout/Layout'
-import ServiceGrid from '@/components/status/ServiceGrid'
+import ServiceGridWithGroups from '@/components/status/ServiceGridWithGroups'
 import IncidentBanner from '@/components/incidents/IncidentBanner'
 import PageHeader from '@/components/ui/PageHeader'
 import { StatusOverview as StatusOverviewType } from '@/types'
@@ -142,7 +142,7 @@ export default function HomePage() {
         />
 
         {/* Service Grid */}
-        <ServiceGrid services={status?.services || []} />
+        <ServiceGridWithGroups services={status?.services || []} />
       </div>
     </Layout>
   )
