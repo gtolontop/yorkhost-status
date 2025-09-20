@@ -18,9 +18,14 @@ export async function DELETE(
 
     const { id: incidentId } = await params
 
-    // Check if incident exists
+    // Check if incident exists and get full details for audit log
     const incident = await prisma.incident.findUnique({
-      where: { id: incidentId }
+      where: { id: incidentId },
+      include: {
+        updates: true,
+        service: true,
+        machine: true
+      }
     })
 
     if (!incident) {
@@ -40,7 +45,7 @@ export async function DELETE(
       where: { id: incidentId }
     })
 
-    // Create audit log
+    // Create detailed audit log
     await prisma.auditLog.create({
       data: {
         userId: auth.user!.userId,
@@ -48,7 +53,14 @@ export async function DELETE(
         resource: 'INCIDENT',
         resourceId: incidentId,
         details: {
-          title: incident.title
+          title: incident.title,
+          status: incident.status,
+          severity: incident.severity,
+          serviceName: incident.service?.name,
+          machineName: incident.machine?.name,
+          updatesCount: incident.updates.length,
+          createdAt: incident.timestamp,
+          endTime: incident.endTime
         }
       }
     })
@@ -84,6 +96,35 @@ export async function PUT(
     const { id: incidentId } = await params
     const body = await request.json()
 
+    // Validate required fields
+    if (!body.title || !body.description || !body.severity || !body.status) {
+      return NextResponse.json({
+        success: false,
+        error: 'Missing required fields: title, description, severity, and status are required'
+      }, { status: 400 })
+    }
+
+    // Get the current incident to check for status changes
+    const currentIncident = await prisma.incident.findUnique({
+      where: { id: incidentId },
+      include: {
+        updates: {
+          orderBy: { timestamp: 'desc' },
+          take: 1
+        }
+      }
+    })
+
+    if (!currentIncident) {
+      return NextResponse.json({
+        success: false,
+        error: 'Incident not found'
+      }, { status: 404 })
+    }
+
+    // Check if status has changed
+    const statusChanged = currentIncident.status !== body.status
+
     // Update incident
     const incident = await prisma.incident.update({
       where: { id: incidentId },
@@ -94,7 +135,9 @@ export async function PUT(
         status: body.status,
         endTime: body.status === 'RESOLVED' ? new Date() : body.endTime,
         eta: body.eta,
-        tags: body.tags
+        tags: body.tags,
+        serviceId: body.serviceId || currentIncident.serviceId,
+        machineId: body.machineId || currentIncident.machineId
       },
       include: {
         updates: {
@@ -112,7 +155,19 @@ export async function PUT(
       }
     })
 
-    // Create audit log
+    // Create status update if status changed and message provided
+    if (statusChanged && body.statusUpdateMessage) {
+      await prisma.incidentUpdate.create({
+        data: {
+          incidentId: incidentId,
+          status: body.status,
+          message: body.statusUpdateMessage,
+          authorId: auth.user!.userId
+        }
+      })
+    }
+
+    // Create audit log with enhanced details
     await prisma.auditLog.create({
       data: {
         userId: auth.user!.userId,
@@ -121,7 +176,11 @@ export async function PUT(
         resourceId: incidentId,
         details: {
           title: incident.title,
-          status: incident.status
+          previousStatus: currentIncident.status,
+          newStatus: incident.status,
+          statusChanged: statusChanged,
+          severity: incident.severity,
+          serviceChanged: currentIncident.serviceId !== incident.serviceId
         }
       }
     })

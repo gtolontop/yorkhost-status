@@ -6,7 +6,7 @@ interface PageHeaderProps {
   icon: ReactNode
   title: string
   subtitle: string
-  status?: 'operational' | 'degraded' | 'outage'
+  status?: 'operational' | 'degraded' | 'outage' | 'maintenance'
 }
 
 export default function PageHeader({ icon, title, subtitle, status }: PageHeaderProps) {
@@ -20,6 +20,8 @@ export default function PageHeader({ icon, title, subtitle, status }: PageHeader
         return 'var(--color-warning)'
       case 'outage':
         return 'var(--color-danger)'
+      case 'maintenance':
+        return 'var(--color-primary)'
       default:
         return 'var(--color-primary)'
     }

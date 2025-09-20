@@ -201,9 +201,28 @@ export async function getStatusOverview() {
     }),
     prisma.incident.findMany({
       where: {
-        status: {
-          in: ['INVESTIGATING', 'IDENTIFIED', 'MONITORING']
-        }
+        OR: [
+          {
+            // Active incidents
+            type: 'INCIDENT',
+            status: {
+              in: ['INVESTIGATING', 'IDENTIFIED', 'MONITORING']
+            }
+          },
+          {
+            // Scheduled maintenances
+            type: 'MAINTENANCE',
+            status: 'SCHEDULED',
+            scheduledFor: {
+              lte: new Date(Date.now() + 24 * 60 * 60 * 1000) // Next 24 hours
+            }
+          },
+          {
+            // Ongoing maintenances
+            type: 'MAINTENANCE',
+            status: 'IN_PROGRESS'
+          }
+        ]
       },
       include: {
         updates: {
@@ -239,15 +258,19 @@ export async function getStatusOverview() {
     ? allUptimes.reduce((sum, uptime) => sum + uptime, 0) / allUptimes.length 
     : 100
 
-  let overallStatus: 'operational' | 'degraded' | 'outage' = 'operational'
+  let overallStatus: 'operational' | 'degraded' | 'outage' | 'maintenance' = 'operational'
   
   // Check if any service has an outage
   const hasOutage = servicesWithStats.some(s => s.currentStatus === 'outage')
   const hasDegraded = servicesWithStats.some(s => s.currentStatus === 'degraded')
+  const hasActiveMaintenance = activeIncidents.some(i => i.type === 'MAINTENANCE' && i.status === 'IN_PROGRESS')
+  const hasActiveIncidents = activeIncidents.some(i => i.type === 'INCIDENT')
   
-  if (hasOutage || activeIncidents.some(i => i.severity === 'CRITICAL')) {
+  if (hasActiveMaintenance && !hasOutage && !hasActiveIncidents) {
+    overallStatus = 'maintenance' as any
+  } else if (hasOutage || activeIncidents.some(i => i.severity === 'CRITICAL')) {
     overallStatus = 'outage'
-  } else if (hasDegraded || activeIncidents.length > 0 || averageUptime < 99) {
+  } else if (hasDegraded || hasActiveIncidents || averageUptime < 99) {
     overallStatus = 'degraded'
   }
 
