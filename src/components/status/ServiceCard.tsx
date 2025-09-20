@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ServiceWithStats, UptimeData } from '@/types'
 import { getStatusColor, formatResponseTime, formatRelativeTime } from '@/lib/utils'
-import { ChevronDown, ChevronUp, CheckCircle, AlertCircle, XCircle } from 'lucide-react'
+import { ChevronDown, ChevronUp, CheckCircle, AlertTriangle, XCircle } from 'lucide-react'
 import UptimeChart from '@/components/charts/UptimeChart'
 import styles from './ServiceCard.module.scss'
 
@@ -46,7 +46,7 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
       case 'operational':
         return <CheckCircle className={styles.statusIcon} />
       case 'degraded':
-        return <AlertCircle className={styles.statusIcon} />
+        return <AlertTriangle className={styles.statusIcon} />
       case 'outage':
         return <XCircle className={styles.statusIcon} />
       default:
@@ -59,15 +59,15 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
       case 'operational':
         return 'Operational'
       case 'degraded':
-        return 'Degraded'
+        return 'Degraded Performance'
       case 'outage':
-        return 'Outage'
+        return 'Major Outage'
       default:
         return 'Unknown'
     }
   }
 
-  // Generate mini uptime bars for last 90 days
+  // Generate 90 uptime bars (like Flare)
   const generateUptimeBars = () => {
     const bars = []
     const today = new Date()
@@ -76,15 +76,27 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
       const date = new Date(today)
       date.setDate(date.getDate() - i)
       
-      // Simulate uptime data (you can replace with real data)
-      const uptime = Math.random() > 0.05 ? 100 : Math.random() * 100
-      const isUp = uptime > 95
+      // Simulate uptime data based on service status
+      let uptime = 100
+      if (service.currentStatus === 'degraded') {
+        uptime = Math.random() > 0.1 ? 100 : 85 + Math.random() * 10
+      } else if (service.currentStatus === 'outage') {
+        uptime = Math.random() > 0.05 ? 100 : Math.random() * 50
+      } else {
+        uptime = Math.random() > 0.02 ? 100 : 90 + Math.random() * 10
+      }
+      
+      const getBarColor = () => {
+        if (uptime >= 98) return styles.barUp
+        if (uptime >= 90) return styles.barDegraded
+        return styles.barDown
+      }
       
       bars.push(
         <div
           key={i}
-          className={`${styles.uptimeBar} ${isUp ? styles.uptimeBarUp : styles.uptimeBarDown}`}
-          title={`${date.toDateString()}: ${uptime.toFixed(1)}% uptime`}
+          className={`${styles.uptimeBar} ${getBarColor()}`}
+          title={`${date.toLocaleDateString()}: ${uptime.toFixed(1)}% uptime`}
         />
       )
     }
@@ -93,36 +105,33 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
   }
 
   return (
-    <div className={`${styles.serviceRow} ${styles[statusColor]}`}>
-      <div className={styles.serviceMain} onClick={onToggle}>
-        {/* Left side: Status + Service info */}
+    <div className={styles.serviceContainer}>
+      <div className={styles.serviceRow} onClick={onToggle}>
+        {/* LEFT: Icon + Service Name + Status */}
         <div className={styles.serviceLeft}>
-          <div className={`${styles.statusIndicator} ${styles[statusColor]}`}>
+          <div className={`${styles.statusIcon} ${styles[statusColor]}`}>
             {getStatusIcon()}
           </div>
           <div className={styles.serviceInfo}>
             <h3 className={styles.serviceName}>{service.name}</h3>
-            <span className={`${styles.statusText} ${styles[statusColor]}`}>
+            <div className={`${styles.statusText} ${styles[statusColor]}`}>
               {getStatusText()}
-            </span>
+            </div>
           </div>
         </div>
 
-        {/* Right side: Uptime chart + percentage */}
+        {/* RIGHT: Uptime % + Bars */}
         <div className={styles.serviceRight}>
-          <div className={styles.uptimeSection}>
-            <div className={styles.uptimeChart}>
-              {generateUptimeBars()}
+          <div className={styles.uptimeStats}>
+            <div className={styles.uptimePercent}>
+              {service.uptimePercent30d.toFixed(3)}%
             </div>
-            <div className={styles.uptimePercentage}>
-              <span className={styles.uptimeValue}>
-                {service.uptimePercent30d.toFixed(3)}%
-              </span>
-              <span className={styles.uptimeLabel}>Uptime</span>
-            </div>
+            <div className={styles.uptimeLabel}>Uptime</div>
           </div>
-          
-          <div className={styles.expandButton}>
+          <div className={styles.uptimeBars}>
+            {generateUptimeBars()}
+          </div>
+          <div className={styles.expandIcon}>
             {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
           </div>
         </div>
@@ -130,42 +139,42 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
 
       {isExpanded && (
         <div className={styles.expandedContent}>
-          <div className={styles.metricsGrid}>
-            <div className={styles.metric}>
-              <span className={styles.metricValue}>{service.uptimePercent24h.toFixed(2)}%</span>
-              <span className={styles.metricLabel}>24h Uptime</span>
+          <div className={styles.detailsGrid}>
+            <div className={styles.statItem}>
+              <span className={styles.statValue}>{service.uptimePercent24h.toFixed(2)}%</span>
+              <span className={styles.statLabel}>24h Uptime</span>
             </div>
-            <div className={styles.metric}>
-              <span className={styles.metricValue}>{service.uptimePercent7d.toFixed(2)}%</span>
-              <span className={styles.metricLabel}>7d Uptime</span>
+            <div className={styles.statItem}>
+              <span className={styles.statValue}>{service.uptimePercent7d.toFixed(2)}%</span>
+              <span className={styles.statLabel}>7d Uptime</span>
             </div>
-            <div className={styles.metric}>
-              <span className={styles.metricValue}>{service.uptimePercent30d.toFixed(2)}%</span>
-              <span className={styles.metricLabel}>30d Uptime</span>
+            <div className={styles.statItem}>
+              <span className={styles.statValue}>{service.uptimePercent30d.toFixed(2)}%</span>
+              <span className={styles.statLabel}>30d Uptime</span>
             </div>
             {service.averageResponseTime && (
-              <div className={styles.metric}>
-                <span className={styles.metricValue}>
+              <div className={styles.statItem}>
+                <span className={styles.statValue}>
                   {formatResponseTime(service.averageResponseTime)}
                 </span>
-                <span className={styles.metricLabel}>Avg Response</span>
+                <span className={styles.statLabel}>Avg Response</span>
               </div>
             )}
-            <div className={styles.metric}>
-              <span className={styles.metricValue}>
+            <div className={styles.statItem}>
+              <span className={styles.statValue}>
                 {service.lastCheck ? formatRelativeTime(service.lastCheck) : 'Never'}
               </span>
-              <span className={styles.metricLabel}>Last Check</span>
+              <span className={styles.statLabel}>Last Check</span>
             </div>
           </div>
 
           {loadingHistory ? (
-            <div className={styles.chartLoading}>
+            <div className={styles.loadingChart}>
               <div className={styles.spinner}></div>
-              <span>Loading detailed uptime history...</span>
+              <span>Loading detailed history...</span>
             </div>
           ) : (
-            <div className={styles.detailedChart}>
+            <div className={styles.chartContainer}>
               <UptimeChart data={uptimeHistory} />
             </div>
           )}
