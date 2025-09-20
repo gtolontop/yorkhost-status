@@ -43,8 +43,8 @@ export default function EditIncidentModal({ isOpen, onClose, onSuccess, incident
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    severity: 'MEDIUM' as const,
-    status: 'INVESTIGATING' as const,
+    severity: 'MEDIUM' as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL',
+    status: 'INVESTIGATING' as 'INVESTIGATING' | 'IDENTIFIED' | 'MONITORING' | 'RESOLVED' | 'SCHEDULED',
     serviceId: ''
   })
   const [services, setServices] = useState<Service[]>([])
