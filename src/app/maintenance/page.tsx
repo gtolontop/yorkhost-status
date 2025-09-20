@@ -14,38 +14,24 @@ export default function MaintenancePage() {
           subtitle="All planned maintenance windows and system updates for Yorkhost services"
         />
 
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <div style={{
-            background: 'var(--bg-secondary)',
-            border: '1px solid var(--border-color)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '32px',
-            textAlign: 'left',
-            marginBottom: '24px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <Calendar size={20} style={{ color: 'var(--color-info)' }} />
-              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: 'var(--text-primary)' }}>
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-left mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Calendar size={20} className="text-info" />
+              <h3 className="text-lg font-semibold text-gray-900">
                 No Scheduled Maintenance
               </h3>
             </div>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}>
+            <p className="text-gray-600 mb-3">
               There are currently no scheduled maintenance windows. We will notify users in advance of any planned maintenance.
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
               <Clock size={16} />
               <span>All maintenance is performed during low-traffic hours</span>
             </div>
           </div>
 
-          <div style={{
-            background: 'var(--bg-tertiary)',
-            border: '1px solid var(--border-light)',
-            borderRadius: 'var(--radius-md)',
-            padding: '16px',
-            fontSize: '0.875rem',
-            color: 'var(--text-secondary)'
-          }}>
+          <div className="bg-gray-100 border border-gray-100 rounded-md p-4 text-sm text-gray-600">
             💡 <strong>Tip:</strong> Subscribe to our status updates to receive notifications about scheduled maintenance and incidents.
           </div>
         </div>
