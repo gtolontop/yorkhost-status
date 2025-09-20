@@ -81,20 +81,16 @@ export default function AdminServicesPage() {
       if (result.success) {
         // Transform the API response to match our component interface
         const transformedServices = result.data.map((service: any) => {
-          // Get the latest check result from the check's results array
-          const latestResult = service.checks?.[0]?.results?.[0] || service.checks?.[0]
-          const isOperational = latestResult?.success === true
-          
           return {
             id: service.id,
             name: service.name,
             description: service.description,
             url: service.url,
-            status: isOperational ? 'operational' : 'outage',
-            uptime: calculateUptime(service.checks || []),
-            responseTime: latestResult?.responseTime || 0,
-            lastCheck: latestResult?.createdAt || latestResult?.timestamp || new Date().toISOString(),
-            isActive: true,
+            status: service.status || 'outage',
+            uptime: service.uptime || 0,
+            responseTime: service.responseTime || 0,
+            lastCheck: service.lastCheck || new Date().toISOString(),
+            isActive: service.isActive !== false,
             group: service.machine?.category || 'other',
             machine: {
               id: service.machine?.id || '',
