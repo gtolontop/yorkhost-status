@@ -54,7 +54,7 @@ export async function POST(
         responseTime: result.responseTime,
         statusCode: result.statusCode,
         error: result.error,
-        createdAt: new Date()
+        timestamp: new Date()
       }
     })
 
