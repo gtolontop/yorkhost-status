@@ -68,15 +68,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div style={{
-            marginTop: '32px',
-            padding: '16px',
-            background: 'var(--bg-tertiary)',
-            border: '1px solid var(--border-light)',
-            borderRadius: 'var(--radius-md)',
-            fontSize: '0.875rem',
-            color: 'var(--text-secondary)'
-          }}>
+          <div className="mt-8 p-4 bg-gray-100 border border-gray-100 rounded-md text-sm text-gray-600">
             📍 <strong>Location:</strong> Paris, France | 
             🕒 <strong>Support Hours:</strong> Monday-Friday, 9AM-6PM CET
           </div>
