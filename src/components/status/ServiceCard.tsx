@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ServiceWithStats, UptimeData } from '@/types'
 import { getStatusColor, formatResponseTime, formatRelativeTime } from '@/lib/utils'
-import { ChevronDown, ChevronUp, CheckCircle, AlertTriangle, XCircle } from 'lucide-react'
+import { ChevronDown, ChevronUp, CheckCircle, AlertTriangle, XCircle, HelpCircle } from 'lucide-react'
 import UptimeChart from '@/components/charts/UptimeChart'
 
 interface ServiceCardProps {
@@ -49,8 +49,10 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
         return <AlertTriangle className="w-5 h-5 text-yellow-600" />
       case 'outage':
         return <XCircle className="w-5 h-5 text-red-600" />
+      case 'unknown':
+        return <HelpCircle className="w-5 h-5 text-gray-400" />
       default:
-        return <CheckCircle className="w-5 h-5 text-green-600" />
+        return <HelpCircle className="w-5 h-5 text-gray-400" />
     }
   }
 
@@ -62,8 +64,10 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
         return 'Degraded Performance'
       case 'outage':
         return 'Major Outage'
+      case 'unknown':
+        return 'No Data'
       default:
-        return 'Unknown'
+        return 'No Data'
     }
   }
 
