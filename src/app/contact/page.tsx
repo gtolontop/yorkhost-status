@@ -17,14 +17,7 @@ export default function ContactPage() {
         <div className="max-w-3xl mx-auto">
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2 mb-12">
             
-            <div style={{
-              background: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '32px',
-              textAlign: 'center',
-              transition: 'var(--transition-all)'
-            }}>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center transition-all hover:shadow-md">
               <Mail size={32} className="text-primary mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Email Support
@@ -34,33 +27,19 @@ export default function ContactPage() {
               </p>
               <a 
                 href="mailto:support@yorkhost.fr"
-                style={{
-                  color: 'var(--color-primary)',
-                  textDecoration: 'none',
-                  fontWeight: '500',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}
+                className="text-primary no-underline font-medium inline-flex items-center gap-1 hover:underline"
               >
                 support@yorkhost.fr
                 <ExternalLink size={14} />
               </a>
             </div>
 
-            <div style={{
-              background: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '32px',
-              textAlign: 'center',
-              transition: 'var(--transition-all)'
-            }}>
-              <MessageCircle size={32} style={{ color: 'var(--color-success)', marginBottom: '16px' }} />
-              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }}>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center transition-all hover:shadow-md">
+              <MessageCircle size={32} className="text-success mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Discord Community
               </h3>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+              <p className="text-gray-600 mb-4">
                 Join our Discord server for community support
               </p>
               <a 
