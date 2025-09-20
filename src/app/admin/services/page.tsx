@@ -120,8 +120,22 @@ export default function AdminServicesPage() {
   // Helper function to calculate uptime from checks
   const calculateUptime = (checks: any[]) => {
     if (!checks || checks.length === 0) return 0
-    const successfulChecks = checks.filter(check => check.success).length
-    return Math.round((successfulChecks / checks.length) * 100 * 100) / 100
+    
+    // Get all results from all checks
+    let allResults: any[] = []
+    checks.forEach(check => {
+      if (check.results && check.results.length > 0) {
+        allResults = allResults.concat(check.results)
+      } else if (check.success !== undefined) {
+        // Direct check result
+        allResults.push(check)
+      }
+    })
+    
+    if (allResults.length === 0) return 0
+    
+    const successfulChecks = allResults.filter(result => result.success === true).length
+    return Math.round((successfulChecks / allResults.length) * 100 * 100) / 100
   }
 
   const fetchGroups = async () => {
