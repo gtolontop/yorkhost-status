@@ -18,9 +18,14 @@ export function formatDate(date: Date, formatString: string = 'PP'): string {
 /**
  * Format relative time
  */
-export function formatRelativeTime(date: Date): string {
+export function formatRelativeTime(date: Date | string | null | undefined): string {
+  if (!date) return 'Never'
+  
+  const dateObj = typeof date === 'string' ? new Date(date) : date
+  if (!dateObj || isNaN(dateObj.getTime())) return 'Invalid date'
+  
   const now = new Date()
-  const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
+  const diffInMinutes = Math.floor((now.getTime() - dateObj.getTime()) / (1000 * 60))
   
   if (diffInMinutes < 1) return 'Just now'
   if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`
@@ -31,7 +36,7 @@ export function formatRelativeTime(date: Date): string {
   const diffInDays = Math.floor(diffInHours / 24)
   if (diffInDays < 30) return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`
   
-  return formatDate(date, 'MMM d, yyyy')
+  return formatDate(dateObj, 'MMM d, yyyy')
 }
 
 /**
