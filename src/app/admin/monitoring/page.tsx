@@ -61,6 +61,7 @@ export default function AdminMonitoringPage() {
 
   useEffect(() => {
     fetchMonitoringData()
+    checkWorkerStatus()
     
     let interval: NodeJS.Timeout
     if (isLiveMode) {
@@ -73,6 +74,18 @@ export default function AdminMonitoringPage() {
       if (interval) clearInterval(interval)
     }
   }, [isLiveMode])
+
+  const checkWorkerStatus = async () => {
+    try {
+      const response = await fetch('/api/start-worker')
+      if (response.ok) {
+        const result = await response.json()
+        setWorkerRunning(result.isRunning)
+      }
+    } catch (error) {
+      console.error('Failed to check worker status:', error)
+    }
+  }
 
   const fetchMonitoringData = async () => {
     try {
@@ -194,6 +207,24 @@ export default function AdminMonitoringPage() {
     }
   }
 
+  const toggleWorker = async () => {
+    try {
+      const response = await fetch('/api/start-worker', {
+        method: workerRunning ? 'DELETE' : 'POST'
+      })
+      
+      if (response.ok) {
+        setWorkerRunning(!workerRunning)
+        const result = await response.json()
+        console.log(result.message)
+      } else {
+        console.error('Failed to toggle worker')
+      }
+    } catch (error) {
+      console.error('Worker toggle error:', error)
+    }
+  }
+
   const filteredServices = services.filter(service => {
     if (selectedFilter === 'all') return true
     return service.status === selectedFilter
@@ -240,6 +271,14 @@ export default function AdminMonitoringPage() {
               >
                 <Activity size={16} />
                 Check All
+              </button>
+
+              <button 
+                className={workerRunning ? "btn btn-danger" : "btn btn-secondary"}
+                onClick={toggleWorker}
+              >
+                <Activity size={16} />
+                {workerRunning ? 'Stop Auto-Check' : 'Start Auto-Check'}
               </button>
               
               <button 
