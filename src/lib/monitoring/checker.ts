@@ -122,27 +122,56 @@ async function performPingCheck(target: string, timeout: number): Promise<CheckR
   const startTime = Date.now()
   
   try {
-    // Use the ping package for real ICMP ping
-    const ping = require('ping')
+    // Use TCP connection test instead of ICMP ping for better Vercel compatibility
+    // Try common ports: 80 (HTTP), 443 (HTTPS), 22 (SSH), 53 (DNS)
+    const ports = [80, 443, 22, 53]
     
-    const result = await ping.promise.probe(target, {
-      timeout: timeout / 1000, // ping expects seconds, not milliseconds
-      min_reply: 1
-    })
-    
-    const responseTime = result.alive ? result.time : Date.now() - startTime
-    
-    return {
-      success: result.alive,
-      responseTime: responseTime,
-      error: result.alive ? undefined : `Ping failed: ${result.output || 'Host unreachable'}`
+    for (const port of ports) {
+      try {
+        const result = await performTcpCheck(target, port, timeout)
+        if (result.success) {
+          return {
+            success: true,
+            responseTime: result.responseTime,
+            error: undefined
+          }
+        }
+      } catch (e) {
+        // Continue to next port
+        continue
+      }
     }
+    
+    // If no port is reachable, try HTTP as fallback
+    try {
+      const httpResult = await performHttpCheck(`http://${target}`, timeout)
+      if (httpResult.success) {
+        return httpResult
+      }
+    } catch (e) {
+      // Continue to HTTPS fallback
+    }
+    
+    // Final fallback: HTTPS
+    try {
+      const httpsResult = await performHttpCheck(`https://${target}`, timeout)
+      return httpsResult
+    } catch (e) {
+      // All methods failed
+      const responseTime = Date.now() - startTime
+      return {
+        success: false,
+        responseTime,
+        error: 'Host unreachable on all tested ports and protocols'
+      }
+    }
+    
   } catch (error) {
     const responseTime = Date.now() - startTime
     return {
       success: false,
       responseTime,
-      error: error instanceof Error ? error.message : 'Ping failed'
+      error: error instanceof Error ? error.message : 'Ping check failed'
     }
   }
 }
