@@ -6,6 +6,31 @@ import { getStatusColor, formatResponseTime, formatRelativeTime } from '@/lib/ut
 import { ChevronDown, ChevronUp, CheckCircle, AlertTriangle, XCircle } from 'lucide-react'
 import UptimeChart from '@/components/charts/UptimeChart'
 // import styles from './ServiceCard.module.scss' // Temporarily disabled for Tailwind migration
+// Temporary styles object for basic layout
+const styles: Record<string, string> = {
+  serviceLeft: "flex items-center gap-3 flex-1",
+  statusIcon: "flex-shrink-0",
+  serviceInfo: "min-w-0",
+  serviceName: "font-medium text-gray-900 truncate",
+  statusText: "text-sm",
+  serviceRight: "flex items-center gap-4",
+  uptimeStats: "text-right",
+  uptimePercent: "text-lg font-semibold",
+  uptimeLabel: "text-xs text-gray-500 uppercase",
+  uptimeBars: "flex gap-1",
+  expandIcon: "flex-shrink-0 transition-transform",
+  expandedContent: "border-t border-gray-100 p-4 bg-gray-50",
+  detailsGrid: "grid grid-cols-2 md:grid-cols-5 gap-4 mb-4",
+  statItem: "text-center",
+  statValue: "text-lg font-semibold text-gray-900",
+  statLabel: "text-xs text-gray-500 uppercase",
+  loadingChart: "flex justify-center items-center h-12",
+  spinner: "animate-spin w-6 h-6 border-2 border-gray-200 border-t-primary rounded-full",
+  chartContainer: "mt-4",
+  success: "text-success",
+  warning: "text-warning", 
+  danger: "text-danger"
+}
 
 interface ServiceCardProps {
   service: ServiceWithStats
@@ -44,13 +69,13 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
   const getStatusIcon = () => {
     switch (service.currentStatus) {
       case 'operational':
-        return <CheckCircle className={styles.statusIcon} />
+        return <CheckCircle className="w-5 h-5 text-success" />
       case 'degraded':
-        return <AlertTriangle className={styles.statusIcon} />
+        return <AlertTriangle className="w-5 h-5 text-warning" />
       case 'outage':
-        return <XCircle className={styles.statusIcon} />
+        return <XCircle className="w-5 h-5 text-danger" />
       default:
-        return <CheckCircle className={styles.statusIcon} />
+        return <CheckCircle className="w-5 h-5 text-success" />
     }
   }
 
@@ -87,15 +112,15 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
       }
       
       const getBarColor = () => {
-        if (uptime >= 98) return styles.barUp
-        if (uptime >= 90) return styles.barDegraded
-        return styles.barDown
+        if (uptime >= 98) return 'bg-success'
+        if (uptime >= 90) return 'bg-warning'
+        return 'bg-danger'
       }
       
       bars.push(
         <div
           key={i}
-          className={`${styles.uptimeBar} ${getBarColor()}`}
+          className={`h-8 w-full rounded border ${getBarColor()}`}
           title={`${date.toLocaleDateString()}: ${uptime.toFixed(1)}% uptime`}
         />
       )
@@ -105,8 +130,8 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
   }
 
   return (
-    <div className={styles.serviceContainer}>
-      <div className={styles.serviceRow} onClick={onToggle}>
+    <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-4">
+      <div className="p-4 cursor-pointer hover:bg-gray-50 transition-colors" onClick={onToggle}>
         {/* LEFT: Icon + Service Name + Status */}
         <div className={styles.serviceLeft}>
           <div className={`${styles.statusIcon} ${styles[statusColor]}`}>
