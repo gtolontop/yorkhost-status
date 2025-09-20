@@ -1,138 +1,127 @@
 import Link from 'next/link'
-// import styles from './Footer.module.scss' // Converted to Tailwind
-const styles = {
-  footer: "bg-gray-50 border-t border-gray-200 mt-auto",
-  container: "py-8",
-  content: "grid md:grid-cols-4 gap-8",
-  brand: "md:col-span-1",
-  brandTitle: "text-lg font-semibold text-gray-900 mb-2",
-  brandDescription: "text-gray-600 text-sm",
-  section: "space-y-3",
-  sectionTitle: "font-medium text-gray-900 mb-3",
-  linkList: "space-y-2",
-  link: "text-gray-600 hover:text-gray-900 transition-colors text-sm",
-  bottom: "border-t border-gray-200 pt-6 mt-6 text-center text-gray-500 text-sm"
-}
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className={styles.footer}>
-      <div className={`container ${styles.container}`}>
-        <div className={styles.content}>
-          <div className={styles.brand}>
-            <h3 className={styles.brandTitle}>Yorkhost Status</h3>
-            <p className={styles.brandDescription}>
+    <footer className="bg-gray-50 border-t border-gray-200 mt-auto">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Brand Section */}
+          <div className="md:col-span-1">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Yorkhost Status</h3>
+            <p className="text-gray-600 text-sm">
               Real-time monitoring and status updates for all Yorkhost services.
             </p>
           </div>
 
-          <div className={styles.links}>
-            <div className={styles.linkGroup}>
-              <h4 className={styles.linkGroupTitle}>Status</h4>
-              <ul className={styles.linkList}>
-                <li>
-                  <Link href="/" className={styles.link}>
-                    Current Status
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/incidents" className={styles.link}>
-                    Incident History
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/api/status" className={styles.link}>
-                    API
-                  </Link>
-                </li>
-              </ul>
-            </div>
+          {/* Status Links */}
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">Status</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+                  Current Status
+                </Link>
+              </li>
+              <li>
+                <Link href="/incidents" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+                  Incident History
+                </Link>
+              </li>
+              <li>
+                <Link href="/maintenance" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+                  Maintenance
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-            <div className={styles.linkGroup}>
-              <h4 className={styles.linkGroupTitle}>Resources</h4>
-              <ul className={styles.linkList}>
-                <li>
-                  <a 
-                    href="https://yorkhost.fr" 
-                    className={styles.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Main Website
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="https://docs.yorkhost.fr" 
-                    className={styles.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Documentation
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="https://support.yorkhost.fr" 
-                    className={styles.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Support
-                  </a>
-                </li>
-              </ul>
-            </div>
+          {/* Resources Links */}
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">Resources</h4>
+            <ul className="space-y-2">
+              <li>
+                <a 
+                  href="https://yorkhost.fr" 
+                  className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Main Website
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="https://docs.yorkhost.fr" 
+                  className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Documentation
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="https://support.yorkhost.fr" 
+                  className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Support
+                </a>
+              </li>
+            </ul>
+          </div>
 
-            <div className={styles.linkGroup}>
-              <h4 className={styles.linkGroupTitle}>Connect</h4>
-              <ul className={styles.linkList}>
-                <li>
-                  <a 
-                    href="https://discord.gg/yorkhost" 
-                    className={styles.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Discord
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="https://twitter.com/yorkhost" 
-                    className={styles.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Twitter
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="https://github.com/yorkhost" 
-                    className={styles.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    GitHub
-                  </a>
-                </li>
-              </ul>
-            </div>
+          {/* Connect Links */}
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">Connect</h4>
+            <ul className="space-y-2">
+              <li>
+                <a 
+                  href="https://discord.gg/yorkhost" 
+                  className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Discord
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="https://twitter.com/yorkhost" 
+                  className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Twitter
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="https://github.com/yorkhost" 
+                  className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  GitHub
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
 
-        <div className={styles.bottom}>
-          <p className={styles.copyright}>
+        {/* Bottom Section */}
+        <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between">
+          <p className="text-gray-500 text-sm mb-4 md:mb-0">
             © {currentYear} Yorkhost. All rights reserved.
           </p>
-          <div className={styles.bottomLinks}>
-            <Link href="/privacy" className={styles.bottomLink}>
+          <div className="flex items-center gap-6">
+            <Link href="/privacy" className="text-gray-500 hover:text-gray-700 text-sm transition-colors">
               Privacy Policy
             </Link>
-            <Link href="/terms" className={styles.bottomLink}>
+            <Link href="/terms" className="text-gray-500 hover:text-gray-700 text-sm transition-colors">
               Terms of Service
             </Link>
           </div>
