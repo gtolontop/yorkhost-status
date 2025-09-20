@@ -118,7 +118,6 @@ export default function UsersPage() {
           </div>
         </div>
 
-        <div style={{ padding: '2rem' }}>
         {error && (
           <div style={{
             background: '#fef2f2',
@@ -132,13 +131,14 @@ export default function UsersPage() {
           </div>
         )}
 
-        {/* Header Actions */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '2rem'
-        }}>
+        <div style={{ padding: '2rem' }}>
+          {/* Header Actions */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '2rem'
+          }}>
           <div style={{
             display: 'flex',
             gap: '1rem',
