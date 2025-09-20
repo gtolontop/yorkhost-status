@@ -49,7 +49,7 @@ async function performHttpCheck(target: string, timeout: number): Promise<CheckR
   
   try {
     // Ensure target has protocol
-    const url = target.startsWith('http') ? target : `https://${target}`
+    const url = target.startsWith('http://') || target.startsWith('https://') ? target : `https://${target}`
     
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), timeout)
