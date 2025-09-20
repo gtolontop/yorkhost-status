@@ -80,23 +80,29 @@ export default function AdminServicesPage() {
       
       if (result.success) {
         // Transform the API response to match our component interface
-        const transformedServices = result.data.map((service: any) => ({
-          id: service.id,
-          name: service.name,
-          description: service.description,
-          url: service.url,
-          status: service.checks?.[0]?.success ? 'operational' : 'outage',
-          uptime: calculateUptime(service.checks || []),
-          responseTime: service.checks?.[0]?.responseTime || 0,
-          lastCheck: service.checks?.[0]?.createdAt || new Date().toISOString(),
-          isActive: true,
-          group: service.machine?.category || 'other',
-          machine: {
-            id: service.machine?.id || '',
-            name: service.machine?.name || 'Unknown',
-            category: service.machine?.category || 'other'
+        const transformedServices = result.data.map((service: any) => {
+          // Get the latest check result from the check's results array
+          const latestResult = service.checks?.[0]?.results?.[0] || service.checks?.[0]
+          const isOperational = latestResult?.success === true
+          
+          return {
+            id: service.id,
+            name: service.name,
+            description: service.description,
+            url: service.url,
+            status: isOperational ? 'operational' : 'outage',
+            uptime: calculateUptime(service.checks || []),
+            responseTime: latestResult?.responseTime || 0,
+            lastCheck: latestResult?.createdAt || latestResult?.timestamp || new Date().toISOString(),
+            isActive: true,
+            group: service.machine?.category || 'other',
+            machine: {
+              id: service.machine?.id || '',
+              name: service.machine?.name || 'Unknown',
+              category: service.machine?.category || 'other'
+            }
           }
-        }))
+        })
         
         setServices(transformedServices)
       } else {
