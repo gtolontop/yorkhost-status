@@ -28,7 +28,7 @@ export interface ServiceWithStats extends Service {
   uptimePercent24h: number
   uptimePercent7d: number
   uptimePercent30d: number
-  currentStatus: 'operational' | 'degraded' | 'outage'
+  currentStatus: 'operational' | 'degraded' | 'outage' | 'unknown'
   lastCheck?: Date
   averageResponseTime?: number
 }

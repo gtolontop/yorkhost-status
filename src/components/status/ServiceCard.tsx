@@ -106,7 +106,7 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
       const incidents = dayData?.incidents || []
       
       const getBarColor = () => {
-        if (!dayData || uptime === 100) return 'bg-gray-300' // No data = gray
+        if (!dayData || uptime === -1) return 'bg-gray-300' // No data = gray
         if (uptime >= 99.9) return 'bg-green-500'
         if (uptime >= 90) return 'bg-yellow-500'
         return 'bg-red-500'
@@ -125,12 +125,12 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
         <div
           key={i}
           className={`h-8 flex-1 ${getBarColor()} hover:opacity-80 transition-opacity cursor-pointer relative group rounded-sm`}
-          title={`${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}: ${uptime.toFixed(1)}% uptime - ${getStatus()}`}
+          title={`${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}: ${uptime === -1 ? 'No data' : `${uptime.toFixed(1)}% uptime - ${getStatus()}`}`}
         >
           {/* Tooltip on hover */}
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
             <div className="font-medium">{date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-            <div>{uptime.toFixed(1)}% - {getStatus()}</div>
+            <div>{uptime === -1 ? 'No data' : `${uptime.toFixed(1)}% - ${getStatus()}`}</div>
             {incidents.length > 0 && (
               <div className="text-xs text-gray-300 mt-0.5">
                 {incidents.map(inc => inc.title).join(', ')}
@@ -210,17 +210,17 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
               </p>
               <p className="text-xs text-gray-500 uppercase">30d Uptime</p>
             </div>
-            {service.responseTime && (
+            {service.averageResponseTime && (
               <div className="text-center">
                 <p className="text-2xl font-semibold text-gray-900">
-                  {formatResponseTime(service.responseTime)}
+                  {formatResponseTime(service.averageResponseTime)}
                 </p>
                 <p className="text-xs text-gray-500 uppercase">Response Time</p>
               </div>
             )}
             <div className="text-center">
               <p className="text-2xl font-semibold text-gray-900">
-                {service.lastCheckedAt ? formatRelativeTime(service.lastCheckedAt) : 'Never'}
+                {service.lastCheck ? formatRelativeTime(service.lastCheck) : 'Never'}
               </p>
               <p className="text-xs text-gray-500 uppercase">Last Check</p>
             </div>
