@@ -76,7 +76,7 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
       date.setDate(date.getDate() - i)
       
       // Find actual uptime data for this date if available
-      const dayData = uptimeHistory.find((d: UptimeData) => {
+      const dayData = uptimeHistory.find((d: any) => {
         const dataDate = new Date(d.date)
         return dataDate.toDateString() === date.toDateString()
       })
@@ -113,7 +113,7 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
             <div>{uptime === -1 ? 'No data' : `${uptime.toFixed(1)}% - ${getStatus()}`}</div>
             {incidents.length > 0 && (
               <div className="text-xs text-gray-300 mt-0.5">
-                {incidents.map(inc => inc.title).join(', ')}
+                {incidents.map((inc: any) => inc.title).join(', ')}
               </div>
             )}
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
