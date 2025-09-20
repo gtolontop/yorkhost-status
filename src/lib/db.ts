@@ -64,7 +64,7 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
     const dateKey = date.toISOString().split('T')[0]
     
     const dayData = dailyData[dateKey]
-    const uptime = dayData ? (dayData.successful / dayData.total) * 100 : 100
+    const uptime = dayData ? (dayData.successful / dayData.total) * 100 : null
     
     // Get incidents for this day
     const incidents = await prisma.incident.findMany({
@@ -87,7 +87,7 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
     
     uptimeData.push({
       date: dateKey,
-      uptime: Math.round(uptime * 100) / 100,
+      uptime: uptime !== null ? Math.round(uptime * 100) / 100 : null as any,
       incidents: incidents.map(incident => ({
         ...incident,
         endTime: incident.endTime || undefined
@@ -113,19 +113,22 @@ export async function getServiceStats(serviceId: string) {
       where: {
         check: { serviceId },
         timestamp: { gte: yesterday }
-      }
+      },
+      orderBy: { timestamp: 'asc' }
     }),
     prisma.checkResult.findMany({
       where: {
         check: { serviceId },
         timestamp: { gte: lastWeek }
-      }
+      },
+      orderBy: { timestamp: 'asc' }
     }),
     prisma.checkResult.findMany({
       where: {
         check: { serviceId },
         timestamp: { gte: lastMonth }
-      }
+      },
+      orderBy: { timestamp: 'asc' }
     }),
     prisma.checkResult.findFirst({
       where: {
@@ -238,9 +241,13 @@ export async function getStatusOverview() {
 
   let overallStatus: 'operational' | 'degraded' | 'outage' = 'operational'
   
-  if (activeIncidents.some(i => i.severity === 'CRITICAL')) {
+  // Check if any service has an outage
+  const hasOutage = servicesWithStats.some(s => s.currentStatus === 'outage')
+  const hasDegraded = servicesWithStats.some(s => s.currentStatus === 'degraded')
+  
+  if (hasOutage || activeIncidents.some(i => i.severity === 'CRITICAL')) {
     overallStatus = 'outage'
-  } else if (activeIncidents.length > 0 || averageUptime < 99) {
+  } else if (hasDegraded || activeIncidents.length > 0 || averageUptime < 99) {
     overallStatus = 'degraded'
   }
 

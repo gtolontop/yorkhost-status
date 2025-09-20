@@ -101,8 +101,8 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
         return dataDate.toDateString() === date.toDateString()
       })
       
-      // Use real data if available, otherwise assume 100% uptime
-      const uptime = dayData ? dayData.uptime : -1 // -1 indicates no data
+      // Use real data if available
+      const uptime = dayData ? (dayData.uptime !== null ? dayData.uptime : -1) : -1 // -1 indicates no data
       const incidents = dayData?.incidents || []
       
       const getBarColor = () => {
