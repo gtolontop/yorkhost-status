@@ -64,7 +64,7 @@ export async function POST(
         check.type,
         check.target,
         check.port,
-        check.timeout * 1000 // Convert seconds to milliseconds
+        check.timeout // Already in milliseconds
       )
     } catch (err) {
       checkResult = {
