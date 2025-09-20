@@ -65,6 +65,7 @@ export default function AdminServicesPage() {
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [editingService, setEditingService] = useState<Service | null>(null)
+  const [checking, setChecking] = useState(false)
   const [selectedServices, setSelectedServices] = useState<string[]>([])
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
 
@@ -323,6 +324,30 @@ export default function AdminServicesPage() {
       }
     } catch (error) {
       console.error('Failed to delete service:', error)
+    }
+  }
+
+  const handleCheckAllServices = async () => {
+    try {
+      setChecking(true)
+      const response = await fetch('/api/admin/services/check-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        // Refresh services to show updated data
+        await fetchServices()
+        console.log('Bulk check completed:', result.data)
+      } else {
+        console.error('Failed to check services:', result.error)
+      }
+    } catch (error) {
+      console.error('Error checking services:', error)
+    } finally {
+      setChecking(false)
     }
   }
 
