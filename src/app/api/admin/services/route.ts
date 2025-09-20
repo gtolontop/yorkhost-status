@@ -6,11 +6,11 @@ import { z } from 'zod'
 const createServiceSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().optional(),
-  type: z.string(),
-  target: z.string(),
-  port: z.number().optional(),
-  interval: z.number().default(60),
-  timeout: z.number().default(10),
+  type: z.enum(['HTTP', 'HTTPS', 'TCP', 'ICMP', 'DNS']),
+  target: z.string().min(1),
+  port: z.number().int().min(1).max(65535).optional(),
+  interval: z.number().int().min(10).default(60),
+  timeout: z.number().int().min(1).max(300).default(10),
   group: z.string().default('other')
 })
 

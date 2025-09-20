@@ -76,8 +76,14 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          ...formData,
-          port: formData.port ? parseInt(formData.port) : null
+          name: formData.name,
+          description: formData.description || undefined,
+          type: formData.type,
+          target: formData.target,
+          port: formData.port ? parseInt(formData.port) : undefined,
+          interval: formData.interval,
+          timeout: formData.timeout,
+          group: formData.group
         })
       })
 

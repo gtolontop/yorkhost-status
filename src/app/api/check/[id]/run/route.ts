@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth, requirePermission } from '@/lib/auth/jwt'
 import { prisma } from '@/lib/db'
+import { executeCheck } from '@/lib/monitoring/checker'
 
 export async function POST(
   request: NextRequest,
@@ -35,9 +36,27 @@ export async function POST(
       }, { status: 404 })
     }
 
-    // TODO: Trigger manual check execution
-    // This would integrate with the worker system
-    // For now, we'll create a placeholder response
+    // Execute the actual check
+    console.log(`Running ${check.type} check for ${check.target}:${check.port || 'N/A'}`)
+    
+    const result = await executeCheck(
+      check.type,
+      check.target,
+      check.port,
+      check.timeout
+    )
+    
+    // Save the result
+    await prisma.checkResult.create({
+      data: {
+        checkId: check.id,
+        success: result.success,
+        responseTime: result.responseTime,
+        statusCode: result.statusCode,
+        error: result.error,
+        createdAt: new Date()
+      }
+    })
 
     // Create audit log
     await prisma.auditLog.create({
@@ -55,11 +74,16 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      message: 'Manual check triggered successfully',
+      message: 'Check executed successfully',
       data: {
         checkId,
         serviceName: check.service.name,
-        scheduledAt: new Date()
+        result: {
+          success: result.success,
+          responseTime: result.responseTime,
+          error: result.error
+        },
+        executedAt: new Date()
       }
     })
   } catch (error) {
