@@ -579,7 +579,7 @@ export default function AdminServicesPage() {
                               {formatRelativeTime(service.lastCheck)}
                             </div>
                             <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                              Dernier check
+                              Last check
                             </div>
                           </div>
                         </div>
@@ -591,7 +591,7 @@ export default function AdminServicesPage() {
                             onClick={() => toggleServiceStatus(service.id)}
                           >
                             {service.isActive ? <Pause size={14} /> : <Play size={14} />}
-                            {service.isActive ? 'Pause' : 'Activer'}
+                            {service.isActive ? 'Pause' : 'Activate'}
                           </button>
                           
                           <button 
