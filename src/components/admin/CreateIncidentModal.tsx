@@ -97,7 +97,8 @@ export default function CreateIncidentModal({ isOpen, onClose, onSuccess }: Crea
     { value: 'INVESTIGATING', label: 'Investigating' },
     { value: 'IDENTIFIED', label: 'Identified' },
     { value: 'MONITORING', label: 'Monitoring' },
-    { value: 'RESOLVED', label: 'Resolved' }
+    { value: 'RESOLVED', label: 'Resolved' },
+    { value: 'SCHEDULED', label: 'Scheduled' }
   ]
 
   return (
