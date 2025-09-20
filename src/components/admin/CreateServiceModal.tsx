@@ -19,8 +19,7 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
     target: '',
     port: '',
     interval: 60,
-    timeout: 10,
-    group: 'web'
+    timeout: 10
   })
 
   const monitorTypes = [
@@ -30,17 +29,6 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
     { value: 'DNS', label: 'DNS Query' }
   ]
 
-  const groups = [
-    { value: 'web', label: 'Web Servers' },
-    { value: 'api', label: 'API Services' },
-    { value: 'database', label: 'Databases' },
-    { value: 'cache', label: 'Cache' },
-    { value: 'storage', label: 'Storage' },
-    { value: 'cdn', label: 'CDN' },
-    { value: 'network', label: 'Network' },
-    { value: 'security', label: 'Security' },
-    { value: 'other', label: 'Other' }
-  ]
 
   const intervalOptions = [
     { value: 30, label: '30 seconds' },
@@ -58,8 +46,7 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
       target: '',
       port: '',
       interval: 60,
-      timeout: 10,
-      group: 'web'
+      timeout: 10
     })
     setError('')
   }
@@ -82,8 +69,7 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
           target: formData.target,
           port: (['ICMP', 'DNS'].includes(formData.type) || !formData.port) ? null : parseInt(formData.port),
           interval: formData.interval,
-          timeout: formData.timeout,
-          group: formData.group
+          timeout: formData.timeout
         })
       })
 
@@ -286,34 +272,6 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
             </div>
           )}
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              marginBottom: '0.5rem',
-              color: '#374151'
-            }}>
-              Group
-            </label>
-            <select
-              value={formData.group}
-              onChange={(e) => setFormData({ ...formData, group: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '0.875rem'
-              }}
-            >
-              {groups.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
 
           <div style={{ marginBottom: '1rem' }}>
             <label style={{

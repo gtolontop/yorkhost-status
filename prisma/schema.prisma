@@ -57,7 +57,7 @@ model Machine {
 
 model Service {
   id           String        @id @default(cuid())
-  machineId    String
+  machineId    String?
   name         String
   description  String?
   url          String?
@@ -66,7 +66,7 @@ model Service {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   
-  machine      Machine       @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  machine      Machine?      @relation(fields: [machineId], references: [id], onDelete: Cascade)
   checks       Check[]
   incidents    Incident[]
   notifications Notification[]

@@ -39,8 +39,8 @@ interface Service {
   responseTime: number
   lastCheck: string
   isActive: boolean
-  group: string
-  machine: {
+  group?: string
+  machine?: {
     id: string
     name: string
     category: string
@@ -92,12 +92,12 @@ export default function AdminServicesPage() {
             responseTime: service.responseTime || 0,
             lastCheck: service.lastCheck || new Date().toISOString(),
             isActive: service.isActive !== false,
-            group: service.machine?.category || 'other',
-            machine: {
-              id: service.machine?.id || '',
-              name: service.machine?.name || 'Unknown',
-              category: service.machine?.category || 'other'
-            }
+            group: service.machine?.category || 'ungrouped',
+            machine: service.machine ? {
+              id: service.machine.id,
+              name: service.machine.name,
+              category: service.machine.category
+            } : undefined
           }
         })
         
@@ -214,6 +214,13 @@ export default function AdminServicesPage() {
           name: 'Other',
           description: 'Miscellaneous services',
           color: '#6b7280',
+          services: []
+        },
+        {
+          id: 'ungrouped',
+          name: 'Ungrouped',
+          description: 'Services not assigned to any group',
+          color: '#94a3b8',
           services: []
         }
       ]
@@ -602,7 +609,7 @@ export default function AdminServicesPage() {
                                 {service.name}
                               </h4>
                               <p style={{ margin: 0, fontSize: '0.8rem', color: '#6b7280' }}>
-                                {service.machine.name}
+                                {service.machine?.name || 'No machine assigned'}
                               </p>
                             </div>
                           </div>

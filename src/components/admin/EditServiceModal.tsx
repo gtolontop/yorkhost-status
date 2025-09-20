@@ -8,19 +8,9 @@ interface Service {
   name: string
   description?: string | null
   url?: string | null
-  machineId?: string | null
   isActive: boolean
-  machine?: {
-    id: string
-    name: string
-  }
 }
 
-interface Machine {
-  id: string
-  name: string
-  category: string
-}
 
 interface EditServiceModalProps {
   isOpen: boolean
@@ -34,10 +24,8 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
     name: '',
     description: '',
     url: '',
-    machineId: '',
     isActive: true
   })
-  const [machines, setMachines] = useState<Machine[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -47,24 +35,10 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
         name: service.name,
         description: service.description || '',
         url: service.url || '',
-        machineId: service.machineId || '',
         isActive: service.isActive
       })
-      fetchMachines()
     }
   }, [isOpen, service])
-
-  const fetchMachines = async () => {
-    try {
-      const response = await fetch('/api/admin/machines')
-      const result = await response.json()
-      if (result.success) {
-        setMachines(result.data)
-      }
-    } catch (error) {
-      console.error('Failed to fetch machines:', error)
-    }
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -77,10 +51,7 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          ...formData,
-          machineId: formData.machineId || undefined
-        })
+        body: JSON.stringify(formData)
       })
 
       const result = await response.json()
@@ -235,35 +206,6 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              marginBottom: '0.5rem',
-              color: '#374151'
-            }}>
-              Machine
-            </label>
-            <select
-              value={formData.machineId}
-              onChange={(e) => setFormData({ ...formData, machineId: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '0.875rem'
-              }}
-            >
-              <option value="">No machine assigned</option>
-              {machines.map((machine) => (
-                <option key={machine.id} value={machine.id}>
-                  {machine.name} ({machine.category})
-                </option>
-              ))}
-            </select>
-          </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={{
