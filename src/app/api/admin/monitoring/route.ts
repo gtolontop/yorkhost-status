@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth/jwt'
 import { prisma } from '@/lib/db'
+import { calculateServiceStatus, calculateUptime, getLatestResponseTime, getLastCheckTime, convertStatusToMonitoring } from '@/lib/status-calculator'
 
 export async function GET(request: NextRequest) {
   try {
@@ -30,12 +31,13 @@ export async function GET(request: NextRequest) {
 
     // Transform services to monitoring format
     const monitoringServices = services.map(service => {
-      const latestResult = service.checks[0]?.results[0]
       const allResults = service.checks.flatMap(check => check.results)
       
-      // Calculate uptime from recent results
-      const successfulChecks = allResults.filter(r => r.success).length
-      const uptime = allResults.length > 0 ? (successfulChecks / allResults.length) * 100 : 100
+      // Use shared status calculation logic
+      const status = calculateServiceStatus(allResults)
+      const uptime = calculateUptime(allResults)
+      const responseTime = getLatestResponseTime(allResults)
+      const lastCheck = getLastCheckTime(allResults)
 
       // Get check history
       const checkHistory = allResults.slice(0, 20).reverse().map(result => ({
@@ -49,10 +51,10 @@ export async function GET(request: NextRequest) {
         id: service.id,
         name: service.name,
         category: service.machine?.category || 'other',
-        status: latestResult?.success ? 'up' : 'down',
-        uptime: Math.round(uptime * 100) / 100,
-        responseTime: latestResult?.responseTime || 0,
-        lastCheck: latestResult?.timestamp?.toISOString() || new Date().toISOString(),
+        status: convertStatusToMonitoring(status),
+        uptime,
+        responseTime,
+        lastCheck,
         machine: service.machine?.name || 'Unknown',
         url: service.url,
         checkHistory
