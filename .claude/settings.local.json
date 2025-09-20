@@ -15,7 +15,8 @@
       "Bash(npx next build:*)",
       "Bash(npm run start:*)",
       "Bash(node:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(npm run typecheck:*)"
     ],
     "deny": []
   }
