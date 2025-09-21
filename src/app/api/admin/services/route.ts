@@ -149,8 +149,9 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Perform initial check
+    // Perform initial check (but don't fail if it doesn't work)
     try {
+      console.log('Performing initial check for:', check.name, check.type, check.target)
       const checkResult = await performCheck(check)
       
       // Save the check result
@@ -158,13 +159,24 @@ export async function POST(request: NextRequest) {
         data: {
           checkId: check.id,
           success: checkResult.success,
-          responseTime: checkResult.responseTime,
-          statusCode: checkResult.statusCode,
-          error: checkResult.error
+          responseTime: checkResult.responseTime || null,
+          statusCode: checkResult.statusCode || null,
+          error: checkResult.error || null
         }
       })
+      console.log('Initial check completed:', checkResult)
     } catch (error) {
-      console.error('Initial check failed:', error)
+      console.error('Initial check failed (non-fatal):', error)
+      // Create a failed check result
+      await prisma.checkResult.create({
+        data: {
+          checkId: check.id,
+          success: false,
+          responseTime: null,
+          statusCode: null,
+          error: error instanceof Error ? error.message : 'Initial check failed'
+        }
+      })
     }
 
     // Fetch the service with updated data
