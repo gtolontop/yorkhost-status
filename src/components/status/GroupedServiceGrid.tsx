@@ -19,7 +19,6 @@ interface GroupedServiceGridProps {
 
 export default function GroupedServiceGrid({ services, groups }: GroupedServiceGridProps) {
   const [expandedServices, setExpandedServices] = useState<Set<string>>(new Set())
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
 
   const toggleService = (serviceId: string) => {
     const newExpanded = new Set(expandedServices)
@@ -29,16 +28,6 @@ export default function GroupedServiceGrid({ services, groups }: GroupedServiceG
       newExpanded.add(serviceId)
     }
     setExpandedServices(newExpanded)
-  }
-
-  const toggleGroup = (groupId: string) => {
-    const newCollapsed = new Set(collapsedGroups)
-    if (newCollapsed.has(groupId)) {
-      newCollapsed.delete(groupId)
-    } else {
-      newCollapsed.add(groupId)
-    }
-    setCollapsedGroups(newCollapsed)
   }
 
   // Group services by machineId
