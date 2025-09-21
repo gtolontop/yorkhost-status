@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
     // Perform initial check (but don't fail if it doesn't work)
     try {
       console.log('Performing initial check for:', check.name, check.type, check.target)
-      const checkResult = await performCheck(check)
+      const checkResult = await executeCheck(check.type, check.target, check.port, check.timeout)
       
       // Save the check result
       await prisma.checkResult.create({
