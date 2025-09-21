@@ -16,6 +16,18 @@ interface ServiceCardProps {
 export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCardProps) {
   const historyContext = useUptimeHistory(service.id)
   const statusColor = getStatusColor(service.uptimePercent24h)
+  const [isMobile, setIsMobile] = useState(false)
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Use context data instead of local state
   const uptimeHistory = 'serviceHistory' in historyContext ? historyContext.serviceHistory : []
