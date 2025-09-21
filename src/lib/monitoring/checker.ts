@@ -1,6 +1,11 @@
 import { CheckType } from '@prisma/client'
 import axios from 'axios'
 import https from 'https'
+import * as net from 'net'
+import { exec } from 'child_process'
+import { promisify } from 'util'
+
+const execAsync = promisify(exec)
 
 interface CheckResult {
   success: boolean
@@ -56,7 +61,7 @@ export async function executeCheck(
   }
 }
 
-// HTTP/HTTPS CHECK - SIMPLE ET FIABLE
+// HTTP/HTTPS CHECK - USING AXIOS FOR BETTER COMPATIBILITY
 async function performHttpCheck(target: string, timeout: number): Promise<CheckResult> {
   const startTime = Date.now()
   
@@ -69,7 +74,9 @@ async function performHttpCheck(target: string, timeout: number): Promise<CheckR
     
     console.log(`[HTTP] Testing: ${url}`)
     
-    const response = await axios.get(url, {
+    const response = await axios({
+      method: 'GET',
+      url: url,
       timeout: timeout,
       maxRedirects: 5,
       validateStatus: () => true, // Accept any status code
@@ -77,9 +84,10 @@ async function performHttpCheck(target: string, timeout: number): Promise<CheckR
         'User-Agent': 'Yorkhost-Status-Monitor/1.0',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
       },
-      // Allow self-signed certificates
+      // Allow self-signed certificates and ignore SSL errors
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
+        timeout: timeout
       })
     })
     
@@ -92,12 +100,21 @@ async function performHttpCheck(target: string, timeout: number): Promise<CheckR
       success,
       responseTime,
       statusCode: response.status,
-      error: success ? undefined : `HTTP ${response.status} ${response.statusText}`
+      error: success ? undefined : `HTTP ${response.status}`
     }
     
   } catch (error: any) {
     const responseTime = Date.now() - startTime
     console.error(`[HTTP] Error:`, error.message)
+    
+    // If it's a timeout error, say so clearly
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      return {
+        success: false,
+        responseTime,
+        error: 'Connection timeout'
+      }
+    }
     
     return {
       success: false,
@@ -107,111 +124,154 @@ async function performHttpCheck(target: string, timeout: number): Promise<CheckR
   }
 }
 
-// TCP CHECK - SIMPLE ET DIRECT
+// TCP CHECK - SIMPLE SOCKET CONNECTION
 async function performTcpCheck(target: string, port: number, timeout: number): Promise<CheckResult> {
   const startTime = Date.now()
   
   return new Promise((resolve) => {
-    const net = require('net')
     const socket = new net.Socket()
+    let resolved = false
     
-    const timer = setTimeout(() => {
-      socket.destroy()
+    // Remove protocol if present
+    const cleanTarget = target.replace(/^https?:\/\//, '')
+    
+    const cleanup = () => {
+      if (!resolved) {
+        resolved = true
+        socket.destroy()
+      }
+    }
+    
+    const timeoutId = setTimeout(() => {
+      cleanup()
       resolve({
         success: false,
         responseTime: Date.now() - startTime,
-        error: `TCP connection timeout to ${target}:${port}`
+        error: 'Connection timeout'
       })
     }, timeout)
     
-    socket.connect(port, target, () => {
-      clearTimeout(timer)
-      socket.destroy()
+    socket.on('connect', () => {
+      clearTimeout(timeoutId)
+      cleanup()
       resolve({
         success: true,
         responseTime: Date.now() - startTime
       })
     })
     
-    socket.on('error', (error: any) => {
-      clearTimeout(timer)
-      socket.destroy()
+    socket.on('error', (error) => {
+      clearTimeout(timeoutId)
+      cleanup()
       resolve({
         success: false,
         responseTime: Date.now() - startTime,
         error: `TCP connection failed: ${error.message}`
       })
     })
+    
+    socket.connect(port, cleanTarget)
   })
 }
 
-// PING CHECK - UTILISE HTTP/TCP COMME FALLBACK
+// PING CHECK - REAL ICMP PING
 async function performPingCheck(target: string, timeout: number): Promise<CheckResult> {
-  console.log(`[PING] Testing ${target}`)
+  const startTime = Date.now()
   
-  // Try HTTP/HTTPS first as it's more reliable
-  try {
-    const httpResult = await performHttpCheck(`http://${target}`, Math.min(timeout / 2, 5000))
-    if (httpResult.success) {
-      console.log(`[PING] Success via HTTP`)
-      return httpResult
-    }
-  } catch (e) {
-    // Continue to HTTPS
-  }
+  // Remove protocol if present
+  const cleanTarget = target.replace(/^https?:\/\//, '')
+  
+  console.log(`[PING] Testing ${cleanTarget}`)
   
   try {
-    const httpsResult = await performHttpCheck(`https://${target}`, Math.min(timeout / 2, 5000))
-    if (httpsResult.success) {
-      console.log(`[PING] Success via HTTPS`)
-      return httpsResult
+    // Use platform-specific ping command
+    const isWindows = process.platform === 'win32'
+    const pingCommand = isWindows 
+      ? `ping -n 1 -w ${timeout} ${cleanTarget}`
+      : `ping -c 1 -W ${Math.floor(timeout/1000)} ${cleanTarget}`
+    
+    const { stdout, stderr } = await execAsync(pingCommand)
+    
+    if (stderr && !stdout) {
+      throw new Error(stderr)
     }
-  } catch (e) {
-    // Continue to TCP
-  }
-  
-  // Try only the most common ports
-  const ports = [80, 443, 22, 8080]
-  
-  for (const port of ports) {
+    
+    // Check if ping was successful
+    const isSuccess = isWindows
+      ? (stdout.includes('TTL=') || stdout.includes('time='))
+      : (stdout.includes('1 received') || stdout.includes('1 packets received'))
+    
+    const responseTime = Date.now() - startTime
+    
+    if (isSuccess) {
+      // Try to extract actual ping time
+      const timeMatch = stdout.match(/time[<=](\d+)(?:\.\d+)?(?:ms)?/i)
+      const actualTime = timeMatch ? parseInt(timeMatch[1]) : responseTime
+      
+      console.log(`[PING] Success: ${actualTime}ms`)
+      return {
+        success: true,
+        responseTime: actualTime
+      }
+    } else {
+      // If ICMP fails, try TCP on port 80 as fallback
+      console.log(`[PING] ICMP failed, trying TCP:80 fallback`)
+      try {
+        const tcpResult = await performTcpCheck(cleanTarget, 80, 3000)
+        if (tcpResult.success) {
+          console.log(`[PING] TCP:80 fallback success`)
+          return tcpResult
+        }
+      } catch (e) {
+        // Continue to error
+      }
+      
+      return {
+        success: false,
+        responseTime: responseTime,
+        error: 'Host unreachable'
+      }
+    }
+    
+  } catch (error: any) {
+    const responseTime = Date.now() - startTime
+    console.log(`[PING] Command error: ${error.message}`)
+    
+    // Fallback to TCP check on port 80 if ping command fails
     try {
-      const result = await performTcpCheck(target, port, Math.min(timeout / ports.length, 3000))
-      if (result.success) {
-        console.log(`[PING] Success via TCP:${port}`)
-        return result
+      console.log(`[PING] Trying TCP:80 fallback after command error`)
+      const tcpResult = await performTcpCheck(cleanTarget, 80, 3000)
+      if (tcpResult.success) {
+        console.log(`[PING] TCP:80 fallback success`)
+        return tcpResult
       }
     } catch (e) {
-      continue
+      // Continue to error
     }
-  }
-  
-  // Try HTTP fallback
-  try {
-    const httpResult = await performHttpCheck(target, timeout)
-    if (httpResult.success) {
-      console.log(`[PING] Success via HTTP`)
-      return httpResult
+    
+    return {
+      success: false,
+      responseTime: responseTime,
+      error: `Ping failed: ${error.message}`
     }
-  } catch (e) {
-    // Continue to final error
-  }
-  
-  return {
-    success: false,
-    responseTime: timeout,
-    error: `Host ${target} is not reachable via TCP or HTTP`
   }
 }
 
-// DNS CHECK - SIMPLE LOOKUP
+// DNS CHECK - SIMPLE DNS LOOKUP
 async function performDnsCheck(target: string, timeout: number): Promise<CheckResult> {
   const startTime = Date.now()
   
   try {
     const dns = require('dns').promises
+    
+    // Remove protocol if present
+    const cleanTarget = target.replace(/^https?:\/\//, '')
+    
     await Promise.race([
-      dns.lookup(target),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('DNS timeout')), timeout))
+      dns.lookup(cleanTarget),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('DNS timeout')), timeout)
+      )
     ])
     
     return {
