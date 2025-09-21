@@ -135,7 +135,7 @@ export default function IncidentDetailPage() {
       }
 
       // Update status if needed
-      if (updateForm.changeStatus && updateForm.status !== incident?.status) {
+      if (updateForm.changeStatus && updateForm.status !== incident?.status && incident) {
         const statusResponse = await fetch(`/api/admin/incidents/${params.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -147,7 +147,7 @@ export default function IncidentDetailPage() {
             statusUpdateMessage: updateForm.message,
             serviceId: incident.serviceId,
             machineId: incident.machineId,
-            tags: incident.tags || [],
+            tags: [],
             // Set endTime if resolving the incident
             endTime: updateForm.status === 'RESOLVED' ? new Date().toISOString() : undefined
           })
