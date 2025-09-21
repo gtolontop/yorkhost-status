@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ServiceWithStats } from '@/types'
+import { ServiceWithStats, ServiceWithEnhancedStatus } from '@/types'
 import CollapsibleGroup from './CollapsibleGroup'
 
 interface ServiceGroup {
@@ -9,11 +9,11 @@ interface ServiceGroup {
   name: string
   description?: string
   color: string
-  services: ServiceWithStats[]
+  services: ServiceWithEnhancedStatus[]
 }
 
 interface GroupedServiceGridProps {
-  services: ServiceWithStats[]
+  services: ServiceWithStats[] | ServiceWithEnhancedStatus[]
   groups: any[]
 }
 
@@ -31,14 +31,14 @@ export default function GroupedServiceGrid({ services, groups }: GroupedServiceG
   }
 
   // Group services by machineId
-  const servicesByGroup = new Map<string, ServiceWithStats[]>()
+  const servicesByGroup = new Map<string, ServiceWithEnhancedStatus[]>()
   
   services.forEach(service => {
     const groupId = service.machineId || 'ungrouped'
     if (!servicesByGroup.has(groupId)) {
       servicesByGroup.set(groupId, [])
     }
-    servicesByGroup.get(groupId)!.push(service)
+    servicesByGroup.get(groupId)!.push(service as ServiceWithEnhancedStatus)
   })
 
   // Create group objects
