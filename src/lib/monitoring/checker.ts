@@ -183,11 +183,11 @@ async function performPingCheck(target: string, timeout: number): Promise<CheckR
   console.log(`[PING] Testing ${target}`)
   
   // Try TCP on common ports first
-  const ports = [80, 443, 22]
+  const ports = [80, 443, 22, 21, 25, 53, 110, 143, 3306, 5432, 3389, 8080, 8443]
   
   for (const port of ports) {
     try {
-      const result = await performTcpCheck(target, port, Math.min(timeout / 3, 3000))
+      const result = await performTcpCheck(target, port, Math.min(timeout / ports.length, 2000))
       if (result.success) {
         console.log(`[PING] Success via TCP:${port}`)
         return result
