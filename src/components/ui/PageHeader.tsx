@@ -29,15 +29,15 @@ export default function PageHeader({ icon, title, subtitle, status, lastUpdate }
   }
 
   return (
-    <div className="text-center px-5 py-12 sm:py-16 md:py-20 max-w-3xl mx-auto">
-      <div className="mb-6 sm:mb-8 flex justify-center">
+    <div className="text-center px-5 py-8 sm:py-12 md:py-16 max-w-3xl mx-auto">
+      <div className="mb-3 sm:mb-6 flex justify-center">
         <div className="w-12 h-12 sm:w-20 sm:h-20 md:w-24 md:h-24" style={{ color: getStatusColor() }}>
           {icon}
         </div>
       </div>
       
       <h1 
-        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 whitespace-nowrap text-white"
+        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 whitespace-nowrap text-white"
         style={{
           lineHeight: '1.2'
         }}
@@ -46,7 +46,7 @@ export default function PageHeader({ icon, title, subtitle, status, lastUpdate }
       </h1>
       
       <p 
-        className="text-base sm:text-lg md:text-xl mb-2"
+        className="text-sm sm:text-base md:text-lg"
         style={{
           color: 'var(--text-secondary)',
           lineHeight: '1.6'
