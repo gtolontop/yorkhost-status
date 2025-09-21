@@ -195,7 +195,7 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
               </Tooltip>
             </TooltipProvider>
             
-            <h3 className="font-semibold text-gray-900 text-base sm:text-lg leading-tight">{service.name}</h3>
+            <h3 className="font-semibold text-gray-900 text-base sm:text-lg leading-tight mb-0">{service.name}</h3>
           </div>
 
           {/* Right Side: Uptime % */}
@@ -209,7 +209,7 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
         </div>
 
         {/* Uptime Bars */}
-        <div className="mt-6">
+        <div>
           <div className="flex items-center h-8 gap-0.5">
             {generateUptimeBars()}
           </div>
