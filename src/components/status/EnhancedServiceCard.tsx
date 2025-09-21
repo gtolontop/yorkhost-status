@@ -197,7 +197,7 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
             
             <div>
               <h3 className="font-semibold text-gray-900 text-lg">{service.name}</h3>
-              <p className={`text-sm ${getStatusTextColor()}`}>
+              <p className={`text-sm ${getStatusTextColor()} hidden sm:block`}>
                 {getStatusText()}
               </p>
             </div>
@@ -205,10 +205,13 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
 
           {/* Right Side: Uptime % */}
           <div className="text-right">
-            <div className="text-2xl font-bold text-gray-900">
-              {service.currentStatus === 'unknown' ? '--' : `${service.uptimePercent24h.toFixed(2)}%`}
+            <div className="flex items-center justify-end gap-1 sm:block">
+              <span className="text-lg sm:text-2xl font-bold text-gray-900">
+                {service.currentStatus === 'unknown' ? '--' : `${service.uptimePercent24h.toFixed(2)}%`}
+              </span>
+              <span className="text-xs text-gray-500 uppercase sm:hidden">Uptime</span>
             </div>
-            <p className="text-xs text-gray-500 uppercase">Uptime</p>
+            <p className="text-xs text-gray-500 uppercase hidden sm:block">Uptime</p>
           </div>
         </div>
 
