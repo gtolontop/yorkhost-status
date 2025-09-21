@@ -3,7 +3,7 @@ import { requireAuth, requirePermission } from '@/lib/auth/jwt'
 import { prisma } from '@/lib/db'
 import { z } from 'zod'
 import { calculateServiceStatus, calculateUptime, getLatestResponseTime, getLastCheckTime } from '@/lib/status-calculator'
-import { performCheck } from '@/lib/monitoring/checker'
+import { executeCheck } from '@/lib/monitoring/checker'
 
 const createServiceSchema = z.object({
   name: z.string().min(1).max(100),
