@@ -386,6 +386,38 @@ export default function AdminServicesPage() {
                       {group.services.length}
                     </span>
                   </div>
+                  {group.id !== 'ungrouped' && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteGroup(group.id);
+                      }}
+                      style={{
+                        padding: '0.25rem 0.5rem',
+                        background: 'transparent',
+                        border: '1px solid #ef4444',
+                        borderRadius: '8px',
+                        color: '#ef4444',
+                        fontSize: '0.75rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.25rem',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#ef4444';
+                        e.currentTarget.style.color = 'white';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.color = '#ef4444';
+                      }}
+                    >
+                      <Trash2 size={14} />
+                      Delete
+                    </button>
+                  )}
                 </div>
                 
                 {!group.isCollapsed && (
