@@ -169,11 +169,16 @@ export async function getServiceStats(serviceId: string) {
   const getCurrentStatus = (results: any[]) => {
     if (results.length === 0) return 'unknown'
     
-    // Get the most recent result
-    const lastResult = results[results.length - 1]
+    // Need at least 2 results to determine consecutive failures
+    if (results.length === 1) {
+      return results[0].success ? 'operational' : 'degraded'
+    }
     
-    // If the last check failed, it's an outage
-    if (!lastResult.success) return 'outage'
+    // Check if the last 2 checks failed consecutively
+    const lastTwo = results.slice(-2)
+    const consecutiveFailures = lastTwo.every(r => !r.success)
+    
+    if (consecutiveFailures) return 'outage'
     
     // Check last few results for degraded performance
     const recentResults = results.slice(-5)
