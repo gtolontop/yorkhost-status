@@ -115,9 +115,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Generate slug from title
+    const slug = data.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') + 
+      '-' + Date.now()
+
     const incident = await prisma.incident.create({
       data: {
         ...data,
+        slug,
         scheduledFor: data.scheduledFor ? new Date(data.scheduledFor) : undefined,
         eta: data.eta ? new Date(data.eta) : undefined,
         status: data.isScheduled ? IncidentStatus.SCHEDULED : IncidentStatus.INVESTIGATING,
