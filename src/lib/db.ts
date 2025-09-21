@@ -212,20 +212,8 @@ export async function getServiceStats(serviceId: string) {
  * Get overall status overview
  */
 export async function getStatusOverview() {
-  const [services, activeIncidents] = await Promise.all([
-    prisma.service.findMany({
-      include: {
-        machine: true,
-        checks: {
-          include: {
-            results: {
-              take: 1,
-              orderBy: { timestamp: 'desc' }
-            }
-          }
-        }
-      }
-    }),
+  const [servicesWithEnhancedStatus, activeIncidents] = await Promise.all([
+    getServicesWithEnhancedStatus(),
     prisma.incident.findMany({
       where: {
         OR: [
@@ -268,19 +256,8 @@ export async function getStatusOverview() {
     })
   ])
 
-  // Calculate service stats
-  const servicesWithStats = await Promise.all(
-    services.map(async (service) => {
-      const stats = await getServiceStats(service.id)
-      return {
-        ...service,
-        ...stats
-      }
-    })
-  )
-
-  // Calculate overall status
-  const allUptimes = servicesWithStats.map(s => s.uptimePercent24h)
+  // Calculate overall status based on enhanced status
+  const allUptimes = servicesWithEnhancedStatus.map(s => s.uptimePercent24h)
   const averageUptime = allUptimes.length > 0 
     ? allUptimes.reduce((sum, uptime) => sum + uptime, 0) / allUptimes.length 
     : 100
@@ -288,9 +265,11 @@ export async function getStatusOverview() {
   let overallStatus: 'operational' | 'degraded' | 'outage' | 'maintenance' = 'operational'
   
   // Check if any service has an outage
-  const hasOutage = servicesWithStats.some(s => s.currentStatus === 'outage')
-  const hasDegraded = servicesWithStats.some(s => s.currentStatus === 'degraded')
-  const hasActiveMaintenance = activeIncidents.some(i => i.type === 'MAINTENANCE' && i.status === 'IN_PROGRESS')
+  const hasOutage = servicesWithEnhancedStatus.some(s => 
+    s.enhancedStatus === 'outage' || s.enhancedStatus === 'outage-with-incident'
+  )
+  const hasDegraded = servicesWithEnhancedStatus.some(s => s.enhancedStatus === 'degraded')
+  const hasActiveMaintenance = servicesWithEnhancedStatus.some(s => s.enhancedStatus === 'maintenance')
   const hasActiveIncidents = activeIncidents.some(i => i.type === 'INCIDENT')
   
   if (hasActiveMaintenance && !hasOutage && !hasActiveIncidents) {
@@ -304,13 +283,13 @@ export async function getStatusOverview() {
   // Calculate uptime stats
   const uptimeStats = {
     '24h': Math.round(averageUptime * 100) / 100,
-    '7d': Math.round(servicesWithStats.reduce((sum, s) => sum + s.uptimePercent7d, 0) / servicesWithStats.length * 100) / 100 || 100,
-    '30d': Math.round(servicesWithStats.reduce((sum, s) => sum + s.uptimePercent30d, 0) / servicesWithStats.length * 100) / 100 || 100
+    '7d': Math.round(servicesWithEnhancedStatus.reduce((sum, s) => sum + s.uptimePercent7d, 0) / servicesWithEnhancedStatus.length * 100) / 100 || 100,
+    '30d': Math.round(servicesWithEnhancedStatus.reduce((sum, s) => sum + s.uptimePercent30d, 0) / servicesWithEnhancedStatus.length * 100) / 100 || 100
   }
 
   return {
     overall: overallStatus,
-    services: servicesWithStats,
+    services: servicesWithEnhancedStatus,
     activeIncidents,
     uptimeStats,
     lastUpdated: new Date()
