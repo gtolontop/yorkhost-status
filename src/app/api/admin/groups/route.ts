@@ -69,21 +69,26 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const data = createGroupSchema.parse(body)
 
-    // For now, just return a mock response
-    const newGroup = {
-      id: Date.now().toString(),
-      name: data.name,
-      description: data.description || '',
-      color: data.color || '#6b7280',
-      icon: data.icon || null,
-      order: 100,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
+    // Create machine as group
+    const machine = await prisma.machine.create({
+      data: {
+        name: data.name,
+        category: data.name.toLowerCase().replace(/\s+/g, '-'),
+        description: data.description,
+        color: data.color || '#6b7280'
+      }
+    })
 
     return NextResponse.json({
       success: true,
-      data: newGroup
+      data: {
+        id: machine.id,
+        name: machine.name,
+        description: machine.description || '',
+        color: machine.color || '#6b7280',
+        order: 0,
+        servicesCount: 0
+      }
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
