@@ -14,14 +14,19 @@ export async function POST(
 
     const { groupId, order } = await request.json()
 
-    // For now, just return success
-    // When DB is migrated, we'll update the service's groupId and order
-    
+    // Update service's machine assignment
+    const service = await prisma.service.update({
+      where: { id: params.id },
+      data: {
+        machineId: groupId === 'ungrouped' ? null : groupId
+      }
+    })
+
     return NextResponse.json({
       success: true,
       data: {
-        serviceId: params.id,
-        groupId,
+        serviceId: service.id,
+        groupId: service.machineId || 'ungrouped',
         order
       }
     })
