@@ -28,7 +28,7 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation - Centered */}
-          <nav className="hidden md:flex items-center justify-center gap-6 flex-1">
+          <nav className="hidden md:flex items-center justify-center gap-4 xl:gap-6 flex-1">
             <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
               Overview
             </Link>
@@ -50,7 +50,7 @@ export default function Header() {
               className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors"
             >
               <MessageCircle size={18} />
-              <span className="hidden sm:inline">Get in Touch</span>
+              <span>Get in Touch</span>
             </a>
             
             {/* Theme Toggle */}
