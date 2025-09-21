@@ -31,13 +31,13 @@ export default function Header() {
 
           {/* Desktop Navigation - Centered */}
           <nav className="hidden md:flex items-center justify-center gap-4 xl:gap-6 flex-1">
-            <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="/" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
               Overview
             </Link>
-            <Link href="/maintenance" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="/maintenance" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
               Maintenance
             </Link>
-            <Link href="/previous-incidents" className="text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap">
+            <Link href="/previous-incidents" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">
               Previous Incidents
             </Link>
           </nav>
@@ -47,7 +47,7 @@ export default function Header() {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
@@ -67,7 +67,7 @@ export default function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={toggleMenu}
-              className="md:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors"
+              className="md:hidden p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -78,25 +78,25 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200">
+        <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
           <nav className="container mx-auto px-4 py-4 space-y-3">
             <Link 
               href="/" 
-              className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
+              className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               Overview
             </Link>
             <Link 
               href="/maintenance" 
-              className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
+              className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               Maintenance
             </Link>
             <Link 
               href="/previous-incidents" 
-              className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
+              className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               Previous Incidents
