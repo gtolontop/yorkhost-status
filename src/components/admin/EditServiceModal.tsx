@@ -72,73 +72,29 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
   if (!isOpen) return null
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '16px',
-        padding: '2rem',
-        maxWidth: '500px',
-        width: '90%',
-        maxHeight: '90vh',
-        overflowY: 'auto'
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '1.5rem'
-        }}>
-          <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
+    <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-[1000]">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-lg w-[90%] max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="m-0 text-2xl font-semibold text-gray-900 dark:text-white">
             Edit Service
           </h2>
           <button
             onClick={onClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '0.5rem',
-              borderRadius: '8px'
-            }}
+            className="bg-transparent border-0 cursor-pointer p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
-            <X size={20} />
+            <X size={20} className="text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
         {error && (
-          <div style={{
-            background: '#fef2f2',
-            border: '1px solid #fecaca',
-            color: '#dc2626',
-            padding: '0.75rem',
-            borderRadius: '8px',
-            marginBottom: '1rem',
-            fontSize: '0.875rem'
-          }}>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 p-3 rounded-lg mb-4 text-sm">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              marginBottom: '0.5rem',
-              color: '#374151'
-            }}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
               Service Name *
             </label>
             <input
@@ -146,49 +102,24 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '0.875rem'
-              }}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              marginBottom: '0.5rem',
-              color: '#374151'
-            }}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '0.875rem',
-                resize: 'vertical'
-              }}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 resize-y"
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              marginBottom: '0.5rem',
-              color: '#374151'
-            }}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
               URL
             </label>
             <input
@@ -196,70 +127,35 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
               value={formData.url}
               onChange={(e) => setFormData({ ...formData, url: e.target.value })}
               placeholder="https://example.com"
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '0.875rem'
-              }}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             />
           </div>
 
 
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{
-              display: 'flex',
-              alignItems: 'center',
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              color: '#374151',
-              cursor: 'pointer'
-            }}>
+          <div className="mb-6">
+            <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
               <input
                 type="checkbox"
                 checked={formData.isActive}
                 onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                style={{ marginRight: '0.5rem' }}
+                className="mr-2 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-900"
               />
               Active service
             </label>
           </div>
 
-          <div style={{
-            display: 'flex',
-            gap: '1rem',
-            justifyContent: 'flex-end'
-          }}>
+          <div className="flex gap-4 justify-end">
             <button
               type="button"
               onClick={onClose}
-              style={{
-                padding: '0.75rem 1.5rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                background: 'white',
-                color: '#374151',
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                cursor: 'pointer'
-              }}
+              className="py-3 px-6 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-sm font-medium cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              style={{
-                padding: '0.75rem 1.5rem',
-                border: 'none',
-                borderRadius: '8px',
-                background: loading ? '#9ca3af' : '#000000',
-                color: 'white',
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                cursor: loading ? 'not-allowed' : 'pointer'
-              }}
+              className={`py-3 px-6 border-0 rounded-lg text-white text-sm font-medium ${loading ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' : 'bg-black dark:bg-white dark:text-black cursor-pointer hover:bg-gray-800 dark:hover:bg-gray-200'} transition-colors`}
             >
               {loading ? 'Updating...' : 'Update'}
             </button>

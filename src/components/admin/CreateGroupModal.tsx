@@ -59,40 +59,21 @@ export default function CreateGroupModal({ isOpen, onClose, onSuccess }: CreateG
   ]
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000
-    }}>
-      <div style={{
-        background: 'white',
-        borderRadius: '16px',
-        padding: '2rem',
-        maxWidth: '500px',
-        width: '90%',
-        maxHeight: '90vh',
-        overflow: 'auto'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-          <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>Créer un nouveau groupe</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-[1000]">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-lg w-[90%] max-h-[90vh] overflow-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="m-0 text-2xl font-semibold text-gray-900 dark:text-white">Créer un nouveau groupe</h2>
           <button 
             onClick={onClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem' }}
+            className="bg-transparent border-0 cursor-pointer p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
-            <X size={20} />
+            <X size={20} className="text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>
+          <div className="mb-4">
+            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
               Nom du groupe *
             </label>
             <input
@@ -100,69 +81,50 @@ export default function CreateGroupModal({ isOpen, onClose, onSuccess }: CreateG
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '0.875rem'
-              }}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
               placeholder="ex: Services Frontend"
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>
+          <div className="mb-4">
+            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '0.875rem',
-                minHeight: '80px',
-                resize: 'vertical'
-              }}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 min-h-[80px] resize-y"
               placeholder="Description du groupe..."
             />
           </div>
 
-          <div style={{ marginBottom: '2rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>
+          <div className="mb-8">
+            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
               Couleur
             </label>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <div className="flex gap-2 flex-wrap">
               {colorOptions.map(color => (
                 <button
                   key={color.value}
                   type="button"
                   onClick={() => setFormData({ ...formData, color: color.value })}
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '8px',
-                    border: formData.color === color.value ? '3px solid #111827' : '2px solid #e5e7eb',
-                    background: color.value,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
+                  className={`w-10 h-10 rounded-lg cursor-pointer flex items-center justify-center transition-all ${
+                    formData.color === color.value 
+                      ? 'ring-2 ring-offset-2 ring-gray-900 dark:ring-white dark:ring-offset-gray-800' 
+                      : 'ring-1 ring-gray-300 dark:ring-gray-600'
+                  }`}
+                  style={{ backgroundColor: color.value }}
                   title={color.name}
                 >
                   {formData.color === color.value && (
-                    <span style={{ color: 'white', fontSize: '1.2rem' }}>✓</span>
+                    <span className="text-white text-xl">✓</span>
                   )}
                 </button>
               ))}
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+          <div className="flex gap-4 justify-end">
             <button 
               type="button"
               onClick={onClose}
