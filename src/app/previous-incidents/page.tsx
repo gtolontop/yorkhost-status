@@ -117,8 +117,15 @@ export default function PreviousIncidentsPage() {
     if (typeFilter === 'incident' && incident.type !== 'INCIDENT') return false
     if (typeFilter === 'maintenance' && incident.type !== 'MAINTENANCE') return false
 
-    // Only show resolved incidents/completed maintenances
-    return incident.status === 'RESOLVED' || incident.status === 'COMPLETED'
+    // Filter by status
+    if (statusFilter === 'active') {
+      return !incident.endTime && incident.status !== 'RESOLVED' && incident.status !== 'COMPLETED'
+    }
+    if (statusFilter === 'resolved') {
+      return incident.status === 'RESOLVED' || incident.status === 'COMPLETED' || incident.endTime
+    }
+    
+    return true
   })
 
   // Group incidents by month
