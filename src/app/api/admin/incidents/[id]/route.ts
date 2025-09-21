@@ -2,6 +2,61 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth/jwt'
 import { prisma } from '@/lib/db'
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const auth = await requireAuth(request)
+
+    if (!auth.authorized) {
+      return NextResponse.json({
+        success: false,
+        error: auth.error || 'Unauthorized'
+      }, { status: 401 })
+    }
+
+    const { id: incidentId } = await params
+
+    const incident = await prisma.incident.findUnique({
+      where: { id: incidentId },
+      include: {
+        updates: {
+          orderBy: { timestamp: 'asc' }
+        },
+        service: true,
+        machine: true,
+        creator: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true
+          }
+        }
+      }
+    })
+
+    if (!incident) {
+      return NextResponse.json({
+        success: false,
+        error: 'Incident not found'
+      }, { status: 404 })
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: incident
+    })
+  } catch (error) {
+    console.error('Get incident error:', error)
+    
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to fetch incident'
+    }, { status: 500 })
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
