@@ -119,6 +119,31 @@ class MonitorWorker {
     console.log(`🔍 Executing check: ${check.name} (${check.type})`)
 
     try {
+      // Use the shared checker from lib/monitoring/checker
+      const { executeCheck } = require('../src/lib/monitoring/checker')
+      const checkResult = await executeCheck(check.type, check.target, check.port, check.timeout)
+      
+      return {
+        checkId: check.id,
+        success: checkResult.success,
+        responseTime: checkResult.responseTime,
+        statusCode: checkResult.statusCode,
+        error: checkResult.error,
+        timestamp
+      }
+    } catch (error) {
+      console.error(`Check execution error:`, error)
+      return {
+        checkId: check.id,
+        success: false,
+        responseTime: Date.now() - startTime,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp
+      }
+    }
+    
+    /* OLD CODE - REPLACED WITH SHARED CHECKER
+    try {
       let result: CheckResult
 
       switch (check.type) {
