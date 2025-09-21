@@ -83,7 +83,7 @@ export default function AdminServicesPage() {
           responseTime: service.responseTime || 0,
           lastCheck: service.lastCheck || new Date().toISOString(),
           isActive: service.isActive !== false,
-          groupId: service.groupId || 'ungrouped',
+          groupId: service.machineId || 'ungrouped',
           order: service.order || 0
         }))
         
