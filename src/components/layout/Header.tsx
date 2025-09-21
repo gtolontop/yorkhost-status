@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Moon, Sun, Menu, X } from 'lucide-react'
+import { Moon, Sun, Menu, X, MessageCircle } from 'lucide-react'
 import { useTheme } from '@/lib/hooks/useTheme'
 
 export default function Header() {
