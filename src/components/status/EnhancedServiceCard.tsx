@@ -213,7 +213,7 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
           <div className="flex items-center h-8 gap-0.5">
             {generateUptimeBars()}
           </div>
-          <div className="flex justify-between text-xs text-gray-400 mt-1">
+          <div className="flex justify-between text-xs text-gray-400 mt-2">
             <span className="md:hidden">30 days ago</span>
             <span className="hidden md:block">90 days ago</span>
             <span>Today</span>
