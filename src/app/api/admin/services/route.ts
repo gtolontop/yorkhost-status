@@ -3,6 +3,7 @@ import { requireAuth, requirePermission } from '@/lib/auth/jwt'
 import { prisma } from '@/lib/db'
 import { z } from 'zod'
 import { calculateServiceStatus, calculateUptime, getLatestResponseTime, getLastCheckTime } from '@/lib/status-calculator'
+import { performCheck } from '@/lib/monitoring/checker'
 
 const createServiceSchema = z.object({
   name: z.string().min(1).max(100),
@@ -148,9 +149,43 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    // Perform initial check
+    try {
+      const checkResult = await performCheck(check)
+      
+      // Save the check result
+      await prisma.checkResult.create({
+        data: {
+          checkId: check.id,
+          success: checkResult.success,
+          responseTime: checkResult.responseTime,
+          statusCode: checkResult.statusCode,
+          error: checkResult.error
+        }
+      })
+    } catch (error) {
+      console.error('Initial check failed:', error)
+    }
+
+    // Fetch the service with updated data
+    const updatedService = await prisma.service.findUnique({
+      where: { id: service.id },
+      include: {
+        machine: true,
+        checks: {
+          include: {
+            results: {
+              orderBy: { timestamp: 'desc' },
+              take: 1
+            }
+          }
+        }
+      }
+    })
+
     return NextResponse.json({
       success: true,
-      data: service
+      data: updatedService
     })
   } catch (error) {
     console.error('Create service error:', error)
