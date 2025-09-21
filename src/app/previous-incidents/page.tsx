@@ -27,6 +27,7 @@ export default function PreviousIncidentsPage() {
   const [loading, setLoading] = useState(true)
   const [yearFilter, setYearFilter] = useState<string>('all')
   const [typeFilter, setTypeFilter] = useState<'all' | 'incident' | 'maintenance'>('all')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'resolved'>('all')
 
   useEffect(() => {
     fetchIncidents()
@@ -34,12 +35,33 @@ export default function PreviousIncidentsPage() {
 
   const fetchIncidents = async () => {
     try {
-      const response = await fetch('/api/incidents/history')
-      const result = await response.json()
+      // Fetch both active and historical incidents
+      const [activeResponse, historyResponse] = await Promise.all([
+        fetch('/api/incidents'),
+        fetch('/api/incidents/history')
+      ])
       
-      if (result.success) {
-        setIncidents(result.data)
+      const activeResult = await activeResponse.json()
+      const historyResult = await historyResponse.json()
+      
+      const allIncidents = []
+      
+      if (activeResult.success && activeResult.data?.incidents) {
+        allIncidents.push(...activeResult.data.incidents)
       }
+      
+      if (historyResult.success && historyResult.data) {
+        allIncidents.push(...historyResult.data)
+      }
+      
+      // Remove duplicates based on ID
+      const uniqueIncidents = Array.from(
+        new Map(allIncidents.map(item => [item.id, item])).values()
+      )
+      
+      setIncidents(uniqueIncidents.sort((a, b) => 
+        new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+      ))
     } catch (error) {
       console.error('Failed to fetch incidents:', error)
     } finally {
