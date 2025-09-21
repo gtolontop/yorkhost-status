@@ -68,12 +68,16 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
     const today = new Date()
     today.setHours(23, 59, 59, 999) // End of today
     
-    // Si on a des données pour ce jour, calculer l'uptime, sinon laisser null pour indiquer "pas de données"
+    // Si on a des données pour ce jour, calculer l'uptime
     let uptime = null
-    if (dayData) {
+    if (dayData && dayData.total > 0) {
       uptime = (dayData.successful / dayData.total) * 100
+    } else if (date <= today && checkResults.length > 0) {
+      // Pour aujourd'hui ou les jours passés, si on a au moins un check dans l'historique,
+      // on considère que le service est opérationnel s'il n'y a pas eu de checks ce jour-là
+      // (permet d'éviter les faux "no data" pour les services récemment ajoutés)
+      uptime = 100
     }
-    // Ne pas assumer 100% d'uptime quand il n'y a pas de données
     
     // Get incidents for this day
     const incidents = await prisma.incident.findMany({
