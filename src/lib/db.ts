@@ -318,6 +318,107 @@ export async function getStatusOverview() {
 }
 
 /**
+ * Get services with enhanced status including incident links
+ */
+export async function getServicesWithEnhancedStatus() {
+  const now = new Date()
+  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+
+  // Get all services with their recent check results and active incidents
+  const services = await prisma.service.findMany({
+    where: {
+      isActive: true
+    },
+    include: {
+      machine: true,
+      checks: {
+        include: {
+          results: {
+            where: {
+              timestamp: { gte: yesterday }
+            },
+            orderBy: { timestamp: 'desc' }
+          }
+        }
+      },
+      incidents: {
+        where: {
+          OR: [
+            {
+              status: {
+                in: ['INVESTIGATING', 'IDENTIFIED', 'MONITORING']
+              },
+              type: 'INCIDENT'
+            },
+            {
+              status: 'IN_PROGRESS',
+              type: 'MAINTENANCE'
+            }
+          ]
+        },
+        orderBy: { startTime: 'desc' },
+        take: 1
+      }
+    }
+  })
+
+  // Process each service to determine enhanced status
+  const servicesWithEnhancedStatus = await Promise.all(
+    services.map(async (service) => {
+      const stats = await getServiceStats(service.id)
+      
+      // Determine enhanced status based on:
+      // 1. Operational status (operational, degraded, outage)
+      // 2. Whether there's a linked incident
+      let enhancedStatus: 'operational' | 'degraded' | 'outage' | 'outage-with-incident' | 'maintenance' = 'operational'
+      
+      const hasActiveIncident = service.incidents.length > 0 && service.incidents[0].type === 'INCIDENT'
+      const hasActiveMaintenance = service.incidents.length > 0 && service.incidents[0].type === 'MAINTENANCE'
+      
+      if (hasActiveMaintenance) {
+        enhancedStatus = 'maintenance'
+      } else if (stats.currentStatus === 'outage') {
+        enhancedStatus = hasActiveIncident ? 'outage-with-incident' : 'outage'
+      } else if (stats.currentStatus === 'degraded') {
+        enhancedStatus = 'degraded'
+      } else {
+        enhancedStatus = 'operational'
+      }
+
+      return {
+        ...service,
+        ...stats,
+        enhancedStatus,
+        activeIncident: service.incidents[0] || null
+      }
+    })
+  )
+
+  return servicesWithEnhancedStatus
+}
+
+/**
+ * Get all services that are currently down
+ */
+export async function getDownServices() {
+  const servicesWithStatus = await getServicesWithEnhancedStatus()
+  
+  // Filter only services that are down (outage or outage-with-incident)
+  const downServices = servicesWithStatus.filter(service => 
+    service.enhancedStatus === 'outage' || 
+    service.enhancedStatus === 'outage-with-incident'
+  )
+
+  // Group by status type for easier display
+  return {
+    withoutIncident: downServices.filter(s => s.enhancedStatus === 'outage'),
+    withIncident: downServices.filter(s => s.enhancedStatus === 'outage-with-incident'),
+    totalDown: downServices.length,
+    lastUpdated: new Date()
+  }
+}
+
+/**
  * Get dashboard statistics for admin panel
  */
 export async function getDashboardStats() {
