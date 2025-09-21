@@ -1,5 +1,4 @@
 import { prisma } from '@/lib/db'
-import { CheckResult } from '@/types/monitoring'
 
 interface IncidentCheckResult {
   serviceId: string
