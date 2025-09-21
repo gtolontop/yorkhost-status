@@ -1,4 +1,6 @@
 import { CheckType } from '@prisma/client'
+import axios from 'axios'
+import https from 'https'
 
 interface CheckResult {
   success: boolean
@@ -67,24 +69,24 @@ async function performHttpCheck(target: string, timeout: number): Promise<CheckR
     
     console.log(`[HTTP] Testing: ${url}`)
     
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), timeout)
-    
-    const response = await fetch(url, {
-      method: 'GET', // Use GET instead of HEAD for better compatibility
-      signal: controller.signal,
+    const response = await axios.get(url, {
+      timeout: timeout,
+      maxRedirects: 5,
+      validateStatus: () => true, // Accept any status code
       headers: {
         'User-Agent': 'Yorkhost-Status-Monitor/1.0',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Encoding': 'gzip, deflate',
-        'Connection': 'keep-alive'
-      }
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+      },
+      // Allow self-signed certificates
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      })
     })
     
-    clearTimeout(timeoutId)
     const responseTime = Date.now() - startTime
-    
     const success = response.status >= 200 && response.status < 400
+    
+    console.log(`[HTTP] Response: ${response.status} in ${responseTime}ms`)
     
     return {
       success,
@@ -95,42 +97,7 @@ async function performHttpCheck(target: string, timeout: number): Promise<CheckR
     
   } catch (error: any) {
     const responseTime = Date.now() - startTime
-    
-    // If HTTPS fails, try HTTP as fallback
-    if (target.includes('https://') || (!target.includes('http://') && !target.includes('https://'))) {
-      try {
-        const httpUrl = target.replace('https://', 'http://').replace(/^(?!http:\/\/)/, 'http://')
-        console.log(`[HTTP] HTTPS failed, trying HTTP: ${httpUrl}`)
-        
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), timeout)
-        
-        const response = await fetch(httpUrl, {
-          method: 'GET',
-          signal: controller.signal,
-          headers: {
-            'User-Agent': 'Yorkhost-Status-Monitor/1.0',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Encoding': 'gzip, deflate',
-            'Connection': 'keep-alive'
-          }
-        })
-        
-        clearTimeout(timeoutId)
-        const httpResponseTime = Date.now() - startTime
-        const success = response.status >= 200 && response.status < 400
-        
-        return {
-          success,
-          responseTime: httpResponseTime,
-          statusCode: response.status,
-          error: success ? undefined : `HTTP ${response.status} ${response.statusText}`
-        }
-        
-      } catch (httpError) {
-        // Both HTTPS and HTTP failed
-      }
-    }
+    console.error(`[HTTP] Error:`, error.message)
     
     return {
       success: false,
