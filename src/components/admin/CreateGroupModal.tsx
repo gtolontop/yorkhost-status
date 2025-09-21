@@ -22,13 +22,23 @@ export default function CreateGroupModal({ isOpen, onClose, onSuccess }: CreateG
     setLoading(true)
 
     try {
-      // For now, just simulate success since we don't have groups in DB yet
-      // In a real app, you'd call an API here
-      await new Promise(resolve => setTimeout(resolve, 500))
+      const response = await fetch('/api/admin/groups', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
       
-      onSuccess()
-      onClose()
-      setFormData({ name: '', description: '', color: '#3b82f6' })
+      const result = await response.json()
+      
+      if (result.success) {
+        onSuccess()
+        onClose()
+        setFormData({ name: '', description: '', color: '#3b82f6' })
+      } else {
+        alert(result.error || 'Erreur lors de la création du groupe')
+      }
     } catch (error) {
       console.error('Failed to create group:', error)
       alert('Erreur lors de la création du groupe')
