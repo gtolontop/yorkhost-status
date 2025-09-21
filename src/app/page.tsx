@@ -164,6 +164,7 @@ export default function HomePage() {
               : 'We are experiencing issues with our services. We apologize for the inconvenience.'
           }
           status={status?.overall}
+          lastUpdate={status?.lastUpdated}
         />
 
         {/* Incident Banner */}
