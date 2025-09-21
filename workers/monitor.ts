@@ -158,7 +158,11 @@ class MonitorWorker {
         timeout: check.timeout,
         headers: check.headers || {},
         validateStatus: () => true, // Don't throw on any status code
-        maxRedirects: check.followRedirects ? 5 : 0
+        maxRedirects: check.followRedirects ? 5 : 0,
+        // Allow self-signed certificates and ignore SSL errors for monitoring
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false
+        })
       })
 
       const responseTime = Date.now() - startTime
