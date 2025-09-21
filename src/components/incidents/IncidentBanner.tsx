@@ -20,7 +20,7 @@ export default function IncidentBanner({ incidents }: IncidentBannerProps) {
   const maintenanceCount = safeIncidents.filter(i => i.type === 'MAINTENANCE').length
 
   return (
-    <div className="max-w-3xl mx-auto mb-8">
+    <div className="max-w-3xl mx-auto mb-12">
       <Link 
         href="/incidents" 
         className="group flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-all"

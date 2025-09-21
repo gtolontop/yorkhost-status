@@ -99,11 +99,6 @@ export default function HomePage() {
   return (
     <Layout>
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        {/* Incident Banner */}
-        {status?.activeIncidents && status.activeIncidents.length > 0 && (
-          <IncidentBanner incidents={status.activeIncidents} />
-        )}
-
         {/* Hero Status Section */}
         <PageHeader
           icon={
@@ -170,6 +165,11 @@ export default function HomePage() {
           }
           status={status?.overall}
         />
+
+        {/* Incident Banner */}
+        {status?.activeIncidents && status.activeIncidents.length > 0 && (
+          <IncidentBanner incidents={status.activeIncidents} />
+        )}
 
         {/* Service Grid */}
         <UptimeHistoryProvider>
