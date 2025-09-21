@@ -63,21 +63,15 @@ export default function CollapsibleGroup({
         className="px-4 sm:px-6 py-4 cursor-pointer hover:bg-[#252530] transition-colors flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
         onClick={toggleCollapse}
       >
-        <div className="flex items-center gap-3">
-          <div className="text-gray-400 transition-transform duration-200 flex-shrink-0" style={{
-            transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)'
-          }}>
-            <ChevronDown size={20} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-base sm:text-lg font-semibold text-white mb-0">
-              {group.name}
-            </h3>
-          </div>
+        <div className="flex-1">
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-0">
+            {group.name}
+          </h3>
         </div>
         
         {/* Group status summary */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm ml-8 sm:ml-0">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
           {group.services.filter(s => s.enhancedStatus === 'operational').length > 0 && (
             <span className="text-green-600 font-medium">
               {group.services.filter(s => s.enhancedStatus === 'operational').length} operational
