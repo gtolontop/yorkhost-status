@@ -40,12 +40,19 @@ export async function POST(
       }, { status: 404 })
     }
 
+    // Get user details for author name
+    const user = await prisma.user.findUnique({
+      where: { id: auth.user!.userId },
+      select: { username: true }
+    })
+
     const update = await prisma.incidentUpdate.create({
       data: {
         incidentId,
         title: data.title,
         message: data.message,
-        authorId: auth.user!.userId
+        authorId: auth.user!.userId,
+        authorName: user?.username || 'Unknown'
       }
     })
 
