@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Layout from '@/components/layout/Layout'
 import ServiceGrid from '@/components/status/ServiceGrid'
+import GroupedServiceGrid from '@/components/status/GroupedServiceGrid'
 import IncidentBanner from '@/components/incidents/IncidentBanner'
 import PageHeader from '@/components/ui/PageHeader'
 import { StatusOverview as StatusOverviewType } from '@/types'
@@ -11,11 +12,13 @@ import { UptimeHistoryProvider } from '@/contexts/UptimeHistoryContext'
 
 export default function HomePage() {
   const [status, setStatus] = useState<StatusOverviewType | null>(null)
+  const [groups, setGroups] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchStatus()
+    fetchGroups()
     
     // Subscribe to real-time updates
     const unsubscribe = useStatusUpdates((data) => {
@@ -43,6 +46,19 @@ export default function HomePage() {
       console.error('Status fetch error:', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchGroups = async () => {
+    try {
+      const response = await fetch('/api/admin/groups')
+      const result = await response.json()
+      
+      if (result.success) {
+        setGroups(result.data.filter((g: any) => g.id !== 'ungrouped'))
+      }
+    } catch (error) {
+      console.error('Failed to fetch groups:', error)
     }
   }
 
@@ -157,7 +173,7 @@ export default function HomePage() {
 
         {/* Service Grid */}
         <UptimeHistoryProvider>
-          <ServiceGrid services={status?.services || []} />
+          <GroupedServiceGrid services={status?.services || []} groups={groups} />
         </UptimeHistoryProvider>
       </div>
     </Layout>
