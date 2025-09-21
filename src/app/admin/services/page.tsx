@@ -6,6 +6,7 @@ import AdminLayout from '@/components/admin/AdminLayout'
 import CreateServiceModal from '@/components/admin/CreateServiceModal'
 import CreateGroupModal from '@/components/admin/CreateGroupModal'
 import EditServiceModal from '@/components/admin/EditServiceModal'
+import ServiceIncidentBadge from '@/components/admin/ServiceIncidentBadge'
 import '../admin.css'
 import { 
   Plus, 
@@ -53,6 +54,7 @@ interface ServiceGroup {
 export default function AdminServicesPage() {
   const [services, setServices] = useState<Service[]>([])
   const [groups, setGroups] = useState<ServiceGroup[]>([])
+  const [incidents, setIncidents] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -105,7 +107,7 @@ export default function AdminServicesPage() {
       if (result.success) {
         const groupsWithServices = result.data.map((group: any) => ({
           ...group,
-          services: services.filter(s => s.groupId === group.id),
+          services: [],  // Will be populated by useEffect
           isCollapsed: false
         }))
         setGroups(groupsWithServices)
