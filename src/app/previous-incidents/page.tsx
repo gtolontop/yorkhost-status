@@ -286,6 +286,8 @@ export default function PreviousIncidentsPage() {
                             <div className="mt-0.5">
                               {incident.type === 'MAINTENANCE' ? (
                                 <Calendar className="w-5 h-5 text-blue-600" />
+                              ) : incident.status === 'RESOLVED' || incident.status === 'COMPLETED' || incident.endTime ? (
+                                <CheckCircle className="w-5 h-5 text-green-600" />
                               ) : (
                                 <AlertTriangle className="w-5 h-5 text-orange-600" />
                               )}
