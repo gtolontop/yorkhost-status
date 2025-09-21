@@ -195,12 +195,12 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
               </Tooltip>
             </TooltipProvider>
             
-            <h3 className="font-semibold text-gray-900 text-base sm:text-lg leading-tight mb-0">{service.name}</h3>
+            <h3 className="font-semibold text-white text-base sm:text-lg leading-tight mb-0">{service.name}</h3>
           </div>
 
           {/* Right Side: Uptime % */}
           <div className="flex items-baseline gap-1 text-gray-500">
-            <span className="text-base sm:text-2xl font-semibold sm:font-bold sm:text-gray-900">
+            <span className="text-base sm:text-2xl font-semibold sm:font-bold text-white">
               {service.currentStatus === 'unknown' ? '--' : `${service.uptimePercent24h.toFixed(2)}%`}
             </span>
             <span className="text-xs sm:hidden">uptime</span>
@@ -259,37 +259,37 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="border-t border-gray-100 p-6 bg-gray-50">
+        <div className="border-t border-[#27272a] p-6 bg-[#16161E]">
           {/* Stats Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 mb-6">
             <div className="text-center">
-              <p className="text-2xl font-semibold text-gray-900">
+              <p className="text-2xl font-semibold text-white">
                 {service.uptimePercent24h.toFixed(2)}%
               </p>
               <p className="text-xs text-gray-500 uppercase">24h Uptime</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-semibold text-gray-900">
+              <p className="text-2xl font-semibold text-white">
                 {service.uptimePercent7d.toFixed(2)}%
               </p>
               <p className="text-xs text-gray-500 uppercase">7d Uptime</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-semibold text-gray-900">
+              <p className="text-2xl font-semibold text-white">
                 {service.uptimePercent30d.toFixed(2)}%
               </p>
               <p className="text-xs text-gray-500 uppercase">30d Uptime</p>
             </div>
             {service.averageResponseTime && (
               <div className="text-center">
-                <p className="text-2xl font-semibold text-gray-900">
+                <p className="text-2xl font-semibold text-white">
                   {formatResponseTime(service.averageResponseTime)}
                 </p>
                 <p className="text-xs text-gray-500 uppercase">Response Time</p>
               </div>
             )}
             <div className="text-center">
-              <p className="text-2xl font-semibold text-gray-900">
+              <p className="text-2xl font-semibold text-white">
                 {service.lastCheck ? formatRelativeTime(service.lastCheck) : 'Never'}
               </p>
               <p className="text-xs text-gray-500 uppercase">Last Check</p>
