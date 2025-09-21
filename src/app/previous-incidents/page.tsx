@@ -82,7 +82,7 @@ export default function PreviousIncidentsPage() {
   }
 
   // Get unique years from incidents
-  const years = [...new Set(incidents.map(inc => new Date(inc.startTime).getFullYear()))].sort((a, b) => b - a)
+  const years = Array.from(new Set(incidents.map(inc => new Date(inc.startTime).getFullYear()))).sort((a, b) => b - a)
 
   const filteredIncidents = incidents.filter(incident => {
     // Filter by year
