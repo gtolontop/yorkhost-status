@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await requireAuth(request)
@@ -12,11 +12,12 @@ export async function POST(
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const { groupId, order } = await request.json()
 
     // Update service's machine assignment
     const service = await prisma.service.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         machineId: groupId === 'ungrouped' ? null : groupId
       }
