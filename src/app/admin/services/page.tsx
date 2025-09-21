@@ -174,19 +174,19 @@ export default function AdminServicesPage() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'operational': return <CheckCircle size={16} style={{ color: '#10b981' }} />
-      case 'degraded': return <AlertTriangle size={16} style={{ color: '#f59e0b' }} />
-      case 'outage': return <XCircle size={16} style={{ color: '#ef4444' }} />
-      default: return <Activity size={16} style={{ color: '#6b7280' }} />
+      case 'operational': return <CheckCircle size={16} className="text-green-500" />
+      case 'degraded': return <AlertTriangle size={16} className="text-amber-500" />
+      case 'outage': return <XCircle size={16} className="text-red-500" />
+      default: return <Activity size={16} className="text-gray-500" />
     }
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'operational': return '#10b981'
-      case 'degraded': return '#f59e0b'
-      case 'outage': return '#ef4444'
-      default: return '#6b7280'
+      case 'operational': return 'text-green-500'
+      case 'degraded': return 'text-amber-500'
+      case 'outage': return 'text-red-500'
+      default: return 'text-gray-500'
     }
   }
 
@@ -317,12 +317,12 @@ export default function AdminServicesPage() {
       <div className="admin-page">
         {/* Page Header */}
         <div className="page-header">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="flex items-center justify-between">
             <div>
               <h1>Service Management</h1>
               <p>Manage and organize your services with drag & drop</p>
             </div>
-            <div style={{ display: 'flex', gap: '1rem' }}>
+            <div className="flex gap-4">
               <button 
                 className="btn btn-secondary"
                 onClick={() => setShowCreateGroupModal(true)}
@@ -342,47 +342,24 @@ export default function AdminServicesPage() {
         </div>
 
         {/* Search */}
-        <div style={{ 
-          background: 'white',
-          border: '1px solid #e5e7eb',
-          borderRadius: '16px',
-          padding: '1.5rem',
-          marginBottom: '2rem'
-        }}>
-          <div style={{ position: 'relative' }}>
-            <Search size={18} style={{ 
-              position: 'absolute', 
-              left: '1rem', 
-              top: '50%', 
-              transform: 'translateY(-50%)',
-              color: '#6b7280'
-            }} />
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-8">
+          <div className="relative">
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400" />
             <input
               type="text"
               placeholder="Search services..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.75rem 1rem 0.75rem 3rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '10px',
-                fontSize: '0.875rem'
-              }}
+              className="w-full py-3 px-12 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             />
           </div>
         </div>
 
         {/* Services by Groups */}
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div className="flex flex-col gap-4">
             {filteredGroups.map(group => (
-              <div key={group.id} style={{
-                background: 'white',
-                border: '1px solid #e5e7eb',
-                borderRadius: '16px',
-                overflow: 'hidden'
-              }}>
+              <div key={group.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
                 <div style={{
                   padding: '1rem 1.5rem',
                   borderBottom: '1px solid #e5e7eb',
