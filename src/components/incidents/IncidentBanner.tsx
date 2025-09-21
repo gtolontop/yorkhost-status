@@ -22,7 +22,7 @@ export default function IncidentBanner({ incidents }: IncidentBannerProps) {
   return (
     <div className="max-w-3xl mx-auto mb-12">
       <Link 
-        href="/incidents" 
+        href="/previous-incidents" 
         className="group flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-all"
       >
         <div className="flex items-center gap-3">
