@@ -61,14 +61,18 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
   for (let i = 0; i < days; i++) {
     const date = new Date()
     date.setDate(date.getDate() - (days - 1 - i))
+    date.setHours(0, 0, 0, 0) // Reset time to start of day
     const dateKey = date.toISOString().split('T')[0]
     
     const dayData = dailyData[dateKey]
-    // Si on a des données pour ce jour, calculer l'uptime, sinon vérifier si on est dans le futur
+    const today = new Date()
+    today.setHours(23, 59, 59, 999) // End of today
+    
+    // Si on a des données pour ce jour, calculer l'uptime, sinon vérifier si on est dans le passé ou aujourd'hui
     let uptime = null
     if (dayData) {
       uptime = (dayData.successful / dayData.total) * 100
-    } else if (date <= new Date()) {
+    } else if (date <= today) {
       // Si on est dans le passé ou aujourd'hui mais pas de données, c'est 100% (pas de checks = tout va bien)
       uptime = 100
     }
