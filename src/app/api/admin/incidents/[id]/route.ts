@@ -160,8 +160,8 @@ export async function PUT(
       await prisma.incidentUpdate.create({
         data: {
           incidentId: incidentId,
-          status: body.status,
-          message: body.statusUpdateMessage,
+          title: 'Status Update',
+          message: body.statusUpdateMessage || `Status changed to ${body.status}`,
           authorId: auth.user!.userId
         }
       })
