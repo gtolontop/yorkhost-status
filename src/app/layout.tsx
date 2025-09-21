@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import '@/styles/globals.css'
-import { ThemeProvider } from '@/contexts/ThemeContext'
+import { ThemeProvider } from '@/components/providers/ThemeProvider'
 
 export const metadata: Metadata = {
   title: 'Yorkhost Status',
