@@ -140,9 +140,16 @@ export default function IncidentDetailPage() {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            ...incident,
+            title: incident.title,
+            description: incident.description,
+            severity: incident.severity,
             status: updateForm.status,
-            statusUpdateMessage: updateForm.message
+            statusUpdateMessage: updateForm.message,
+            serviceId: incident.serviceId,
+            machineId: incident.machineId,
+            tags: incident.tags || [],
+            // Set endTime if resolving the incident
+            endTime: updateForm.status === 'RESOLVED' ? new Date().toISOString() : undefined
           })
         })
 
