@@ -47,7 +47,7 @@ export default function Header() {
               href="https://discord.gg/yorkhost"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-[#5865F2] text-white rounded-md hover:bg-[#4752C4] transition-colors"
             >
               <MessageCircle size={18} />
               <span>Get in Touch</span>
