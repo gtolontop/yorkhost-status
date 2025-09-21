@@ -212,6 +212,8 @@ export default function IncidentDetailPage() {
               <div className="flex items-center gap-3 mb-2">
                 {incident.type === 'MAINTENANCE' ? (
                   <Wrench className="w-6 h-6 text-blue-600" />
+                ) : incident.status === 'RESOLVED' || incident.status === 'COMPLETED' ? (
+                  <CheckCircle className="w-6 h-6 text-green-600" />
                 ) : (
                   <AlertTriangle className="w-6 h-6 text-orange-600" />
                 )}
