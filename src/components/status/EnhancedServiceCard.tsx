@@ -172,11 +172,11 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
       >
         <div className="flex items-center justify-between">
           {/* Left Side: Icon + Service Name + Status */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="relative flex-shrink-0">
+                  <div className="relative flex-shrink-0 flex items-center">
                     {getStatusIcon()}
                     {service.activeIncident && service.enhancedStatus === 'outage-with-incident' && (
                       <Info className="w-3 h-3 text-orange-600 absolute -bottom-1 -right-1" />
@@ -195,15 +195,15 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
               </Tooltip>
             </TooltipProvider>
             
-            <h3 className="font-semibold text-gray-900 text-base sm:text-lg">{service.name}</h3>
+            <h3 className="font-semibold text-gray-900 text-base sm:text-lg leading-tight">{service.name}</h3>
           </div>
 
           {/* Right Side: Uptime % */}
-          <div className="flex items-center gap-1 text-gray-500">
+          <div className="flex items-baseline gap-1 text-gray-500">
             <span className="text-base sm:text-2xl font-semibold sm:font-bold sm:text-gray-900">
               {service.currentStatus === 'unknown' ? '--' : `${service.uptimePercent24h.toFixed(2)}%`}
             </span>
-            <span className="text-xs sm:text-xs sm:uppercase sm:hidden">uptime</span>
+            <span className="text-xs sm:hidden">uptime</span>
             <p className="text-xs uppercase hidden sm:block">Uptime</p>
           </div>
         </div>
