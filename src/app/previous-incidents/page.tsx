@@ -220,6 +220,40 @@ export default function PreviousIncidentsPage() {
                   Maintenance
                 </button>
               </div>
+
+              {/* Status Filter */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setStatusFilter('all')}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    statusFilter === 'all'
+                      ? 'bg-gray-900 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  All Status
+                </button>
+                <button
+                  onClick={() => setStatusFilter('active')}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    statusFilter === 'active'
+                      ? 'bg-gray-900 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Active
+                </button>
+                <button
+                  onClick={() => setStatusFilter('resolved')}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    statusFilter === 'resolved'
+                      ? 'bg-gray-900 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Resolved
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -241,7 +275,11 @@ export default function PreviousIncidentsPage() {
                 
                 <div className="space-y-4">
                   {monthIncidents.map((incident: Incident) => (
-                    <div key={incident.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                    <div key={incident.id} className={`bg-white rounded-lg border p-6 hover:shadow-md transition-shadow ${
+                      incident.status !== 'RESOLVED' && incident.status !== 'COMPLETED' && !incident.endTime
+                        ? 'border-orange-200 bg-orange-50'
+                        : 'border-gray-200'
+                    }`}>
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-start gap-3 mb-2">
