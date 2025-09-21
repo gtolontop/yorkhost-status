@@ -149,9 +149,46 @@ export default function AdminDashboard() {
 
   // Remove loading screen, just show the page immediately
 
+  const servicesDownWithoutIncident = services.filter(s => s.status === 'outage').length
+
   return (
     <AdminLayout>
       <div className="admin-page">
+        {/* Alert Banner for Services Down Without Incident */}
+        {servicesDownWithoutIncident > 0 && (
+          <div style={{ 
+            background: '#fef2f2', 
+            border: '1px solid #fecaca', 
+            borderRadius: '8px', 
+            padding: '1rem', 
+            marginBottom: '1.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem'
+          }}>
+            <AlertTriangle size={20} style={{ color: '#dc2626' }} />
+            <div style={{ flex: 1 }}>
+              <p style={{ margin: 0, fontWeight: 600, color: '#991b1b' }}>
+                Action requise: {servicesDownWithoutIncident} service{servicesDownWithoutIncident > 1 ? 's' : ''} en panne sans incident déclaré
+              </p>
+              <p style={{ margin: 0, fontSize: '0.875rem', color: '#7f1d1d', marginTop: '0.25rem' }}>
+                Veuillez créer des incidents pour les services affectés afin d'informer les utilisateurs.
+              </p>
+            </div>
+            <a 
+              href="/admin/incidents" 
+              className="btn btn-primary"
+              style={{ 
+                fontSize: '0.875rem',
+                padding: '0.5rem 1rem',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              Créer un incident
+            </a>
+          </div>
+        )}
+
         {/* Page Header */}
         <div className="page-header">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
