@@ -164,7 +164,7 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
   }
 
   return (
-    <div className={`bg-white border-2 rounded-lg shadow-sm hover:shadow-md transition-all ${getCardBorderClass()}`}>
+    <div className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-all`}>
       {/* Card Header */}
       <div 
         className="p-6 cursor-pointer"
