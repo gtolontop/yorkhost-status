@@ -162,8 +162,8 @@ export default function PreviousIncidentsPage() {
       <div className="container mx-auto px-4">
         <PageHeader
           icon={<Clock size={64} />}
-          title="Previous Incidents"
-          subtitle="View the history of past incidents and maintenance"
+          title="All Incidents"
+          subtitle="View all current and past incidents affecting our services"
         />
 
         {/* Filters */}
