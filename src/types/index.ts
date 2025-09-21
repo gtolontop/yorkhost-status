@@ -58,7 +58,7 @@ export interface ApiResponse<T = any> {
 }
 
 export interface StatusOverview {
-  overall: 'operational' | 'degraded' | 'outage'
+  overall: 'operational' | 'degraded' | 'outage' | 'maintenance'
   services: ServiceWithStats[]
   activeIncidents: IncidentWithDetails[]
   uptimeStats: {
