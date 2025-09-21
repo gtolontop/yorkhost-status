@@ -18,7 +18,7 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Brand */}
-          <div className="flex items-center">
+          <div className="flex items-center flex-1">
             <Link href="/" className="flex items-center gap-3">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold">Y</span>
@@ -27,8 +27,8 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
+          {/* Desktop Navigation - Centered */}
+          <nav className="hidden md:flex items-center justify-center gap-6 flex-1">
             <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
               Overview
             </Link>
@@ -44,7 +44,7 @@ export default function Header() {
           </nav>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-end gap-2 flex-1">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
