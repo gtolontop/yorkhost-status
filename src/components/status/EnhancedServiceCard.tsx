@@ -176,7 +176,7 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="relative">
+                  <div className="relative flex-shrink-0">
                     {getStatusIcon()}
                     {service.activeIncident && service.enhancedStatus === 'outage-with-incident' && (
                       <Info className="w-3 h-3 text-orange-600 absolute -bottom-1 -right-1" />
@@ -195,23 +195,16 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
               </Tooltip>
             </TooltipProvider>
             
-            <div>
-              <h3 className="font-semibold text-gray-900 text-lg">{service.name}</h3>
-              <p className={`text-sm ${getStatusTextColor()} hidden sm:block`}>
-                {getStatusText()}
-              </p>
-            </div>
+            <h3 className="font-semibold text-gray-900 text-base sm:text-lg">{service.name}</h3>
           </div>
 
           {/* Right Side: Uptime % */}
-          <div className="text-right">
-            <div className="flex items-center justify-end gap-1 sm:block">
-              <span className="text-lg sm:text-2xl font-bold text-gray-900">
-                {service.currentStatus === 'unknown' ? '--' : `${service.uptimePercent24h.toFixed(2)}%`}
-              </span>
-              <span className="text-xs text-gray-500 uppercase sm:hidden">Uptime</span>
-            </div>
-            <p className="text-xs text-gray-500 uppercase hidden sm:block">Uptime</p>
+          <div className="flex items-center gap-1 text-gray-500">
+            <span className="text-base sm:text-2xl font-semibold sm:font-bold sm:text-gray-900">
+              {service.currentStatus === 'unknown' ? '--' : `${service.uptimePercent24h.toFixed(2)}%`}
+            </span>
+            <span className="text-xs sm:text-xs sm:uppercase sm:hidden">uptime</span>
+            <p className="text-xs uppercase hidden sm:block">Uptime</p>
           </div>
         </div>
 
