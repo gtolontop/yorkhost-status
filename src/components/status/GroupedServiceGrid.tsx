@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import { ServiceWithStats } from '@/types'
-import ServiceCard from './ServiceCard'
-import { ChevronDown, ChevronRight, Server } from 'lucide-react'
+import CollapsibleGroup from './CollapsibleGroup'
 
 interface ServiceGroup {
   id: string
