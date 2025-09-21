@@ -82,7 +82,6 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
   const generateUptimeBars = () => {
     const bars = []
     const today = new Date()
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
     const daysToShow = isMobile ? 30 : 90
     
     for (let i = daysToShow - 1; i >= 0; i--) {
