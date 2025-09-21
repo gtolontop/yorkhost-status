@@ -36,7 +36,8 @@
       "Bash(npx prisma generate:*)",
       "Bash(npx prisma:*)",
       "Bash(npx dotenv:*)",
-      "Bash(update-db.bat)"
+      "Bash(update-db.bat)",
+      "Bash(cmd:*)"
     ],
     "deny": []
   }
