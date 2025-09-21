@@ -56,31 +56,31 @@ export default function CollapsibleGroup({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       <div 
-        className="px-6 py-4 cursor-pointer hover:bg-gray-50 transition-colors flex items-center justify-between"
+        className="px-4 sm:px-6 py-4 cursor-pointer hover:bg-gray-50 transition-colors flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
         onClick={toggleCollapse}
         style={{ borderLeft: `4px solid ${group.color}` }}
       >
-        <div className="flex items-center gap-3">
-          <div className="text-gray-400 transition-transform duration-200" style={{
+        <div className="flex items-start sm:items-center gap-3">
+          <div className="text-gray-400 transition-transform duration-200 mt-1 sm:mt-0 flex-shrink-0" style={{
             transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)'
           }}>
             <ChevronDown size={20} />
           </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              {group.name}
-              <span className="text-sm font-normal text-gray-500">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex flex-wrap items-center gap-2">
+              <span className="break-words">{group.name}</span>
+              <span className="text-sm font-normal text-gray-500 whitespace-nowrap">
                 ({group.services.length} service{group.services.length > 1 ? 's' : ''})
               </span>
             </h3>
             {group.description && (
-              <p className="text-sm text-gray-500">{group.description}</p>
+              <p className="text-sm text-gray-500 mt-1 line-clamp-2">{group.description}</p>
             )}
           </div>
         </div>
         
         {/* Group status summary */}
-        <div className="flex items-center gap-4 text-sm">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm ml-8 sm:ml-0">
           {group.services.filter(s => s.enhancedStatus === 'operational').length > 0 && (
             <span className="text-green-600 font-medium">
               {group.services.filter(s => s.enhancedStatus === 'operational').length} operational
@@ -114,7 +114,7 @@ export default function CollapsibleGroup({
         style={{ height: height !== undefined ? `${height}px` : 'auto' }}
       >
         <div ref={contentRef} className="border-t border-gray-200">
-          <div className="p-4 space-y-3">
+          <div className="p-3 sm:p-4 space-y-3">
             {group.services.map((service) => (
               <EnhancedServiceCard
                 key={service.id}
