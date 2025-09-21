@@ -1,5 +1,8 @@
 import { PrismaClient } from '@prisma/client'
 
+// Force using the production database URL
+process.env.DATABASE_URL = 'postgresql://neondb_owner:npg_Yigqv7bupNU6@ep-flat-sound-ag98carx-pooler.c-2.eu-central-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require'
+
 const prisma = new PrismaClient()
 
 async function resetDatabase() {
