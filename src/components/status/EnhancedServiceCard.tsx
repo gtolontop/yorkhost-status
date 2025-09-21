@@ -265,7 +265,7 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
       {isExpanded && (
         <div className="border-t border-gray-100 p-6 bg-gray-50">
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 mb-6">
             <div className="text-center">
               <p className="text-2xl font-semibold text-gray-900">
                 {service.uptimePercent24h.toFixed(2)}%
