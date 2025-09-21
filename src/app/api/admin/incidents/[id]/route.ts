@@ -59,7 +59,7 @@ export async function DELETE(
           serviceName: incident.service?.name,
           machineName: incident.machine?.name,
           updatesCount: incident.updates.length,
-          createdAt: incident.timestamp,
+          createdAt: incident.startTime,
           endTime: incident.endTime
         }
       }

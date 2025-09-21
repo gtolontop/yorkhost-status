@@ -6,7 +6,7 @@ interface PageHeaderProps {
   icon: ReactNode
   title: string
   subtitle: string
-  status?: 'operational' | 'degraded' | 'outage' | 'maintenance'
+  status?: 'operational' | 'degraded' | 'outage' | 'maintenance' | undefined
 }
 
 export default function PageHeader({ icon, title, subtitle, status }: PageHeaderProps) {
