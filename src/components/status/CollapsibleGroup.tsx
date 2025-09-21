@@ -15,6 +15,8 @@ interface CollapsibleGroupProps {
   }
   expandedServices: Set<string>
   onToggleService: (serviceId: string) => void
+  isFirst?: boolean
+  isLast?: boolean
 }
 
 export default function CollapsibleGroup({ 

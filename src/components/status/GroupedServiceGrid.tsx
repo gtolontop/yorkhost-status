@@ -74,15 +74,19 @@ export default function GroupedServiceGrid({ services, groups }: GroupedServiceG
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      {nonEmptyGroups.map((group) => (
-        <CollapsibleGroup
-          key={group.id}
-          group={group}
-          expandedServices={expandedServices}
-          onToggleService={toggleService}
-        />
-      ))}
+    <div className="max-w-6xl mx-auto">
+      <div className="bg-[#1A1A24] rounded-lg shadow-lg overflow-hidden">
+        {nonEmptyGroups.map((group, index) => (
+          <CollapsibleGroup
+            key={group.id}
+            group={group}
+            expandedServices={expandedServices}
+            onToggleService={toggleService}
+            isFirst={index === 0}
+            isLast={index === nonEmptyGroups.length - 1}
+          />
+        ))}
+      </div>
     </div>
   )
 }
