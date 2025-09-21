@@ -192,8 +192,14 @@ class MonitorWorker {
 
   private validateHttpResponse(response: any, check: any): boolean {
     // Check status code
-    if (check.expectedStatus && response.status !== check.expectedStatus) {
-      return false
+    if (check.expectedStatus !== null && check.expectedStatus !== undefined) {
+      // If we have a specific expected status, check for it
+      if (response.status !== check.expectedStatus) {
+        // But if followRedirects is true and we got a redirect, that's still OK
+        if (!(check.followRedirects && response.status >= 300 && response.status < 400)) {
+          return false
+        }
+      }
     }
 
     // Check response body

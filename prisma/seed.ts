@@ -83,13 +83,13 @@ async function main() {
     create: {
       id: "website-http-check",
       serviceId: websiteService.id,
-      name: "Vérification HTTP Site Web",
-      type: CheckType.HTTP,
+      name: "Vérification HTTPS Site Web",
+      type: CheckType.HTTPS,
       target: "https://yorkhost.fr",
       timeout: 30,
       interval: 300,
       retryAttempts: 3,
-      expectedStatus: 200,
+      expectedStatus: null, // Allow any success status including redirects
       isActive: true
     }
   })
