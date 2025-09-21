@@ -20,6 +20,18 @@ interface EnhancedServiceCardProps {
 
 export default function EnhancedServiceCard({ service, isExpanded, onToggle }: EnhancedServiceCardProps) {
   const historyContext = useUptimeHistory(service.id)
+  const [isMobile, setIsMobile] = useState(false)
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
   
   // Use context data instead of local state
   const uptimeHistory = 'serviceHistory' in historyContext ? historyContext.serviceHistory : []
@@ -93,7 +105,6 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
   const generateUptimeBars = () => {
     const bars = []
     const today = new Date()
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
     const daysToShow = isMobile ? 30 : 90
     
     for (let i = daysToShow - 1; i >= 0; i--) {
