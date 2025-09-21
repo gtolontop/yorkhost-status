@@ -42,6 +42,15 @@ export default function Header() {
 
           {/* Right Actions */}
           <div className="flex items-center justify-end gap-2 flex-1">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            
             {/* Discord Button */}
             <a
               href="https://discord.gg/yorkhost"
@@ -52,15 +61,6 @@ export default function Header() {
               <MessageCircle size={18} />
               <span>Get in Touch</span>
             </a>
-            
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
 
             {/* Mobile Menu Button */}
             <button
