@@ -97,6 +97,12 @@ export default function CollapsibleGroup({
               {group.services.filter(s => s.enhancedStatus === 'maintenance').length} maintenance
             </span>
           )}
+          </div>
+          <div className="text-gray-400 transition-transform duration-200 flex-shrink-0" style={{
+            transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)'
+          }}>
+            <ChevronDown size={20} />
+          </div>
         </div>
       </div>
       
