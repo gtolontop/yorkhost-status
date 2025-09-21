@@ -22,7 +22,9 @@ interface CollapsibleGroupProps {
 export default function CollapsibleGroup({ 
   group, 
   expandedServices, 
-  onToggleService 
+  onToggleService,
+  isFirst = false,
+  isLast = false
 }: CollapsibleGroupProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [height, setHeight] = useState<number | undefined>(undefined)
