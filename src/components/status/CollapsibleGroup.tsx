@@ -11,7 +11,7 @@ interface CollapsibleGroupProps {
     name: string
     description?: string
     color: string
-    services: ServiceWithStats[]
+    services: ServiceWithEnhancedStatus[]
   }
   expandedServices: Set<string>
   onToggleService: (serviceId: string) => void
@@ -81,19 +81,29 @@ export default function CollapsibleGroup({
         
         {/* Group status summary */}
         <div className="flex items-center gap-4 text-sm">
-          {group.services.filter(s => s.currentStatus === 'operational').length > 0 && (
+          {group.services.filter(s => s.enhancedStatus === 'operational').length > 0 && (
             <span className="text-green-600 font-medium">
-              {group.services.filter(s => s.currentStatus === 'operational').length} operational
+              {group.services.filter(s => s.enhancedStatus === 'operational').length} operational
             </span>
           )}
-          {group.services.filter(s => s.currentStatus === 'degraded').length > 0 && (
+          {group.services.filter(s => s.enhancedStatus === 'degraded').length > 0 && (
             <span className="text-yellow-600 font-medium">
-              {group.services.filter(s => s.currentStatus === 'degraded').length} degraded
+              {group.services.filter(s => s.enhancedStatus === 'degraded').length} degraded
             </span>
           )}
-          {group.services.filter(s => s.currentStatus === 'outage').length > 0 && (
+          {group.services.filter(s => s.enhancedStatus === 'outage' || s.enhancedStatus === 'outage-with-incident').length > 0 && (
             <span className="text-red-600 font-medium">
-              {group.services.filter(s => s.currentStatus === 'outage').length} down
+              {group.services.filter(s => s.enhancedStatus === 'outage').length} down
+            </span>
+          )}
+          {group.services.filter(s => s.enhancedStatus === 'outage-with-incident').length > 0 && (
+            <span className="text-orange-600 font-medium">
+              {group.services.filter(s => s.enhancedStatus === 'outage-with-incident').length} with incident
+            </span>
+          )}
+          {group.services.filter(s => s.enhancedStatus === 'maintenance').length > 0 && (
+            <span className="text-blue-600 font-medium">
+              {group.services.filter(s => s.enhancedStatus === 'maintenance').length} maintenance
             </span>
           )}
         </div>
@@ -106,7 +116,7 @@ export default function CollapsibleGroup({
         <div ref={contentRef} className="border-t border-gray-200">
           <div className="p-4 space-y-3">
             {group.services.map((service) => (
-              <ServiceCard
+              <EnhancedServiceCard
                 key={service.id}
                 service={service}
                 isExpanded={expandedServices.has(service.id)}
