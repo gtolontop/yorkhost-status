@@ -35,16 +35,24 @@ export default function Header() {
             <Link href="/maintenance" className="text-gray-600 hover:text-gray-900 transition-colors">
               Maintenance
             </Link>
-            <Link href="/previous-incidents" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="/previous-incidents" className="text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap">
               Previous Incidents
-            </Link>
-            <Link href="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">
-              Contact
             </Link>
           </nav>
 
           {/* Right Actions */}
           <div className="flex items-center justify-end gap-2 flex-1">
+            {/* Discord Button */}
+            <a
+              href="https://discord.gg/yorkhost"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors"
+            >
+              <MessageCircle size={18} />
+              <span className="hidden sm:inline">Get in Touch</span>
+            </a>
+            
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -90,13 +98,6 @@ export default function Header() {
               onClick={() => setIsMenuOpen(false)}
             >
               Previous Incidents
-            </Link>
-            <Link 
-              href="/contact" 
-              className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Contact
             </Link>
           </nav>
         </div>
