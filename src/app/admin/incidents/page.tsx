@@ -394,15 +394,24 @@ export default function IncidentsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end gap-2">
+                        <Link
+                          href={`/admin/incidents/${incident.id}`}
+                          className="text-[#6D96FF] hover:text-[#5A84FF]"
+                          title="View details"
+                        >
+                          <Eye size={16} />
+                        </Link>
                         <button
                           onClick={() => openModal(incident)}
                           className="text-[#6D96FF] hover:text-[#5A84FF]"
+                          title="Edit"
                         >
                           <Edit2 size={16} />
                         </button>
                         <button
                           onClick={() => handleDelete(incident.id)}
                           className="text-red-600 hover:text-red-700"
+                          title="Delete"
                         >
                           <Trash2 size={16} />
                         </button>
