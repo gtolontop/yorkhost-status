@@ -457,10 +457,9 @@ export default function AdminServicesPage() {
                                       </div>
                                     </div>
                                     
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <div className="flex gap-2">
                                       <button 
-                                        className="btn btn-secondary"
-                                        style={{ padding: '0.5rem' }}
+                                        className="btn btn-secondary p-2"
                                         onClick={() => toggleServiceStatus(service.id)}
                                         title={service.isActive ? 'Pause monitoring' : 'Resume monitoring'}
                                       >
@@ -468,8 +467,7 @@ export default function AdminServicesPage() {
                                       </button>
                                       
                                       <button 
-                                        className="btn btn-secondary"
-                                        style={{ padding: '0.5rem' }}
+                                        className="btn btn-secondary p-2"
                                         onClick={() => testService(service.id)}
                                         title="Test now"
                                       >
@@ -477,8 +475,7 @@ export default function AdminServicesPage() {
                                       </button>
                                       
                                       <button 
-                                        className="btn btn-secondary"
-                                        style={{ padding: '0.5rem' }}
+                                        className="btn btn-secondary p-2"
                                         onClick={() => {
                                           setEditingService(service)
                                           setShowEditModal(true)
@@ -489,8 +486,7 @@ export default function AdminServicesPage() {
                                       </button>
                                       
                                       <button 
-                                        className="btn btn-danger"
-                                        style={{ padding: '0.5rem' }}
+                                        className="btn btn-danger p-2"
                                         onClick={() => setShowDeleteConfirm(service.id)}
                                         title="Delete service"
                                       >
@@ -551,48 +547,21 @@ export default function AdminServicesPage() {
 
         {/* Delete Confirmation Modal */}
         {showDeleteConfirm && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }}>
-            <div style={{
-              background: 'white',
-              borderRadius: '16px',
-              padding: '2rem',
-              maxWidth: '400px',
-              width: '90%',
-              textAlign: 'center'
-            }}>
-              <div style={{ 
-                width: '64px', 
-                height: '64px', 
-                background: '#fee2e2', 
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 1rem'
-              }}>
-                <Trash2 size={32} style={{ color: '#ef4444' }} />
+          <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-[1000]">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-sm w-[90%] text-center">
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 size={32} className="text-red-500 dark:text-red-400" />
               </div>
               
-              <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem', fontWeight: 600 }}>
+              <h3 className="m-0 mb-2 text-xl font-semibold text-gray-900 dark:text-white">
                 Delete Service
               </h3>
               
-              <p style={{ margin: '0 0 2rem 0', color: '#6b7280' }}>
+              <p className="m-0 mb-8 text-gray-500 dark:text-gray-400">
                 Are you sure you want to delete this service? This action cannot be undone.
               </p>
               
-              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <div className="flex gap-4 justify-center">
                 <button 
                   className="btn btn-secondary"
                   onClick={() => setShowDeleteConfirm(null)}
