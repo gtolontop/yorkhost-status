@@ -65,8 +65,12 @@ export default function AdminServicesPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchServices()
-    fetchGroups()
+    // Fetch groups first, then services
+    const loadData = async () => {
+      await fetchGroups()
+      await fetchServices()
+    }
+    loadData()
   }, [])
 
   const fetchServices = async () => {
@@ -529,18 +533,18 @@ export default function AdminServicesPage() {
         <CreateServiceModal 
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
-          onSuccess={() => {
-            fetchServices()
-            fetchGroups()
+          onSuccess={async () => {
+            await fetchGroups()
+            await fetchServices()
           }}
         />
 
         <CreateGroupModal 
           isOpen={showCreateGroupModal}
           onClose={() => setShowCreateGroupModal(false)}
-          onSuccess={() => {
-            fetchGroups()
-            fetchServices()
+          onSuccess={async () => {
+            await fetchGroups()
+            await fetchServices()
           }}
         />
 
@@ -551,8 +555,9 @@ export default function AdminServicesPage() {
               setShowEditModal(false)
               setEditingService(null)
             }}
-            onSuccess={() => {
-              fetchServices()
+            onSuccess={async () => {
+              await fetchGroups()
+              await fetchServices()
               setShowEditModal(false)
               setEditingService(null)
             }}
