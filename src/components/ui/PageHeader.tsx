@@ -30,7 +30,7 @@ export default function PageHeader({ icon, title, subtitle, status }: PageHeader
   return (
     <div style={{ 
       textAlign: 'center', 
-      padding: '80px 20px 60px',
+      padding: '80px 20px 20px',
       maxWidth: '800px',
       margin: '0 auto'
     }}>
@@ -57,7 +57,7 @@ export default function PageHeader({ icon, title, subtitle, status }: PageHeader
       <p style={{
         fontSize: '1.25rem',
         color: 'var(--text-secondary)',
-        marginBottom: '48px',
+        marginBottom: '8px',
         lineHeight: '1.6'
       }}>
         {subtitle}
