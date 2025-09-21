@@ -7,9 +7,10 @@ interface PageHeaderProps {
   title: string
   subtitle: string
   status?: 'operational' | 'degraded' | 'outage' | 'maintenance' | undefined
+  lastUpdate?: Date
 }
 
-export default function PageHeader({ icon, title, subtitle, status }: PageHeaderProps) {
+export default function PageHeader({ icon, title, subtitle, status, lastUpdate }: PageHeaderProps) {
   const getStatusColor = () => {
     if (!status) return 'var(--color-primary)'
     
@@ -51,7 +52,7 @@ export default function PageHeader({ icon, title, subtitle, status }: PageHeader
           lineHeight: '1.6'
         }}
       >
-        {subtitle}
+        {lastUpdate ? `Last updated: ${new Date(lastUpdate).toLocaleString()}` : subtitle}
       </p>
     </div>
   )
