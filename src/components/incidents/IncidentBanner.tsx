@@ -98,7 +98,7 @@ export default function IncidentBanner({ incidents }: IncidentBannerProps) {
         
         <div className="flex flex-col gap-2 items-end flex-shrink-0 sm:flex-row sm:gap-3">
           <Link 
-            href={`/incidents/${primaryIncident.id}`}
+            href={`/incident/${primaryIncident.slug || primaryIncident.id}`}
             className="flex items-center gap-2 px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-md text-sm font-medium transition-all whitespace-nowrap hover:bg-opacity-30 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:ring-offset-2"
           >
             <span>View Details</span>

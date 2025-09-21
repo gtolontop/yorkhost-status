@@ -201,9 +201,28 @@ export async function getStatusOverview() {
     }),
     prisma.incident.findMany({
       where: {
-        status: {
-          in: ['INVESTIGATING', 'IDENTIFIED', 'MONITORING']
-        }
+        OR: [
+          {
+            // Active incidents
+            type: 'INCIDENT',
+            status: {
+              in: ['INVESTIGATING', 'IDENTIFIED', 'MONITORING']
+            }
+          },
+          {
+            // Scheduled maintenances
+            type: 'MAINTENANCE',
+            status: 'SCHEDULED',
+            scheduledFor: {
+              lte: new Date(Date.now() + 24 * 60 * 60 * 1000) // Next 24 hours
+            }
+          },
+          {
+            // Ongoing maintenances
+            type: 'MAINTENANCE',
+            status: 'IN_PROGRESS'
+          }
+        ]
       },
       include: {
         updates: {

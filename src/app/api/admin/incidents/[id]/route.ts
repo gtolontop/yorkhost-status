@@ -162,7 +162,9 @@ export async function PUT(
           incidentId: incidentId,
           title: 'Status Update',
           message: body.statusUpdateMessage || `Status changed to ${body.status}`,
-          authorId: auth.user!.userId
+          status: body.status,
+          authorId: auth.user!.userId,
+          isStatusChange: true
         }
       })
     }
