@@ -54,10 +54,16 @@ const IncidentsPage: React.FC = () => {
     try {
       const response = await fetch('/api/incidents');
       if (!response.ok) throw new Error('Failed to fetch incidents');
-      const data = await response.json();
-      setIncidents(data);
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        setIncidents(result.data.incidents || []);
+      } else {
+        setIncidents([]);
+      }
     } catch (err) {
       setError('Failed to load incidents');
+      setIncidents([]);
     } finally {
       setLoading(false);
     }
