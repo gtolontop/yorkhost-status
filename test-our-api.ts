@@ -3,7 +3,7 @@ import axios from 'axios'
 async function testOurAPI() {
   console.log('🧪 Testing our status page API endpoints...\n')
   
-  const baseUrl = 'http://localhost:3003'
+  const baseUrl = 'http://localhost:3000'
   
   // Test 1: Public status endpoint
   console.log('1️⃣ Testing GET /api/status')
