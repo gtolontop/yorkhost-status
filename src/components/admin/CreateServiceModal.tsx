@@ -149,14 +149,8 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
             </select>
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              marginBottom: '0.5rem',
-              color: '#374151'
-            }}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
               Target (IP/Domain) *
             </label>
             <input
@@ -169,25 +163,13 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
                 formData.type === 'ICMP' ? '8.8.8.8' : 'example.com'
               }
               required
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '0.875rem'
-              }}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             />
           </div>
 
           {(formData.type === 'TCP' || formData.type === 'HTTP') && (
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                marginBottom: '0.5rem',
-                color: '#374151'
-              }}>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                 Port {formData.type === 'TCP' ? '*' : '(optional)'}
               </label>
               <input
@@ -198,38 +180,20 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
                 min="1"
                 max="65535"
                 required={formData.type === 'TCP'}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  fontSize: '0.875rem'
-                }}
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
               />
             </div>
           )}
 
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              marginBottom: '0.5rem',
-              color: '#374151'
-            }}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
               Check Interval
             </label>
             <select
               value={formData.interval}
               onChange={(e) => setFormData({ ...formData, interval: parseInt(e.target.value) })}
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '0.875rem'
-              }}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             >
               {intervalOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -239,14 +203,8 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
             </select>
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              marginBottom: '0.5rem',
-              color: '#374151'
-            }}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
               Description
             </label>
             <textarea
@@ -254,51 +212,22 @@ export default function CreateServiceModal({ isOpen, onClose, onSuccess }: Creat
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
               placeholder="Optional description..."
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '0.875rem',
-                resize: 'vertical'
-              }}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 resize-y"
             />
           </div>
 
-          <div style={{
-            display: 'flex',
-            gap: '1rem',
-            justifyContent: 'flex-end'
-          }}>
+          <div className="flex gap-4 justify-end">
             <button
               type="button"
               onClick={() => { onClose(); resetForm(); }}
-              style={{
-                padding: '0.75rem 1.5rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                background: 'white',
-                color: '#374151',
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                cursor: 'pointer'
-              }}
+              className="py-3 px-6 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-sm font-medium cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              style={{
-                padding: '0.75rem 1.5rem',
-                border: 'none',
-                borderRadius: '8px',
-                background: loading ? '#9ca3af' : '#000000',
-                color: 'white',
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                cursor: loading ? 'not-allowed' : 'pointer'
-              }}
+              className={`py-3 px-6 border-0 rounded-lg text-white text-sm font-medium ${loading ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' : 'bg-black dark:bg-white dark:text-black cursor-pointer hover:bg-gray-800 dark:hover:bg-gray-200'} transition-colors`}
             >
               {loading ? 'Creating...' : 'Create Service'}
             </button>
