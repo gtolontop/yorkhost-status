@@ -540,6 +540,7 @@ export default function AdminServicesPage() {
           onClose={() => setShowCreateGroupModal(false)}
           onSuccess={() => {
             fetchGroups()
+            fetchServices()
           }}
         />
 
