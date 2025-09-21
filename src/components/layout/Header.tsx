@@ -69,15 +69,15 @@ export default function Header() {
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
               
-              {/* Discord Button */}
+              {/* Discord Button - Hidden on mobile when burger menu is visible */}
               <a
                 href="https://discord.gg/yorkhost"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden sm:flex items-center gap-2 px-3 sm:px-4 py-2 bg-[#5865F2] text-white rounded-md hover:bg-[#4752C4] transition-all hover:scale-105 active:scale-95"
+                className="hidden lg:flex items-center gap-2 px-3 lg:px-4 py-2 bg-[#5865F2] text-white rounded-md hover:bg-[#4752C4] transition-all hover:scale-105 active:scale-95"
               >
                 <MessageCircle size={18} />
-                <span className="hidden sm:inline">Get in Touch</span>
+                <span>Get in Touch</span>
               </a>
 
               {/* Mobile Menu Button */}
