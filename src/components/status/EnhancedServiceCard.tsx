@@ -164,7 +164,7 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
   }
 
   return (
-    <div className={`bg-[#1A1A24] rounded-lg hover:bg-[#1E1E28] transition-all`}>
+    <div className={`transition-all`}>
       {/* Card Header */}
       <div 
         className="p-6 cursor-pointer"
@@ -259,7 +259,7 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="border-t border-[#27272a] p-6 bg-[#16161E]">
+        <div className="border-t border-[#27272a] p-6">
           {/* Stats Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 mb-6">
             <div className="text-center">
