@@ -16,8 +16,8 @@ export async function getOptimizedUptimeHistory(serviceId: string, days: number 
       DATE(timestamp) as date,
       COUNT(*) as total,
       COUNT(CASE WHEN success = true THEN 1 END) as successful
-    FROM "checkResult" cr
-    INNER JOIN "check" c ON cr."checkId" = c.id
+    FROM check_results cr
+    INNER JOIN checks c ON cr."checkId" = c.id
     WHERE c."serviceId" = ${serviceId}
       AND cr.timestamp >= ${startDate}
     GROUP BY DATE(timestamp)
@@ -108,8 +108,8 @@ export async function getBulkUptimeHistory(serviceIds: string[], days: number = 
       DATE(cr.timestamp) as date,
       COUNT(*) as total,
       COUNT(CASE WHEN cr.success = true THEN 1 END) as successful
-    FROM "checkResult" cr
-    INNER JOIN "check" c ON cr."checkId" = c.id
+    FROM check_results cr
+    INNER JOIN checks c ON cr."checkId" = c.id
     WHERE c."serviceId" = ANY(${serviceIds})
       AND cr.timestamp >= ${startDate}
     GROUP BY c."serviceId", DATE(cr.timestamp)
