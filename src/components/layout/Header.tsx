@@ -30,7 +30,13 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
-              Status
+              Overview
+            </Link>
+            <Link href="/maintenance" className="text-gray-600 hover:text-gray-900 transition-colors">
+              Maintenance
+            </Link>
+            <Link href="/previous-incidents" className="text-gray-600 hover:text-gray-900 transition-colors">
+              Previous Incidents
             </Link>
             <Link href="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">
               Contact
@@ -69,7 +75,21 @@ export default function Header() {
               className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
-              Status
+              Overview
+            </Link>
+            <Link 
+              href="/maintenance" 
+              className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Maintenance
+            </Link>
+            <Link 
+              href="/previous-incidents" 
+              className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Previous Incidents
             </Link>
             <Link 
               href="/contact" 
