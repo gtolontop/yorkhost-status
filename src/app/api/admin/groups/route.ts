@@ -26,14 +26,20 @@ export async function GET(request: NextRequest) {
     })
 
     // Transform machines to groups format
-    const groups = machines.map(machine => ({
-      id: machine.id,
-      name: machine.name,
-      description: machine.description || '',
-      color: machine.color || '#6b7280',
-      order: 0,
-      servicesCount: machine.services.length
-    }))
+    const groups = machines.map(machine => {
+      // Extract color from tags
+      const colorTag = machine.tags.find(tag => tag.startsWith('color:'))
+      const color = colorTag ? colorTag.replace('color:', '') : '#6b7280'
+      
+      return {
+        id: machine.id,
+        name: machine.name,
+        description: machine.description || '',
+        color,
+        order: 0,
+        servicesCount: machine.services.length
+      }
+    })
 
     // Add ungrouped special group
     const ungroupedCount = await prisma.service.count({
@@ -69,13 +75,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const data = createGroupSchema.parse(body)
 
-    // Create machine as group
+    // Create machine as group (store color in tags)
     const machine = await prisma.machine.create({
       data: {
         name: data.name,
         category: data.name.toLowerCase().replace(/\s+/g, '-'),
         description: data.description,
-        color: data.color || '#6b7280'
+        tags: [`color:${data.color || '#6b7280'}`]
       }
     })
 
@@ -85,7 +91,7 @@ export async function POST(request: NextRequest) {
         id: machine.id,
         name: machine.name,
         description: machine.description || '',
-        color: machine.color || '#6b7280',
+        color: data.color || '#6b7280',
         order: 0,
         servicesCount: 0
       }
