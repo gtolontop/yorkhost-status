@@ -72,11 +72,6 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
     let uptime = null
     if (dayData && dayData.total > 0) {
       uptime = (dayData.successful / dayData.total) * 100
-    } else if (date <= today && checkResults.length > 0) {
-      // Pour aujourd'hui ou les jours passés, si on a au moins un check dans l'historique,
-      // on considère que le service est opérationnel s'il n'y a pas eu de checks ce jour-là
-      // (permet d'éviter les faux "no data" pour les services récemment ajoutés)
-      uptime = 100
     }
     
     // Get incidents for this day
