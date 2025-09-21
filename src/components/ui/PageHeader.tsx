@@ -36,9 +36,8 @@ export default function PageHeader({ icon, title, subtitle, status }: PageHeader
       </div>
       
       <h1 
-        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 whitespace-nowrap"
+        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 whitespace-nowrap text-white"
         style={{
-          color: status ? getStatusColor() : 'var(--text-primary)',
           lineHeight: '1.2'
         }}
       >
