@@ -74,9 +74,16 @@ const IncidentsPage: React.FC = () => {
       const response = await fetch('/api/services');
       if (!response.ok) throw new Error('Failed to fetch services');
       const data = await response.json();
-      setServices(data);
+      
+      // If error response, set empty array
+      if (data.error) {
+        setServices([]);
+      } else {
+        setServices(Array.isArray(data) ? data : []);
+      }
     } catch (err) {
       console.error('Failed to load services:', err);
+      setServices([]);
     }
   };
 
