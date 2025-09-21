@@ -1,0 +1,203 @@
+import { prisma } from '@/lib/db'
+import { UptimeData } from '@/types/status'
+
+export async function getOptimizedUptimeHistory(serviceId: string, days: number = 30): Promise<UptimeData[]> {
+  const startDate = new Date()
+  startDate.setUTCDate(startDate.getUTCDate() - days)
+  startDate.setUTCHours(0, 0, 0, 0)
+
+  // Use raw SQL for better performance with aggregation
+  const dailyStats = await prisma.$queryRaw<Array<{
+    date: string
+    total: bigint
+    successful: bigint
+  }>>`
+    SELECT 
+      DATE(timestamp) as date,
+      COUNT(*) as total,
+      COUNT(CASE WHEN success = true THEN 1 END) as successful
+    FROM "checkResult" cr
+    INNER JOIN "check" c ON cr."checkId" = c.id
+    WHERE c."serviceId" = ${serviceId}
+      AND cr.timestamp >= ${startDate}
+    GROUP BY DATE(timestamp)
+    ORDER BY date
+  `
+
+  // Get incidents
+  const incidents = await prisma.incident.findMany({
+    where: {
+      serviceId: serviceId,
+      startTime: {
+        gte: startDate
+      }
+    },
+    select: {
+      id: true,
+      title: true,
+      status: true,
+      severity: true,
+      startTime: true,
+      endTime: true
+    }
+  })
+
+  // Group incidents by date
+  const incidentsByDate: { [key: string]: any[] } = {}
+  incidents.forEach(incident => {
+    const dateKey = incident.startTime.toISOString().split('T')[0]
+    if (!incidentsByDate[dateKey]) {
+      incidentsByDate[dateKey] = []
+    }
+    incidentsByDate[dateKey].push({
+      ...incident,
+      endTime: incident.endTime || undefined
+    })
+  })
+
+  // Convert daily stats to map
+  const statsMap: { [key: string]: { total: number; successful: number } } = {}
+  dailyStats.forEach(stat => {
+    statsMap[stat.date] = {
+      total: Number(stat.total),
+      successful: Number(stat.successful)
+    }
+  })
+
+  // Build result array
+  const uptimeData: UptimeData[] = []
+  
+  for (let i = 0; i < days; i++) {
+    const date = new Date()
+    date.setUTCDate(date.getUTCDate() - (days - 1 - i))
+    date.setUTCHours(0, 0, 0, 0)
+    const dateKey = date.toISOString().split('T')[0]
+    
+    const dayStats = statsMap[dateKey]
+    let uptime = null
+    
+    if (dayStats && dayStats.total > 0) {
+      uptime = (dayStats.successful / dayStats.total) * 100
+    }
+    
+    uptimeData.push({
+      date: dateKey,
+      uptime: uptime !== null ? Math.round(uptime * 100) / 100 : null as any,
+      incidents: incidentsByDate[dateKey] || []
+    })
+  }
+
+  return uptimeData
+}
+
+// Optimized version for multiple services
+export async function getBulkUptimeHistory(serviceIds: string[], days: number = 30) {
+  const startDate = new Date()
+  startDate.setUTCDate(startDate.getUTCDate() - days)
+  startDate.setUTCHours(0, 0, 0, 0)
+
+  // Get all stats in one query
+  const allStats = await prisma.$queryRaw<Array<{
+    serviceId: string
+    date: string
+    total: bigint
+    successful: bigint
+  }>>`
+    SELECT 
+      c."serviceId",
+      DATE(cr.timestamp) as date,
+      COUNT(*) as total,
+      COUNT(CASE WHEN cr.success = true THEN 1 END) as successful
+    FROM "checkResult" cr
+    INNER JOIN "check" c ON cr."checkId" = c.id
+    WHERE c."serviceId" = ANY(${serviceIds})
+      AND cr.timestamp >= ${startDate}
+    GROUP BY c."serviceId", DATE(cr.timestamp)
+    ORDER BY c."serviceId", date
+  `
+
+  // Get all incidents in one query
+  const allIncidents = await prisma.incident.findMany({
+    where: {
+      serviceId: { in: serviceIds },
+      startTime: { gte: startDate }
+    },
+    select: {
+      serviceId: true,
+      id: true,
+      title: true,
+      status: true,
+      severity: true,
+      startTime: true,
+      endTime: true
+    }
+  })
+
+  // Process results
+  const result: Record<string, UptimeData[]> = {}
+  
+  // Group data by service
+  const statsByService: Record<string, Record<string, { total: number; successful: number }>> = {}
+  const incidentsByService: Record<string, Record<string, any[]>> = {}
+  
+  // Initialize
+  serviceIds.forEach(serviceId => {
+    statsByService[serviceId] = {}
+    incidentsByService[serviceId] = {}
+  })
+  
+  // Process stats
+  allStats.forEach(stat => {
+    if (!statsByService[stat.serviceId][stat.date]) {
+      statsByService[stat.serviceId][stat.date] = {
+        total: Number(stat.total),
+        successful: Number(stat.successful)
+      }
+    }
+  })
+  
+  // Process incidents
+  allIncidents.forEach(incident => {
+    const dateKey = incident.startTime.toISOString().split('T')[0]
+    if (!incidentsByService[incident.serviceId][dateKey]) {
+      incidentsByService[incident.serviceId][dateKey] = []
+    }
+    incidentsByService[incident.serviceId][dateKey].push({
+      id: incident.id,
+      title: incident.title,
+      status: incident.status,
+      severity: incident.severity,
+      startTime: incident.startTime,
+      endTime: incident.endTime || undefined
+    })
+  })
+  
+  // Build results for each service
+  serviceIds.forEach(serviceId => {
+    const uptimeData: UptimeData[] = []
+    
+    for (let i = 0; i < days; i++) {
+      const date = new Date()
+      date.setUTCDate(date.getUTCDate() - (days - 1 - i))
+      date.setUTCHours(0, 0, 0, 0)
+      const dateKey = date.toISOString().split('T')[0]
+      
+      const dayStats = statsByService[serviceId][dateKey]
+      let uptime = null
+      
+      if (dayStats && dayStats.total > 0) {
+        uptime = (dayStats.successful / dayStats.total) * 100
+      }
+      
+      uptimeData.push({
+        date: dateKey,
+        uptime: uptime !== null ? Math.round(uptime * 100) / 100 : null as any,
+        incidents: incidentsByService[serviceId][dateKey] || []
+      })
+    }
+    
+    result[serviceId] = uptimeData
+  })
+  
+  return result
+}
