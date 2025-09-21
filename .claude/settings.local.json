@@ -33,7 +33,8 @@
       "Bash(timeout 15 npm run dev)",
       "Bash(mv:*)",
       "Bash(true)",
-      "Bash(npx prisma generate:*)"
+      "Bash(npx prisma generate:*)",
+      "Bash(npx prisma:*)"
     ],
     "deny": []
   }
