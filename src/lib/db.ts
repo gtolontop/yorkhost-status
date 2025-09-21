@@ -64,8 +64,8 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
   
   for (let i = 0; i < days; i++) {
     const date = new Date()
-    date.setDate(date.getDate() - (days - 1 - i))
-    date.setHours(0, 0, 0, 0) // Reset time to start of day
+    date.setUTCDate(date.getUTCDate() - (days - 1 - i))
+    date.setUTCHours(0, 0, 0, 0) // Reset time to start of day in UTC
     const dateKey = date.toISOString().split('T')[0]
     
     const dayData = dailyData[dateKey]
