@@ -66,12 +66,14 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
     }
   }
 
-  // Generate 90 uptime bars based on real data
+  // Generate uptime bars based on real data (30 on mobile, 90 on desktop)
   const generateUptimeBars = () => {
     const bars = []
     const today = new Date()
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+    const daysToShow = isMobile ? 30 : 90
     
-    for (let i = 89; i >= 0; i--) {
+    for (let i = daysToShow - 1; i >= 0; i--) {
       const date = new Date(today)
       date.setDate(date.getDate() - i)
       
@@ -161,7 +163,8 @@ export default function ServiceCard({ service, isExpanded, onToggle }: ServiceCa
             {generateUptimeBars()}
           </div>
           <div className="flex justify-between text-xs text-gray-400 mt-1">
-            <span>90 days ago</span>
+            <span className="md:hidden">30 days ago</span>
+            <span className="hidden md:block">90 days ago</span>
             <span>Today</span>
           </div>
         </div>
