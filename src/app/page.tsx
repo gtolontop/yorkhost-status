@@ -104,8 +104,8 @@ export default function HomePage() {
           icon={
             status?.overall === 'operational' ? (
               <svg 
-                width="96" 
-                height="96" 
+                width="100%" 
+                height="100%" 
                 viewBox="0 0 24 24" 
                 fill="none" 
                 xmlns="http://www.w3.org/2000/svg"
@@ -115,8 +115,8 @@ export default function HomePage() {
               </svg>
             ) : status?.overall === 'maintenance' ? (
               <svg 
-                width="96" 
-                height="96" 
+                width="100%" 
+                height="100%" 
                 viewBox="0 0 24 24" 
                 fill="none" 
                 xmlns="http://www.w3.org/2000/svg"
@@ -125,8 +125,8 @@ export default function HomePage() {
               </svg>
             ) : status?.overall === 'degraded' ? (
               <svg 
-                width="96" 
-                height="96" 
+                width="100%" 
+                height="100%" 
                 viewBox="0 0 24 24" 
                 fill="none" 
                 xmlns="http://www.w3.org/2000/svg"
@@ -137,8 +137,8 @@ export default function HomePage() {
               </svg>
             ) : (
               <svg 
-                width="96" 
-                height="96" 
+                width="100%" 
+                height="100%" 
                 viewBox="0 0 24 24" 
                 fill="none" 
                 xmlns="http://www.w3.org/2000/svg"
