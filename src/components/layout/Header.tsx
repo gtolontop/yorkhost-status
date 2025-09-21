@@ -88,13 +88,6 @@ export default function Header() {
               Overview
             </Link>
             <Link 
-              href="/down-services" 
-              className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Down Services
-            </Link>
-            <Link 
               href="/maintenance" 
               className="block text-gray-600 hover:text-gray-900 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}

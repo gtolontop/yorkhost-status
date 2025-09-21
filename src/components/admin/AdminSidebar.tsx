@@ -49,6 +49,13 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
     },
     {
       icon: AlertTriangle,
+      label: 'Down Services',
+      href: '/admin/down-services',
+      active: pathname.startsWith('/admin/down-services'),
+      badgeColor: 'danger'
+    },
+    {
+      icon: AlertTriangle,
       label: 'Incidents',
       href: '/admin/incidents',
       active: pathname.startsWith('/admin/incidents'),
