@@ -23,12 +23,12 @@ export async function handleCheckResult(result: IncidentCheckResult) {
       // Service just went down - create incident
       console.log(`[INCIDENT] Creating incident for ${result.serviceName}`)
       
-      await prisma.incident.create({
+      const newIncident = await prisma.incident.create({
         data: {
           serviceId: result.serviceId,
           title: `${result.serviceName} is down`,
           status: 'INVESTIGATING',
-          severity: 'major',
+          severity: 'HIGH',
           startTime: result.timestamp,
           description: result.error || 'Service is not responding'
         }
@@ -37,9 +37,9 @@ export async function handleCheckResult(result: IncidentCheckResult) {
       // Create incident update
       await prisma.incidentUpdate.create({
         data: {
-          incidentId: activeIncident?.id || '', // Will be updated
+          incidentId: newIncident.id,
           content: 'Service went down',
-          status: 'monitoring'
+          status: 'MONITORING'
         }
       })
     } else if (result.success && activeIncident) {
@@ -56,7 +56,7 @@ export async function handleCheckResult(result: IncidentCheckResult) {
       await prisma.incident.update({
         where: { id: activeIncident.id },
         data: {
-          status: 'resolved',
+          status: 'RESOLVED',
           endTime: result.timestamp
         }
       })
@@ -66,7 +66,7 @@ export async function handleCheckResult(result: IncidentCheckResult) {
         data: {
           incidentId: activeIncident.id,
           content: `Service restored after ${downtimeText} of downtime`,
-          status: 'resolved'
+          status: 'RESOLVED'
         }
       })
     }
@@ -85,7 +85,7 @@ export async function getRecentIncidents(serviceId?: string, limit: number = 10)
     include: {
       service: true,
       updates: {
-        orderBy: { createdAt: 'desc' }
+        orderBy: { timestamp: 'desc' }
       }
     }
   })
@@ -105,7 +105,7 @@ export async function getRecentIncidents(serviceId?: string, limit: number = 10)
       ...incident,
       duration,
       durationText,
-      isActive: incident.status === 'active'
+      isActive: incident.status === 'INVESTIGATING' || incident.status === 'MONITORING'
     }
   })
 }

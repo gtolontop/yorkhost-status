@@ -113,19 +113,19 @@ export default function GroupedServiceGrid({ services, groups }: GroupedServiceG
             
             {/* Group status summary */}
             <div className="flex items-center gap-4 text-sm">
-              {group.services.filter(s => s.status === 'operational').length > 0 && (
+              {group.services.filter(s => s.currentStatus === 'operational').length > 0 && (
                 <span className="text-green-600 font-medium">
-                  {group.services.filter(s => s.status === 'operational').length} operational
+                  {group.services.filter(s => s.currentStatus === 'operational').length} operational
                 </span>
               )}
-              {group.services.filter(s => s.status === 'degraded').length > 0 && (
+              {group.services.filter(s => s.currentStatus === 'degraded').length > 0 && (
                 <span className="text-yellow-600 font-medium">
-                  {group.services.filter(s => s.status === 'degraded').length} degraded
+                  {group.services.filter(s => s.currentStatus === 'degraded').length} degraded
                 </span>
               )}
-              {group.services.filter(s => s.status === 'outage').length > 0 && (
+              {group.services.filter(s => s.currentStatus === 'outage').length > 0 && (
                 <span className="text-red-600 font-medium">
-                  {group.services.filter(s => s.status === 'outage').length} down
+                  {group.services.filter(s => s.currentStatus === 'outage').length} down
                 </span>
               )}
             </div>

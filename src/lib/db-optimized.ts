@@ -1,5 +1,10 @@
 import { prisma } from '@/lib/db'
-import { UptimeData } from '@/types/status'
+
+interface UptimeData {
+  date: string
+  uptime: number | null
+  incidents: any[]
+}
 
 export async function getOptimizedUptimeHistory(serviceId: string, days: number = 30): Promise<UptimeData[]> {
   const startDate = new Date()
@@ -159,17 +164,20 @@ export async function getBulkUptimeHistory(serviceIds: string[], days: number = 
   // Process incidents
   allIncidents.forEach(incident => {
     const dateKey = incident.startTime.toISOString().split('T')[0]
-    if (!incidentsByService[incident.serviceId][dateKey]) {
-      incidentsByService[incident.serviceId][dateKey] = []
+    const serviceId = incident.serviceId
+    if (serviceId && !incidentsByService[serviceId][dateKey]) {
+      incidentsByService[serviceId][dateKey] = []
     }
-    incidentsByService[incident.serviceId][dateKey].push({
-      id: incident.id,
-      title: incident.title,
-      status: incident.status,
-      severity: incident.severity,
-      startTime: incident.startTime,
-      endTime: incident.endTime || undefined
-    })
+    if (serviceId) {
+      incidentsByService[serviceId][dateKey].push({
+        id: incident.id,
+        title: incident.title,
+        status: incident.status,
+        severity: incident.severity,
+        startTime: incident.startTime,
+        endTime: incident.endTime || undefined
+      })
+    }
   })
   
   // Build results for each service
