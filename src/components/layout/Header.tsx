@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Moon, Sun, Menu, X, MessageCircle } from 'lucide-react'
+import { Moon, Sun, MessageCircle } from 'lucide-react'
 import { useTheme } from '@/components/providers/ThemeProvider'
 
 export default function Header() {
@@ -13,97 +13,166 @@ export default function Header() {
     setIsMenuOpen(!isMenuOpen)
   }
 
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isMenuOpen])
+
   return (
-    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50 transition-colors">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Brand */}
-          <div className="flex items-center flex-1">
-            <Link href="/" className="flex items-center gap-3">
-              <img 
-                src="https://yorkhost.fr/images/logo.png" 
-                alt="Yorkhost"
-                className="h-8 w-auto"
-              />
-              <span className="text-xl font-bold text-gray-900 dark:text-white">Status</span>
-            </Link>
+    <>
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50 transition-colors">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            {/* Brand */}
+            <div className="flex items-center flex-1 lg:flex-none">
+              <Link href="/" className="flex items-center gap-2 sm:gap-3">
+                <img 
+                  src="https://yorkhost.fr/images/logo.png" 
+                  alt="Yorkhost"
+                  className="h-7 sm:h-8 w-auto"
+                />
+                <span className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Status</span>
+              </Link>
+            </div>
+
+            {/* Desktop Navigation - Centered */}
+            <nav className="hidden lg:flex items-center justify-center gap-6 xl:gap-8 flex-1">
+              <Link href="/" className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium group">
+                Overview
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+              <Link href="/maintenance" className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium group">
+                Maintenance
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+              <Link href="/previous-incidents" className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium group whitespace-nowrap">
+                Previous Incidents
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </nav>
+
+            {/* Right Actions */}
+            <div className="flex items-center justify-end gap-2 flex-1 lg:flex-none">
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+              
+              {/* Discord Button */}
+              <a
+                href="https://discord.gg/yorkhost"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:flex items-center gap-2 px-3 sm:px-4 py-2 bg-[#5865F2] text-white rounded-md hover:bg-[#4752C4] transition-all hover:scale-105 active:scale-95"
+              >
+                <MessageCircle size={18} />
+                <span className="hidden sm:inline">Get in Touch</span>
+              </a>
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={toggleMenu}
+                className="lg:hidden relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                aria-label="Toggle menu"
+              >
+                <div className="w-6 h-5 relative flex flex-col justify-between">
+                  <span className={`block h-0.5 w-full bg-gray-600 dark:bg-gray-300 transition-all duration-300 origin-left ${isMenuOpen ? 'rotate-45 translate-x-0.5' : ''}`}></span>
+                  <span className={`block h-0.5 w-full bg-gray-600 dark:bg-gray-300 transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></span>
+                  <span className={`block h-0.5 w-full bg-gray-600 dark:bg-gray-300 transition-all duration-300 origin-left ${isMenuOpen ? '-rotate-45 translate-x-0.5' : ''}`}></span>
+                </div>
+              </button>
+            </div>
           </div>
+        </div>
+      </header>
 
-          {/* Desktop Navigation - Centered */}
-          <nav className="hidden md:flex items-center justify-center gap-4 xl:gap-6 flex-1">
-            <Link href="/" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-              Overview
-            </Link>
-            <Link href="/maintenance" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-              Maintenance
-            </Link>
-            <Link href="/previous-incidents" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">
-              Previous Incidents
-            </Link>
-          </nav>
+      {/* Mobile Menu Overlay */}
+      <div 
+        className={`lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 ${
+          isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={toggleMenu}
+      />
 
-          {/* Right Actions */}
-          <div className="flex items-center justify-end gap-2 flex-1">
-            {/* Theme Toggle */}
+      {/* Mobile Menu */}
+      <div 
+        className={`lg:hidden fixed top-0 right-0 h-full w-full max-w-sm bg-white dark:bg-gray-900 z-50 transition-transform duration-300 ease-out ${
+          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+          <div className="flex items-center justify-between">
+            <span className="text-lg font-semibold text-gray-900 dark:text-white">Menu</span>
             <button
-              onClick={toggleTheme}
-              className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-              aria-label="Toggle theme"
+              onClick={toggleMenu}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="Close menu"
             >
-              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
-            
-            {/* Discord Button */}
+          </div>
+        </div>
+
+        <nav className="p-4 space-y-1">
+          <Link 
+            href="/" 
+            className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span className="font-medium">Overview</span>
+          </Link>
+          <Link 
+            href="/maintenance" 
+            className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span className="font-medium">Maintenance</span>
+          </Link>
+          <Link 
+            href="/previous-incidents" 
+            className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="font-medium">Previous Incidents</span>
+          </Link>
+
+          <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800">
             <a
               href="https://discord.gg/yorkhost"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-[#5865F2] text-white rounded-md hover:bg-[#4752C4] transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-[#5865F2] text-white rounded-lg hover:bg-[#4752C4] transition-all hover:scale-105 active:scale-95"
+              onClick={() => setIsMenuOpen(false)}
             >
-              <MessageCircle size={18} />
-              <span>Get in Touch</span>
+              <MessageCircle size={20} />
+              <span className="font-medium">Get in Touch</span>
             </a>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={toggleMenu}
-              className="md:hidden p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
           </div>
-        </div>
+        </nav>
       </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
-          <nav className="container mx-auto px-4 py-4 space-y-3">
-            <Link 
-              href="/" 
-              className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Overview
-            </Link>
-            <Link 
-              href="/maintenance" 
-              className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Maintenance
-            </Link>
-            <Link 
-              href="/previous-incidents" 
-              className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Previous Incidents
-            </Link>
-          </nav>
-        </div>
-      )}
-    </header>
+    </>
   )
 }
