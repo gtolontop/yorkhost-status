@@ -93,38 +93,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   // Si on est en train de charger la première fois et qu'on n'a pas d'utilisateur
   if (loading && !user) {
     return (
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: '#ffffff',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            border: '3px solid #f3f3f3',
-            borderTop: '3px solid #000000',
-            borderRadius: '50%',
-            margin: '0 auto 16px'
-          }} className="loading-spinner"></div>
-          <p style={{ color: '#666', margin: 0 }}>Loading...</p>
+      <div className="fixed inset-0 bg-white dark:bg-gray-900 flex items-center justify-center z-[9999]">
+        <div className="text-center">
+          <div className="w-10 h-10 border-[3px] border-gray-200 dark:border-gray-700 border-t-black dark:border-t-white rounded-full mx-auto mb-4 animate-spin"></div>
+          <p className="text-gray-600 dark:text-gray-400 m-0">Loading...</p>
         </div>
-        <style jsx>{`
-          .loading-spinner {
-            animation: spin 1s linear infinite;
-          }
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
       </div>
     )
   }
