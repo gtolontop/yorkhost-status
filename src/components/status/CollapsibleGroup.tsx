@@ -58,9 +58,9 @@ export default function CollapsibleGroup({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className={`${!isLast ? 'border-b border-[#27272a]' : ''}`}>
       <div 
-        className="px-4 sm:px-6 py-4 cursor-pointer hover:bg-gray-50 transition-colors flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+        className="px-4 sm:px-6 py-4 cursor-pointer hover:bg-[#252530] transition-colors flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
         onClick={toggleCollapse}
         style={{ borderLeft: `4px solid ${group.color}` }}
       >
