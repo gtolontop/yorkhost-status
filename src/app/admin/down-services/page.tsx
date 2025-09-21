@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
-import { AlertTriangle, AlertCircle, Clock, Activity, ExternalLink, RefreshCw } from 'lucide-react'
+import { AlertTriangle, AlertCircle, Clock, Activity, ExternalLink, RefreshCw, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { formatDistanceToNow } from 'date-fns'
 import { clsx } from 'clsx'
 
 interface DownService {
@@ -12,6 +11,7 @@ interface DownService {
   name: string
   description?: string
   status: string
+  enhancedStatus: string
   lastCheck?: string
   uptimePercent24h: number
   averageResponseTime: number
@@ -41,6 +41,12 @@ export default function AdminDownServicesPage() {
   const [error, setError] = useState('')
   const [refreshing, setRefreshing] = useState(false)
 
+  useEffect(() => {
+    fetchDownServices()
+    const interval = setInterval(fetchDownServices, 30000) // Refresh every 30s
+    return () => clearInterval(interval)
+  }, [])
+
   const fetchDownServices = async () => {
     try {
       setRefreshing(true)
@@ -48,32 +54,36 @@ export default function AdminDownServicesPage() {
       if (!response.ok) throw new Error('Failed to fetch down services')
       const data = await response.json()
       setDownData(data)
+      setError('')
     } catch (err) {
-      setError('Failed to load down services')
+      setError('Failed to fetch down services')
+      console.error(err)
     } finally {
       setLoading(false)
       setRefreshing(false)
     }
   }
 
-  useEffect(() => {
-    fetchDownServices()
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchDownServices, 30000)
-    return () => clearInterval(interval)
-  }, [])
+  const formatTimeAgo = (date: string | undefined) => {
+    if (!date) return 'Unknown'
+    const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000)
+    if (seconds < 60) return `${seconds}s ago`
+    const minutes = Math.floor(seconds / 60)
+    if (minutes < 60) return `${minutes}m ago`
+    const hours = Math.floor(minutes / 60)
+    if (hours < 24) return `${hours}h ago`
+    return `${Math.floor(hours / 24)}d ago`
+  }
 
-  if (loading) {
+  if (loading && !downData) {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6D96FF]"></div>
         </div>
       </AdminLayout>
     )
   }
-
-  const hasDownServices = downData && downData.totalDown > 0
 
   return (
     <AdminLayout>
@@ -82,7 +92,7 @@ export default function AdminDownServicesPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Down Services</h1>
-            <p className="text-gray-600 mt-1">Real-time overview of all services experiencing outages</p>
+            <p className="text-gray-600 mt-1">Monitor and manage services experiencing outages</p>
           </div>
           <button
             onClick={fetchDownServices}
@@ -93,30 +103,32 @@ export default function AdminDownServicesPage() {
               refreshing && "opacity-50 cursor-not-allowed"
             )}
           >
-            <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+            <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
             Refresh
           </button>
         </div>
 
         {/* Error Alert */}
         {error && (
-          <div className="bg-red-50 text-red-700 p-4 rounded-lg flex items-center gap-3">
-            <AlertCircle size={20} />
-            <p>{error}</p>
+          <div className="bg-red-50 text-red-700 p-4 rounded-lg flex items-start gap-3">
+            <AlertCircle size={20} className="shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium">Error</p>
+              <p className="text-sm mt-1">{error}</p>
+            </div>
           </div>
         )}
 
-        {/* Summary Stats */}
-        <div className="grid gap-4 md:grid-cols-3">
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Down</p>
-                <p className="mt-2 text-3xl font-semibold text-gray-900">{downData?.totalDown || 0}</p>
-                <p className="mt-1 text-sm text-gray-600">Services currently experiencing issues</p>
+                <p className="text-sm font-medium text-gray-600">Total Down</p>
+                <p className="text-2xl font-bold text-gray-900">{downData?.totalDown || 0}</p>
               </div>
-              <div className="p-3 bg-gray-100 rounded-lg">
-                <AlertTriangle className="h-6 w-6 text-gray-600" />
+              <div className="p-3 bg-red-100 rounded-lg">
+                <AlertTriangle className="text-red-600" size={24} />
               </div>
             </div>
           </div>
@@ -124,12 +136,11 @@ export default function AdminDownServicesPage() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Without Incidents</p>
-                <p className="mt-2 text-3xl font-semibold text-red-600">{downData?.withoutIncident.length || 0}</p>
-                <p className="mt-1 text-sm text-gray-600">Major outages requiring incident reports</p>
+                <p className="text-sm font-medium text-gray-600">Without Incident</p>
+                <p className="text-2xl font-bold text-red-600">{downData?.withoutIncident.length || 0}</p>
               </div>
-              <div className="p-3 bg-red-50 rounded-lg">
-                <AlertCircle className="h-6 w-6 text-red-600" />
+              <div className="p-3 bg-red-100 rounded-lg">
+                <AlertCircle className="text-red-600" size={24} />
               </div>
             </div>
           </div>
@@ -137,103 +148,67 @@ export default function AdminDownServicesPage() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">With Incidents</p>
-                <p className="mt-2 text-3xl font-semibold text-orange-600">{downData?.withIncident.length || 0}</p>
-                <p className="mt-1 text-sm text-gray-600">Acknowledged with active incidents</p>
+                <p className="text-sm font-medium text-gray-600">With Incident</p>
+                <p className="text-2xl font-bold text-orange-600">{downData?.withIncident.length || 0}</p>
               </div>
-              <div className="p-3 bg-orange-50 rounded-lg">
-                <Activity className="h-6 w-6 text-orange-600" />
+              <div className="p-3 bg-orange-100 rounded-lg">
+                <Activity className="text-orange-600" size={24} />
               </div>
             </div>
           </div>
         </div>
 
-        {!hasDownServices && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12">
-            <div className="text-center">
-              <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-                <Activity className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">All Systems Operational</h3>
-              <p className="text-gray-600 max-w-md mx-auto">
-                Great news! All services are currently operating normally.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Services without incidents */}
-        {downData?.withoutIncident && downData.withoutIncident.length > 0 && (
+        {/* Services without incidents (Major Outages) */}
+        {downData && downData.withoutIncident.length > 0 && (
           <div>
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-red-600" />
-              Major Outages (No Incident Linked)
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <AlertCircle className="text-red-600" size={20} />
+              Major Outages - No Incident Reported
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {downData.withoutIncident.map((service) => (
-                <div key={service.id} className="bg-white rounded-lg shadow-sm border border-red-200 overflow-hidden">
-                  <div className="p-6">
-                    <div className="flex items-center justify-between mb-4">
+                <div
+                  key={service.id}
+                  className="bg-white rounded-lg border border-red-200 p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
                       <div className="flex items-center gap-3">
-                        <div className="h-3 w-3 bg-red-600 rounded-full animate-pulse" />
+                        <div className="p-2 bg-red-100 rounded">
+                          <AlertTriangle className="text-red-600" size={20} />
+                        </div>
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {service.name}
-                            {service.machine && (
-                              <span className="text-sm text-gray-500 font-normal ml-2">
-                                on {service.machine.name}
-                              </span>
-                            )}
-                          </h3>
+                          <h3 className="font-semibold text-gray-900">{service.name}</h3>
                           {service.description && (
-                            <p className="text-sm text-gray-600 mt-1">{service.description}</p>
+                            <p className="text-sm text-gray-600">{service.description}</p>
                           )}
+                          <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <Clock size={14} />
+                              Last check: {formatTimeAgo(service.lastCheck)}
+                            </span>
+                            <span>Uptime: {service.uptimePercent24h.toFixed(2)}%</span>
+                            {service.machine && (
+                              <span>Group: {service.machine.name}</span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                      <span className="px-3 py-1 text-xs font-medium text-white bg-red-600 rounded-full">
-                        DOWN
-                      </span>
                     </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-500 mb-1">Status</p>
-                        <p className="font-medium text-gray-900">Requires Incident Report</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500 mb-1">Last Check</p>
-                        <p className="font-medium text-gray-900">
-                          {service.lastCheck ? (
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {formatDistanceToNow(new Date(service.lastCheck), { addSuffix: true })}
-                            </span>
-                          ) : (
-                            'Never'
-                          )}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500 mb-1">24h Uptime</p>
-                        <p className="font-medium text-gray-900">{service.uptimePercent24h.toFixed(2)}%</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500 mb-1">Response Time</p>
-                        <p className="font-medium text-gray-900">
-                          {service.averageResponseTime > 0 
-                            ? `${Math.round(service.averageResponseTime)}ms` 
-                            : 'N/A'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                      <Link 
-                        href={`/admin/incidents/new?serviceId=${service.id}`}
-                        className="inline-flex items-center gap-1 text-sm text-[#6D96FF] hover:text-[#5A84FF] transition-colors"
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/admin/services/${service.id}`}
+                        className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+                        title="View service"
                       >
-                        Create Incident Report
-                        <ExternalLink className="h-3 w-3" />
+                        <ExternalLink size={16} />
+                      </Link>
+                      <Link
+                        href={`/admin/incidents?serviceId=${service.id}`}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                      >
+                        <Plus size={16} />
+                        Create Incident
                       </Link>
                     </div>
                   </div>
@@ -243,82 +218,70 @@ export default function AdminDownServicesPage() {
           </div>
         )}
 
-        {/* Services with incidents */}
-        {downData?.withIncident && downData.withIncident.length > 0 && (
+        {/* Services with incidents (Acknowledged Outages) */}
+        {downData && downData.withIncident.length > 0 && (
           <div>
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-orange-600" />
-              Acknowledged Outages (With Active Incidents)
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Activity className="text-orange-600" size={20} />
+              Acknowledged Outages - With Active Incidents
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {downData.withIncident.map((service) => (
-                <div key={service.id} className="bg-white rounded-lg shadow-sm border border-orange-200 overflow-hidden">
-                  <div className="p-6">
-                    <div className="flex items-center justify-between mb-4">
+                <div
+                  key={service.id}
+                  className="bg-white rounded-lg border border-orange-200 p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
                       <div className="flex items-center gap-3">
-                        <div className="h-3 w-3 bg-orange-600 rounded-full animate-pulse" />
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {service.name}
-                            {service.machine && (
-                              <span className="text-sm text-gray-500 font-normal ml-2">
-                                on {service.machine.name}
-                              </span>
-                            )}
-                          </h3>
+                        <div className="p-2 bg-orange-100 rounded">
+                          <AlertTriangle className="text-orange-600" size={20} />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900">{service.name}</h3>
                           {service.description && (
-                            <p className="text-sm text-gray-600 mt-1">{service.description}</p>
+                            <p className="text-sm text-gray-600">{service.description}</p>
                           )}
+                          {service.activeIncident && (
+                            <div className="mt-2 p-2 bg-orange-50 rounded">
+                              <p className="text-sm font-medium text-orange-900">
+                                Active Incident: {service.activeIncident.title}
+                              </p>
+                              <p className="text-xs text-orange-700 mt-1">
+                                Status: {service.activeIncident.status} • Started: {formatTimeAgo(service.activeIncident.startTime)}
+                              </p>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <Clock size={14} />
+                              Last check: {formatTimeAgo(service.lastCheck)}
+                            </span>
+                            <span>Uptime: {service.uptimePercent24h.toFixed(2)}%</span>
+                            {service.machine && (
+                              <span>Group: {service.machine.name}</span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                      <span className="px-3 py-1 text-xs font-medium text-white bg-orange-600 rounded-full">
-                        DOWN - ACKNOWLEDGED
-                      </span>
                     </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-500 mb-1">Active Incident</p>
-                        <p className="font-medium text-gray-900">{service.activeIncident?.title}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500 mb-1">Incident Status</p>
-                        <p className="font-medium">
-                          <span className={clsx(
-                            "px-2 py-1 text-xs rounded-full",
-                            "text-orange-600 bg-orange-50"
-                          )}>
-                            {service.activeIncident?.status}
-                          </span>
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500 mb-1">Started</p>
-                        <p className="font-medium text-gray-900">
-                          {service.activeIncident?.startTime ? (
-                            formatDistanceToNow(new Date(service.activeIncident.startTime), { addSuffix: true })
-                          ) : (
-                            'Unknown'
-                          )}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500 mb-1">24h Uptime</p>
-                        <p className="font-medium text-gray-900">{service.uptimePercent24h.toFixed(2)}%</p>
-                      </div>
-                    </div>
-
-                    {service.activeIncident && (
-                      <div className="mt-4 pt-4 border-t border-gray-200">
-                        <Link 
-                          href={`/incident/${service.activeIncident.slug || service.activeIncident.id}`}
-                          className="inline-flex items-center gap-1 text-sm text-[#6D96FF] hover:text-[#5A84FF] transition-colors"
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/admin/services/${service.id}`}
+                        className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+                        title="View service"
+                      >
+                        <ExternalLink size={16} />
+                      </Link>
+                      {service.activeIncident && (
+                        <Link
+                          href={`/admin/incidents/${service.activeIncident.id}`}
+                          className="px-3 py-1.5 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors"
                         >
-                          View Incident Details
-                          <ExternalLink className="h-3 w-3" />
+                          View Incident
                         </Link>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -326,11 +289,22 @@ export default function AdminDownServicesPage() {
           </div>
         )}
 
-        {/* Last updated */}
-        {downData && (
-          <div className="text-center text-sm text-gray-500">
-            Last updated: {formatDistanceToNow(new Date(downData.lastUpdated), { addSuffix: true })}
+        {/* No down services */}
+        {downData && downData.totalDown === 0 && (
+          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+              <AlertCircle className="text-green-600" size={32} />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">All Services Operational</h3>
+            <p className="text-gray-600">No services are currently experiencing downtime.</p>
           </div>
+        )}
+
+        {/* Last Updated */}
+        {downData && (
+          <p className="text-sm text-gray-500 text-center">
+            Last updated: {formatTimeAgo(downData.lastUpdated)}
+          </p>
         )}
       </div>
     </AdminLayout>

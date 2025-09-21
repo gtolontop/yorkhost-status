@@ -34,9 +34,6 @@ export default function Header() {
             <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
               Overview
             </Link>
-            <Link href="/down-services" className="text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap">
-              Down Services
-            </Link>
             <Link href="/maintenance" className="text-gray-600 hover:text-gray-900 transition-colors">
               Maintenance
             </Link>
