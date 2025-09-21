@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ServiceWithEnhancedStatus, UptimeData } from '@/types'
 import { formatResponseTime, formatRelativeTime } from '@/lib/utils'
 import { ChevronDown, ChevronUp, CheckCircle, AlertTriangle, XCircle, HelpCircle, AlertCircle, Wrench, Info } from 'lucide-react'
