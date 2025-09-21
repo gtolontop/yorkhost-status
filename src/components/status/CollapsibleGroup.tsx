@@ -71,7 +71,7 @@ export default function CollapsibleGroup({
             <ChevronDown size={20} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base sm:text-lg font-semibold text-white">
+            <h3 className="text-base sm:text-lg font-semibold text-white mb-0">
               {group.name}
             </h3>
           </div>
