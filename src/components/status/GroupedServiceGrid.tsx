@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { ServiceWithStats } from '@/types'
 import ServiceCard from './ServiceCard'
 import { ChevronDown, ChevronRight, Server } from 'lucide-react'

@@ -51,7 +51,7 @@ export default function HomePage() {
 
   const fetchGroups = async () => {
     try {
-      const response = await fetch('/api/admin/groups')
+      const response = await fetch('/api/groups')
       const result = await response.json()
       
       if (result.success) {
