@@ -71,7 +71,7 @@ export default function CollapsibleGroup({
             <ChevronDown size={20} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex flex-wrap items-center gap-2">
+            <h3 className="text-base sm:text-lg font-semibold text-white flex flex-wrap items-center gap-2">
               <span className="break-words">{group.name}</span>
               <span className="text-sm font-normal text-gray-500 whitespace-nowrap">
                 ({group.services.length} service{group.services.length > 1 ? 's' : ''})
@@ -117,8 +117,8 @@ export default function CollapsibleGroup({
         className="overflow-hidden transition-all duration-300 ease-in-out"
         style={{ height: height !== undefined ? `${height}px` : 'auto' }}
       >
-        <div ref={contentRef} className="border-t border-gray-200">
-          <div className="p-3 sm:p-4 space-y-3">
+        <div ref={contentRef} className="border-t border-[#27272a]">
+          <div className="p-3 sm:p-4 space-y-3 bg-[#16161E]">
             {group.services.map((service) => (
               <EnhancedServiceCard
                 key={service.id}
