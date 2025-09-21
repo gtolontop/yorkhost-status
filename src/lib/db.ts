@@ -56,9 +56,40 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
     }
   })
   
-  // Debug: log daily data for today
-  const todayKey = new Date().toISOString().split('T')[0]
-  console.log(`Today's data for service ${serviceId}:`, todayKey, dailyData[todayKey] || 'No data')
+  // Get all incidents for the period in one query
+  const periodStart = new Date()
+  periodStart.setUTCDate(periodStart.getUTCDate() - days)
+  periodStart.setUTCHours(0, 0, 0, 0)
+  
+  const allIncidents = await prisma.incident.findMany({
+    where: {
+      serviceId: serviceId,
+      startTime: {
+        gte: periodStart
+      }
+    },
+    select: {
+      id: true,
+      title: true,
+      status: true,
+      severity: true,
+      startTime: true,
+      endTime: true
+    }
+  })
+  
+  // Group incidents by date
+  const incidentsByDate: { [key: string]: any[] } = {}
+  allIncidents.forEach(incident => {
+    const dateKey = incident.startTime.toISOString().split('T')[0]
+    if (!incidentsByDate[dateKey]) {
+      incidentsByDate[dateKey] = []
+    }
+    incidentsByDate[dateKey].push({
+      ...incident,
+      endTime: incident.endTime || undefined
+    })
+  })
 
   // Convert to UptimeData array
   const uptimeData: UptimeData[] = []
@@ -79,32 +110,10 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
       uptime = (dayData.successful / dayData.total) * 100
     }
     
-    // Get incidents for this day
-    const incidents = await prisma.incident.findMany({
-      where: {
-        serviceId: serviceId,
-        startTime: {
-          gte: new Date(dateKey),
-          lt: new Date(new Date(dateKey).getTime() + 24 * 60 * 60 * 1000)
-        }
-      },
-      select: {
-        id: true,
-        title: true,
-        status: true,
-        severity: true,
-        startTime: true,
-        endTime: true
-      }
-    })
-    
     uptimeData.push({
       date: dateKey,
       uptime: uptime !== null ? Math.round(uptime * 100) / 100 : null as any,
-      incidents: incidents.map(incident => ({
-        ...incident,
-        endTime: incident.endTime || undefined
-      }))
+      incidents: incidentsByDate[dateKey] || []
     })
   }
 
