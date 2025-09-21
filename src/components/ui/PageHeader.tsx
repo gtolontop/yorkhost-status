@@ -28,38 +28,30 @@ export default function PageHeader({ icon, title, subtitle, status }: PageHeader
   }
 
   return (
-    <div style={{ 
-      textAlign: 'center', 
-      padding: '80px 20px 20px',
-      maxWidth: '800px',
-      margin: '0 auto'
-    }}>
-      <div style={{
-        marginBottom: '32px',
-        display: 'flex',
-        justifyContent: 'center'
-      }}>
-        <div style={{ color: getStatusColor() }}>
+    <div className="text-center px-5 py-12 sm:py-16 md:py-20 max-w-3xl mx-auto">
+      <div className="mb-6 sm:mb-8 flex justify-center">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24" style={{ color: getStatusColor() }}>
           {icon}
         </div>
       </div>
       
-      <h1 style={{
-        fontSize: '3rem',
-        fontWeight: '700',
-        color: status ? getStatusColor() : 'var(--text-primary)',
-        marginBottom: '16px',
-        lineHeight: '1.2'
-      }}>
+      <h1 
+        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 whitespace-nowrap"
+        style={{
+          color: status ? getStatusColor() : 'var(--text-primary)',
+          lineHeight: '1.2'
+        }}
+      >
         {title}
       </h1>
       
-      <p style={{
-        fontSize: '1.25rem',
-        color: 'var(--text-secondary)',
-        marginBottom: '8px',
-        lineHeight: '1.6'
-      }}>
+      <p 
+        className="text-base sm:text-lg md:text-xl mb-2"
+        style={{
+          color: 'var(--text-secondary)',
+          lineHeight: '1.6'
+        }}
+      >
         {subtitle}
       </p>
     </div>
