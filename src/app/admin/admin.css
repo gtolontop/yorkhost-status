@@ -273,6 +273,16 @@
   margin: 0 0 1.5rem 0;
 }
 
+@media (prefers-color-scheme: dark) {
+  .empty-state {
+    color: #9ca3af;
+  }
+  
+  .empty-state h3 {
+    color: #d1d5db;
+  }
+}
+
 /* Loading Animation */
 @keyframes spin {
   from {
@@ -304,6 +314,25 @@ textarea:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  input[type="text"],
+  input[type="email"],
+  input[type="url"],
+  select,
+  textarea {
+    background: #1f2937;
+    color: #f9fafb;
+    border-color: #374151;
+  }
+  
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
 }
 
 /* Mobile Responsive */
