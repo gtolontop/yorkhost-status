@@ -30,7 +30,7 @@ export default function PageHeader({ icon, title, subtitle, status }: PageHeader
   return (
     <div className="text-center px-5 py-12 sm:py-16 md:py-20 max-w-3xl mx-auto">
       <div className="mb-6 sm:mb-8 flex justify-center">
-        <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24" style={{ color: getStatusColor() }}>
+        <div className="w-12 h-12 sm:w-20 sm:h-20 md:w-24 md:h-24" style={{ color: getStatusColor() }}>
           {icon}
         </div>
       </div>
