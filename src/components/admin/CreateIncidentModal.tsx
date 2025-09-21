@@ -19,14 +19,11 @@ export default function CreateIncidentModal({ onClose, onSuccess, editData }: Cr
   const [formData, setFormData] = useState({
     title: editData?.title || '',
     description: editData?.description || '',
-    type: editData?.type || 'INCIDENT',
     status: editData?.status || 'INVESTIGATING',
     severity: editData?.severity || 'MEDIUM',
-    impact: editData?.impact || '',
     isScheduled: editData?.isScheduled || false,
     scheduledFor: editData?.scheduledFor ? new Date(editData.scheduledFor).toISOString().slice(0, 16) : '',
-    scheduledEnd: editData?.scheduledEnd ? new Date(editData.scheduledEnd).toISOString().slice(0, 16) : '',
-    affectedServices: editData?.affectedServices || []
+    serviceId: editData?.serviceId || ''
   })
   const [loading, setLoading] = useState(false)
 
@@ -51,16 +48,8 @@ export default function CreateIncidentModal({ onClose, onSuccess, editData }: Cr
     setLoading(true)
 
     try {
-      // Generate slug from title
-      const slug = formData.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '') + 
-        '-' + Date.now()
-
       const payload = {
         ...formData,
-        slug,
         startTime: formData.isScheduled && formData.scheduledFor 
           ? new Date(formData.scheduledFor).toISOString()
           : new Date().toISOString()
