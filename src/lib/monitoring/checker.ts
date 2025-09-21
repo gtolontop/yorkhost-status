@@ -182,12 +182,33 @@ async function performTcpCheck(target: string, port: number, timeout: number): P
 async function performPingCheck(target: string, timeout: number): Promise<CheckResult> {
   console.log(`[PING] Testing ${target}`)
   
-  // Try TCP on common ports first
-  const ports = [80, 443, 22, 21, 25, 53, 110, 143, 3306, 5432, 3389, 8080, 8443]
+  // Try HTTP/HTTPS first as it's more reliable
+  try {
+    const httpResult = await performHttpCheck(`http://${target}`, Math.min(timeout / 2, 5000))
+    if (httpResult.success) {
+      console.log(`[PING] Success via HTTP`)
+      return httpResult
+    }
+  } catch (e) {
+    // Continue to HTTPS
+  }
+  
+  try {
+    const httpsResult = await performHttpCheck(`https://${target}`, Math.min(timeout / 2, 5000))
+    if (httpsResult.success) {
+      console.log(`[PING] Success via HTTPS`)
+      return httpsResult
+    }
+  } catch (e) {
+    // Continue to TCP
+  }
+  
+  // Try only the most common ports
+  const ports = [80, 443, 22, 8080]
   
   for (const port of ports) {
     try {
-      const result = await performTcpCheck(target, port, Math.min(timeout / ports.length, 2000))
+      const result = await performTcpCheck(target, port, Math.min(timeout / ports.length, 3000))
       if (result.success) {
         console.log(`[PING] Success via TCP:${port}`)
         return result
