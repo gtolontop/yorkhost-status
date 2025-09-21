@@ -64,7 +64,14 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
     const dateKey = date.toISOString().split('T')[0]
     
     const dayData = dailyData[dateKey]
-    const uptime = dayData ? (dayData.successful / dayData.total) * 100 : null
+    // Si on a des données pour ce jour, calculer l'uptime, sinon vérifier si on est dans le futur
+    let uptime = null
+    if (dayData) {
+      uptime = (dayData.successful / dayData.total) * 100
+    } else if (date <= new Date()) {
+      // Si on est dans le passé ou aujourd'hui mais pas de données, c'est 100% (pas de checks = tout va bien)
+      uptime = 100
+    }
     
     // Get incidents for this day
     const incidents = await prisma.incident.findMany({
