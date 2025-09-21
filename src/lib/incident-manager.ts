@@ -30,7 +30,8 @@ export async function handleCheckResult(result: IncidentCheckResult) {
           status: 'INVESTIGATING',
           severity: 'HIGH',
           startTime: result.timestamp,
-          description: result.error || 'Service is not responding'
+          description: result.error || 'Service is not responding',
+          createdBy: 'system' // System-generated incident
         }
       })
 
@@ -38,7 +39,7 @@ export async function handleCheckResult(result: IncidentCheckResult) {
       await prisma.incidentUpdate.create({
         data: {
           incidentId: newIncident.id,
-          content: 'Service went down',
+          message: 'Service went down',
           status: 'MONITORING'
         }
       })
@@ -65,7 +66,7 @@ export async function handleCheckResult(result: IncidentCheckResult) {
       await prisma.incidentUpdate.create({
         data: {
           incidentId: activeIncident.id,
-          content: `Service restored after ${downtimeText} of downtime`,
+          message: `Service restored after ${downtimeText} of downtime`,
           status: 'RESOLVED'
         }
       })
