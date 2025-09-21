@@ -17,18 +17,41 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
 
-    // For now, return mock groups until DB is migrated
-    const mockGroups = [
-      { id: 'web', name: 'Web Servers', description: 'Web servers and frontend services', color: '#3b82f6', order: 0 },
-      { id: 'api', name: 'API Services', description: 'Backend APIs and business services', color: '#10b981', order: 1 },
-      { id: 'database', name: 'Databases', description: 'Database services and data storage', color: '#f59e0b', order: 2 },
-      { id: 'monitoring', name: 'Monitoring', description: 'Monitoring and metrics services', color: '#ef4444', order: 3 },
-      { id: 'ungrouped', name: 'Ungrouped', description: 'Services not assigned to any group', color: '#94a3b8', order: 999 }
-    ]
+    // Use machines table as groups
+    const machines = await prisma.machine.findMany({
+      orderBy: { name: 'asc' },
+      include: {
+        services: true
+      }
+    })
+
+    // Transform machines to groups format
+    const groups = machines.map(machine => ({
+      id: machine.id,
+      name: machine.name,
+      description: machine.description || '',
+      color: machine.color || '#6b7280',
+      order: 0,
+      servicesCount: machine.services.length
+    }))
+
+    // Add ungrouped special group
+    const ungroupedCount = await prisma.service.count({
+      where: { machineId: null }
+    })
+
+    groups.push({
+      id: 'ungrouped',
+      name: 'Ungrouped',
+      description: 'Services not assigned to any group',
+      color: '#94a3b8',
+      order: 999,
+      servicesCount: ungroupedCount
+    })
 
     return NextResponse.json({
       success: true,
-      data: mockGroups
+      data: groups
     })
   } catch (error) {
     console.error('Groups fetch error:', error)
