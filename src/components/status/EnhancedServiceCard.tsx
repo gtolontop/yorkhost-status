@@ -167,7 +167,7 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
     <div className={`transition-all`}>
       {/* Card Header */}
       <div 
-        className="p-6 cursor-pointer"
+        className="cursor-pointer"
         onClick={onToggle}
       >
         <div className="flex items-center justify-between mb-3">
