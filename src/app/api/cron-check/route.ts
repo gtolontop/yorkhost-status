@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { executeCheck } from '@/lib/monitoring/checker'
+import { handleCheckResult } from '@/lib/incident-manager'
 
 export async function GET() {
   try {
@@ -54,7 +55,7 @@ export async function GET() {
         console.log(`${status} ${check.service.name}: ${result.success ? 'UP' : 'DOWN'} (${result.responseTime}ms)`)
         
         // Save result to database
-        await prisma.checkResult.create({
+        const checkResultRecord = await prisma.checkResult.create({
           data: {
             checkId: check.id,
             success: result.success,
@@ -64,6 +65,16 @@ export async function GET() {
             responseBody: null,
             timestamp: new Date()
           }
+        })
+        
+        // Handle incident creation/resolution
+        await handleCheckResult({
+          serviceId: check.serviceId,
+          serviceName: check.service.name,
+          checkId: check.id,
+          success: result.success,
+          timestamp: new Date(),
+          error: result.error
         })
         
         if (result.success) {
