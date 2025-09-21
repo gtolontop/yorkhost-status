@@ -1,6 +1,7 @@
 import { PrismaClient, CheckType } from '@prisma/client'
 import * as cron from 'node-cron'
 import axios from 'axios'
+import * as https from 'https'
 import * as net from 'net'
 import * as dgram from 'dgram'
 import { promisify } from 'util'
