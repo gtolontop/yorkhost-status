@@ -170,7 +170,7 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
         className="p-6 cursor-pointer"
         onClick={onToggle}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-3">
           {/* Left Side: Icon + Service Name + Status */}
           <div className="flex items-center gap-2">
             <TooltipProvider>
