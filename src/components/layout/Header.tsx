@@ -107,19 +107,19 @@ export default function Header() {
 
       {/* Mobile Menu */}
       <div 
-        className={`lg:hidden fixed top-0 right-0 h-full w-full max-w-sm bg-white dark:bg-gray-900 z-50 transition-transform duration-300 ease-out ${
+        className={`lg:hidden fixed top-0 right-0 h-full w-full max-w-sm bg-[#0C0C14] z-50 transition-transform duration-300 ease-out ${
           isMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="p-4 border-b border-[#27272a]">
           <div className="flex items-center justify-between">
-            <span className="text-lg font-semibold text-gray-900 dark:text-white">Menu</span>
+            <span className="text-lg font-semibold text-white">Menu</span>
             <button
               onClick={toggleMenu}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="p-2 rounded-lg hover:bg-[#1A1A24] transition-colors"
               aria-label="Close menu"
             >
-              <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -129,7 +129,7 @@ export default function Header() {
         <nav className="p-4 space-y-1">
           <Link 
             href="/" 
-            className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-[#1A1A24] rounded-lg transition-colors"
             onClick={() => setIsMenuOpen(false)}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,7 +139,7 @@ export default function Header() {
           </Link>
           <Link 
             href="/maintenance" 
-            className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-[#1A1A24] rounded-lg transition-colors"
             onClick={() => setIsMenuOpen(false)}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,7 +150,7 @@ export default function Header() {
           </Link>
           <Link 
             href="/previous-incidents" 
-            className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-[#1A1A24] rounded-lg transition-colors"
             onClick={() => setIsMenuOpen(false)}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@ export default function Header() {
             <span className="font-medium">Previous Incidents</span>
           </Link>
 
-          <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800">
+          <div className="pt-4 mt-4 border-t border-[#27272a]">
             <a
               href="https://discord.gg/yorkhost"
               target="_blank"
