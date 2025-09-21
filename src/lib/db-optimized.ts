@@ -13,14 +13,14 @@ export async function getOptimizedUptimeHistory(serviceId: string, days: number 
     successful: bigint
   }>>`
     SELECT 
-      DATE(timestamp) as date,
+      DATE(cr."timestamp") as date,
       COUNT(*) as total,
-      COUNT(CASE WHEN success = true THEN 1 END) as successful
-    FROM check_results cr
-    INNER JOIN checks c ON cr."checkId" = c.id
+      COUNT(CASE WHEN cr."success" = true THEN 1 END) as successful
+    FROM "check_results" cr
+    INNER JOIN "checks" c ON cr."checkId" = c."id"
     WHERE c."serviceId" = ${serviceId}
-      AND cr.timestamp >= ${startDate}
-    GROUP BY DATE(timestamp)
+      AND cr."timestamp" >= ${startDate}
+    GROUP BY DATE(cr."timestamp")
     ORDER BY date
   `
 
@@ -105,14 +105,14 @@ export async function getBulkUptimeHistory(serviceIds: string[], days: number = 
   }>>`
     SELECT 
       c."serviceId",
-      DATE(cr.timestamp) as date,
+      DATE(cr."timestamp") as date,
       COUNT(*) as total,
-      COUNT(CASE WHEN cr.success = true THEN 1 END) as successful
-    FROM check_results cr
-    INNER JOIN checks c ON cr."checkId" = c.id
+      COUNT(CASE WHEN cr."success" = true THEN 1 END) as successful
+    FROM "check_results" cr
+    INNER JOIN "checks" c ON cr."checkId" = c."id"
     WHERE c."serviceId" = ANY(${serviceIds})
-      AND cr.timestamp >= ${startDate}
-    GROUP BY c."serviceId", DATE(cr.timestamp)
+      AND cr."timestamp" >= ${startDate}
+    GROUP BY c."serviceId", DATE(cr."timestamp")
     ORDER BY c."serviceId", date
   `
 
