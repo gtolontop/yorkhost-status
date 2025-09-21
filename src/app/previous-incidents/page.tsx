@@ -292,8 +292,13 @@ export default function PreviousIncidentsPage() {
                             </div>
                             
                             <div className="flex-1">
-                              <h4 className="text-lg font-semibold text-gray-900 mb-1">
+                              <h4 className="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
                                 {incident.title}
+                                {incident.status !== 'RESOLVED' && incident.status !== 'COMPLETED' && !incident.endTime && (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-red-600 text-white animate-pulse">
+                                    ACTIVE
+                                  </span>
+                                )}
                               </h4>
                               
                               <div className="flex flex-wrap items-center gap-3 mb-2">
