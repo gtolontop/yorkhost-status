@@ -16,7 +16,8 @@ if (process.env.NODE_ENV === 'development') {
  */
 export async function getUptimeHistory(serviceId: string, days: number = 30): Promise<UptimeData[]> {
   const startDate = new Date()
-  startDate.setDate(startDate.getDate() - days)
+  startDate.setUTCDate(startDate.getUTCDate() - days)
+  startDate.setUTCHours(0, 0, 0, 0)
 
   const checkResults = await prisma.checkResult.findMany({
     where: {
