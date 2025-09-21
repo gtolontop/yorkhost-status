@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { getUptimeHistory } from '@/lib/db'
+import { getBulkUptimeHistory } from '@/lib/db-optimized'
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,23 +13,10 @@ export async function GET(request: NextRequest) {
       select: { id: true }
     })
     
-    // Get history for all services in parallel
-    const historyPromises = services.map(service => 
-      getUptimeHistory(service.id, days)
-        .then(history => ({ serviceId: service.id, history }))
-        .catch(error => {
-          console.error(`Error fetching history for service ${service.id}:`, error)
-          return { serviceId: service.id, history: [] }
-        })
-    )
+    const serviceIds = services.map(s => s.id)
     
-    const allHistory = await Promise.all(historyPromises)
-    
-    // Convert to object format for easy access
-    const historyByService = allHistory.reduce((acc, { serviceId, history }) => {
-      acc[serviceId] = history
-      return acc
-    }, {} as Record<string, any[]>)
+    // Use optimized bulk query
+    const historyByService = await getBulkUptimeHistory(serviceIds, days)
     
     return NextResponse.json({
       success: true,
