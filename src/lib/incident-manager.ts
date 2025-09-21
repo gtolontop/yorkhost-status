@@ -15,7 +15,7 @@ export async function handleCheckResult(result: IncidentCheckResult) {
     const activeIncident = await prisma.incident.findFirst({
       where: {
         serviceId: result.serviceId,
-        status: 'active'
+        status: 'INVESTIGATING'
       }
     })
 
@@ -27,7 +27,7 @@ export async function handleCheckResult(result: IncidentCheckResult) {
         data: {
           serviceId: result.serviceId,
           title: `${result.serviceName} is down`,
-          status: 'active',
+          status: 'INVESTIGATING',
           severity: 'major',
           startTime: result.timestamp,
           description: result.error || 'Service is not responding'
