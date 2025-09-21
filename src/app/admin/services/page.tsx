@@ -255,6 +255,33 @@ export default function AdminServicesPage() {
     }
   }
 
+  const handleDeleteGroup = async (groupId: string) => {
+    if (!confirm('Are you sure you want to delete this group? All services in this group will be moved to ungrouped.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/groups/${groupId}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        // Move all services from this group to ungrouped
+        setServices(prev => prev.map(service => 
+          service.groupId === groupId ? { ...service, groupId: 'ungrouped' } : service
+        ))
+        
+        // Remove the group from the list
+        setGroups(prev => prev.filter(g => g.id !== groupId))
+      } else {
+        alert('Failed to delete group')
+      }
+    } catch (error) {
+      console.error('Failed to delete group:', error)
+      alert('Failed to delete group')
+    }
+  }
+
   const testService = async (serviceId: string) => {
     try {
       const response = await fetch(`/api/admin/services/${serviceId}/check`, {
