@@ -2,15 +2,14 @@
 
 import Link from 'next/link'
 import { IncidentWithDetails } from '@/types'
-import { getSeverityColor, formatRelativeTime } from '@/lib/utils'
-import { AlertTriangle, XCircle, Clock, ExternalLink, Wrench, Info } from 'lucide-react'
+import { formatRelativeTime } from '@/lib/utils'
+import { AlertTriangle, Info, Wrench, ChevronRight } from 'lucide-react'
 
 interface IncidentBannerProps {
   incidents: IncidentWithDetails[]
 }
 
 export default function IncidentBanner({ incidents }: IncidentBannerProps) {
-  // Ensure incidents is an array
   const safeIncidents = Array.isArray(incidents) ? incidents : []
   
   if (safeIncidents.length === 0) {
@@ -27,94 +26,110 @@ export default function IncidentBanner({ incidents }: IncidentBannerProps) {
       return bSeverity - aSeverity
     }
     
-    const bTime = new Date(b.startTime || 0).getTime()
-    const aTime = new Date(a.startTime || 0).getTime()
-    return bTime - aTime
+    return new Date(b.startTime || 0).getTime() - new Date(a.startTime || 0).getTime()
   })
 
-  const primaryIncident = sortedIncidents[0]
-  const additionalCount = safeIncidents.length - 1
-
-  const getSeverityIcon = (incident: IncidentWithDetails) => {
+  const getIncidentStyle = (incident: IncidentWithDetails) => {
     if (incident.type === 'MAINTENANCE') {
-      return Wrench
+      return {
+        bg: 'bg-blue-50',
+        border: 'border-blue-200',
+        text: 'text-blue-900',
+        icon: Wrench,
+        iconColor: 'text-blue-600'
+      }
     }
+
     switch (incident.severity) {
       case 'CRITICAL':
-        return XCircle
+        return {
+          bg: 'bg-red-50',
+          border: 'border-red-200',
+          text: 'text-red-900',
+          icon: AlertTriangle,
+          iconColor: 'text-red-600'
+        }
       case 'HIGH':
-        return AlertTriangle
+        return {
+          bg: 'bg-orange-50',
+          border: 'border-orange-200',
+          text: 'text-orange-900',
+          icon: AlertTriangle,
+          iconColor: 'text-orange-600'
+        }
       case 'MEDIUM':
-        return Info
+        return {
+          bg: 'bg-yellow-50',
+          border: 'border-yellow-200',
+          text: 'text-yellow-900',
+          icon: Info,
+          iconColor: 'text-yellow-600'
+        }
       default:
-        return Clock
+        return {
+          bg: 'bg-gray-50',
+          border: 'border-gray-200',
+          text: 'text-gray-900',
+          icon: Info,
+          iconColor: 'text-gray-600'
+        }
     }
   }
 
-  const SeverityIcon = getSeverityIcon(primaryIncident)
-  const severityColor = primaryIncident.type === 'MAINTENANCE' ? 'info' : getSeverityColor(primaryIncident.severity)
-
   return (
-    <div className={`mb-8 rounded-lg shadow-lg overflow-hidden animate-fade-in ${
-      severityColor === 'info' ? 'bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-300 text-blue-900' :
-      severityColor === 'success' ? 'bg-gradient-to-br from-success-light to-success border border-success text-success-dark' :
-      severityColor === 'warning' ? 'bg-gradient-to-br from-warning-light to-warning border border-warning text-warning-dark' :
-      'bg-gradient-to-br from-danger-light to-danger border border-danger text-danger-dark'
-    }`}>
-      <div className="flex items-start gap-4 p-6 md:p-8 md:gap-6">
-        <div className="flex-shrink-0 mt-1 opacity-90">
-          <SeverityIcon size={24} />
-        </div>
-        
-        <div className="flex-1 min-w-0">
-          <div className="mb-3">
-            <h3 className="text-lg md:text-xl font-bold mb-2">{primaryIncident.title}</h3>
-            <div className="flex items-center gap-3 flex-wrap">
-              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wide bg-white bg-opacity-30">
-                {primaryIncident.type === 'MAINTENANCE' ? 'Maintenance' : primaryIncident.severity}
-              </span>
-              <span className="text-sm opacity-90">
-                Started {formatRelativeTime(primaryIncident.startTime)}
-              </span>
-            </div>
-          </div>
-          
-          <p className="mb-3 leading-relaxed opacity-90">
-            {primaryIncident.description}
-          </p>
-          
-          {primaryIncident.updates && primaryIncident.updates.length > 0 && (
-            <div className="mb-2 p-3 bg-white bg-opacity-20 rounded-md text-sm leading-relaxed">
-              <strong className="font-semibold">Latest Update:</strong> {primaryIncident.updates[0].message}
-            </div>
-          )}
-          
-          {additionalCount > 0 && (
-            <p className="text-sm font-medium opacity-80 m-0">
-              +{additionalCount} additional incident{additionalCount > 1 ? 's' : ''}
-            </p>
-          )}
-        </div>
-        
-        <div className="flex flex-col gap-2 items-end flex-shrink-0 sm:flex-row sm:gap-3">
-          <Link 
-            href={`/incident/${primaryIncident.slug || primaryIncident.id}`}
-            className="flex items-center gap-2 px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-md text-sm font-medium transition-all whitespace-nowrap hover:bg-opacity-30 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:ring-offset-2"
+    <div className="mb-6 space-y-3">
+      {sortedIncidents.map((incident) => {
+        const style = getIncidentStyle(incident)
+        const Icon = style.icon
+
+        return (
+          <Link
+            key={incident.id}
+            href={`/incident/${incident.slug || incident.id}`}
+            className={`block p-4 rounded-lg border ${style.bg} ${style.border} ${style.text} hover:shadow-md transition-all duration-200 group`}
           >
-            <span>View Details</span>
-            <ExternalLink size={16} />
+            <div className="flex items-start gap-3">
+              <Icon className={`${style.iconColor} mt-0.5 shrink-0`} size={20} />
+              
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-sm mb-1 group-hover:underline">
+                      {incident.title}
+                    </h3>
+                    <p className="text-sm opacity-75 line-clamp-1">
+                      {incident.description}
+                    </p>
+                    {incident.updates && incident.updates.length > 0 && (
+                      <p className="text-xs opacity-60 mt-1">
+                        Latest: {incident.updates[0].message}
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="text-right">
+                      <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${
+                        incident.type === 'MAINTENANCE' ? 'bg-blue-100 text-blue-700' :
+                        incident.severity === 'CRITICAL' ? 'bg-red-100 text-red-700' :
+                        incident.severity === 'HIGH' ? 'bg-orange-100 text-orange-700' :
+                        incident.severity === 'MEDIUM' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {incident.type === 'MAINTENANCE' ? 'Maintenance' : incident.severity}
+                      </span>
+                      <p className="text-xs opacity-60 mt-1">
+                        {formatRelativeTime(incident.startTime)}
+                      </p>
+                    </div>
+                    <ChevronRight className="opacity-40 group-hover:opacity-70 transition-opacity" size={16} />
+                  </div>
+                </div>
+              </div>
+            </div>
           </Link>
-          
-          {additionalCount > 0 && (
-            <Link 
-              href="/incidents"
-              className="px-3 py-2 text-sm font-medium opacity-80 transition-all rounded-md whitespace-nowrap hover:opacity-100 hover:bg-white hover:bg-opacity-10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:ring-offset-2"
-            >
-              View All Incidents
-            </Link>
-          )}
-        </div>
-      </div>
+        )
+      })}
     </div>
   )
 }
