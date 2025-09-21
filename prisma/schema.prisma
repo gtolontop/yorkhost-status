@@ -58,20 +58,38 @@ model Machine {
 model Service {
   id           String        @id @default(cuid())
   machineId    String?
+  groupId      String?
   name         String
   description  String?
   url          String?
   icon         String?
   isActive     Boolean       @default(true)
+  order        Int           @default(0)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   
   machine      Machine?      @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  group        ServiceGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
   checks       Check[]
   incidents    Incident[]
   notifications Notification[]
   
   @@map("services")
+}
+
+model ServiceGroup {
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  color        String        @default("#6b7280")
+  icon         String?
+  order        Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  
+  services     Service[]
+  
+  @@map("service_groups")
 }
 
 enum CheckType {
