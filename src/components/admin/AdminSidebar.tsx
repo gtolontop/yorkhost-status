@@ -95,11 +95,23 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         <div className={styles.logo}>
           {!isCollapsed && (
             <>
-              <Shield size={24} />
+              <img 
+                src="https://yorkhost.fr/images/logo.png" 
+                alt="Yorkhost"
+                className="h-6 w-auto"
+                style={{ height: '24px', width: 'auto' }}
+              />
               <span>Admin Panel</span>
             </>
           )}
-          {isCollapsed && <Shield size={24} />}
+          {isCollapsed && (
+            <img 
+              src="https://yorkhost.fr/images/logo.png" 
+              alt="Yorkhost"
+              className="h-6 w-auto"
+              style={{ height: '24px', width: 'auto' }}
+            />
+          )}
         </div>
       </div>
 
