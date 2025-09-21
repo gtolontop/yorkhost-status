@@ -360,33 +360,21 @@ export default function AdminServicesPage() {
           <div className="flex flex-col gap-4">
             {filteredGroups.map(group => (
               <div key={group.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
-                <div style={{
-                  padding: '1rem 1.5rem',
-                  borderBottom: '1px solid #e5e7eb',
-                  background: `${group.color}10`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  cursor: 'pointer'
-                }} onClick={() => toggleGroup(group.id)}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    {group.isCollapsed ? <ChevronRight size={20} /> : <ChevronDown size={20} />}
-                    <div style={{
-                      width: '12px',
-                      height: '12px',
-                      borderRadius: '50%',
-                      background: group.color
-                    }} />
-                    <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>
+                <div 
+                  className="p-4 px-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between cursor-pointer"
+                  style={{ backgroundColor: `${group.color}10` }}
+                  onClick={() => toggleGroup(group.id)}
+                >
+                  <div className="flex items-center gap-3">
+                    {group.isCollapsed ? <ChevronRight size={20} className="text-gray-600 dark:text-gray-400" /> : <ChevronDown size={20} className="text-gray-600 dark:text-gray-400" />}
+                    <div 
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: group.color }}
+                    />
+                    <h3 className="m-0 text-base font-semibold text-gray-900 dark:text-white">
                       {group.name}
                     </h3>
-                    <span style={{ 
-                      fontSize: '0.75rem', 
-                      color: '#6b7280',
-                      background: 'white',
-                      padding: '0.125rem 0.5rem',
-                      borderRadius: '12px'
-                    }}>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 px-2 py-0.5 rounded-xl">
                       {group.services.length}
                     </span>
                   </div>
@@ -396,27 +384,7 @@ export default function AdminServicesPage() {
                         e.stopPropagation();
                         handleDeleteGroup(group.id);
                       }}
-                      style={{
-                        padding: '0.25rem 0.5rem',
-                        background: 'transparent',
-                        border: '1px solid #ef4444',
-                        borderRadius: '8px',
-                        color: '#ef4444',
-                        fontSize: '0.75rem',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.25rem',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = '#ef4444';
-                        e.currentTarget.style.color = 'white';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent';
-                        e.currentTarget.style.color = '#ef4444';
-                      }}
+                      className="py-1 px-2 bg-transparent border border-red-500 dark:border-red-400 rounded-lg text-red-500 dark:text-red-400 text-xs cursor-pointer flex items-center gap-1 transition-all hover:bg-red-500 hover:text-white dark:hover:bg-red-400"
                     >
                       <Trash2 size={14} />
                       Delete
@@ -430,19 +398,10 @@ export default function AdminServicesPage() {
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        style={{
-                          padding: '0.5rem',
-                          minHeight: '60px',
-                          background: snapshot.isDraggingOver ? '#f3f4f6' : 'transparent'
-                        }}
+                        className={`p-2 min-h-[60px] ${snapshot.isDraggingOver ? 'bg-gray-100 dark:bg-gray-700' : 'bg-transparent'}`}
                       >
                         {group.services.length === 0 ? (
-                          <div style={{
-                            padding: '2rem',
-                            textAlign: 'center',
-                            color: '#6b7280',
-                            fontSize: '0.875rem'
-                          }}>
+                          <div className="p-8 text-center text-gray-500 dark:text-gray-400 text-sm">
                             Drop services here
                           </div>
                         ) : (
@@ -452,57 +411,46 @@ export default function AdminServicesPage() {
                                 <div
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
-                                  style={{
-                                    ...provided.draggableProps.style,
-                                    marginBottom: '0.5rem',
-                                    opacity: snapshot.isDragging ? 0.5 : 1
-                                  }}
+                                  className={`mb-2 ${snapshot.isDragging ? 'opacity-50' : 'opacity-100'}`}
+                                  style={provided.draggableProps.style}
                                 >
-                                  <div style={{
-                                    border: '1px solid #e5e7eb',
-                                    borderRadius: '12px',
-                                    padding: '1rem 1.5rem',
-                                    background: '#ffffff',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '1rem'
-                                  }}>
-                                    <div {...provided.dragHandleProps} style={{ cursor: 'grab' }}>
-                                      <GripVertical size={20} color="#9ca3af" />
+                                  <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 px-6 bg-white dark:bg-gray-800 flex items-center gap-4">
+                                    <div {...provided.dragHandleProps} className="cursor-grab">
+                                      <GripVertical size={20} className="text-gray-400 dark:text-gray-500" />
                                     </div>
                                     
                                     {getStatusIcon(service.status)}
                                     
-                                    <div style={{ flex: 1 }}>
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2">
+                                        <h4 className="m-0 text-sm font-semibold text-gray-900 dark:text-white">
                                           {service.name}
                                         </h4>
                                         {service.description && (
-                                          <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                                          <span className="text-xs text-gray-500 dark:text-gray-400">
                                             - {service.description}
                                           </span>
                                         )}
                                       </div>
                                     </div>
                                     
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', color: '#6b7280', fontSize: '0.75rem' }}>
-                                      <div style={{ textAlign: 'center' }}>
-                                        <div style={{ fontWeight: 600, color: getStatusColor(service.status) }}>
+                                    <div className="flex items-center gap-8 text-gray-500 dark:text-gray-400 text-xs">
+                                      <div className="text-center">
+                                        <div className={`font-semibold ${getStatusColor(service.status)}`}>
                                           {service.uptime}%
                                         </div>
                                         <div>Uptime</div>
                                       </div>
                                       
-                                      <div style={{ textAlign: 'center' }}>
-                                        <div style={{ fontWeight: 600, color: '#374151' }}>
+                                      <div className="text-center">
+                                        <div className="font-semibold text-gray-700 dark:text-gray-300">
                                           {service.responseTime}ms
                                         </div>
                                         <div>Response</div>
                                       </div>
                                       
-                                      <div style={{ textAlign: 'center' }}>
-                                        <div style={{ fontWeight: 600, color: '#374151' }}>
+                                      <div className="text-center">
+                                        <div className="font-semibold text-gray-700 dark:text-gray-300">
                                           {formatRelativeTime(service.lastCheck)}
                                         </div>
                                         <div>Last check</div>
