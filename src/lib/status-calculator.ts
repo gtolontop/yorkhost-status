@@ -6,15 +6,33 @@ interface CheckResult {
 }
 
 export function calculateServiceStatus(results: CheckResult[]): 'operational' | 'degraded' | 'outage' {
-  if (results.length === 0) return 'outage' // No data = can't verify it's operational
+  if (results.length === 0) return 'operational' // No data = assume operational
   
-  // Check last 5 results for more accurate status
-  const recentResults = results.slice(0, 5)
-  const successRate = recentResults.filter(r => r.success).length / recentResults.length
+  // Sort results by timestamp to ensure we have the most recent first
+  const sortedResults = [...results].sort((a, b) => 
+    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  )
   
-  if (successRate === 1) return 'operational'
-  if (successRate >= 0.8) return 'degraded'
-  return 'outage'
+  // Need at least 2 consecutive failures for outage
+  if (sortedResults.length >= 2) {
+    const lastTwo = sortedResults.slice(0, 2)
+    if (lastTwo.every(r => !r.success)) {
+      return 'outage'
+    }
+  }
+  
+  // If the most recent check succeeded, we're at least degraded (not outage)
+  if (sortedResults[0].success) {
+    // Check last 5 results for operational vs degraded
+    const recentResults = sortedResults.slice(0, Math.min(5, sortedResults.length))
+    const successRate = recentResults.filter(r => r.success).length / recentResults.length
+    
+    if (successRate >= 0.9) return 'operational'
+    return 'degraded'
+  }
+  
+  // Single failure = degraded
+  return 'degraded'
 }
 
 export function calculateUptime(results: CheckResult[]): number {
