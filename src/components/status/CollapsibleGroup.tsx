@@ -91,7 +91,7 @@ export default function CollapsibleGroup({
               {group.services.filter(s => s.enhancedStatus === 'degraded').length} degraded
             </span>
           )}
-          {group.services.filter(s => s.enhancedStatus === 'outage' || s.enhancedStatus === 'outage-with-incident').length > 0 && (
+          {group.services.filter(s => s.enhancedStatus === 'outage').length > 0 && (
             <span className="text-red-600 font-medium">
               {group.services.filter(s => s.enhancedStatus === 'outage').length} down
             </span>
