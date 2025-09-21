@@ -111,7 +111,7 @@ export default function CollapsibleGroup({
         style={{ height: height !== undefined ? `${height}px` : 'auto' }}
       >
         <div ref={contentRef} className="border-t border-[#27272a]">
-          <div className="p-3 sm:p-4 space-y-3 bg-[#16161E]">
+          <div className="p-3 sm:p-4 space-y-3">
             {group.services.map((service) => (
               <EnhancedServiceCard
                 key={service.id}
