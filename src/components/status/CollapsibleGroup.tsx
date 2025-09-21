@@ -64,22 +64,16 @@ export default function CollapsibleGroup({
         onClick={toggleCollapse}
         style={{ borderLeft: `4px solid ${group.color}` }}
       >
-        <div className="flex items-start sm:items-center gap-3">
-          <div className="text-gray-400 transition-transform duration-200 mt-1 sm:mt-0 flex-shrink-0" style={{
+        <div className="flex items-center gap-3">
+          <div className="text-gray-400 transition-transform duration-200 flex-shrink-0" style={{
             transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)'
           }}>
             <ChevronDown size={20} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base sm:text-lg font-semibold text-white flex flex-wrap items-center gap-2">
-              <span className="break-words">{group.name}</span>
-              <span className="text-sm font-normal text-gray-500 whitespace-nowrap">
-                ({group.services.length} service{group.services.length > 1 ? 's' : ''})
-              </span>
+            <h3 className="text-base sm:text-lg font-semibold text-white">
+              {group.name}
             </h3>
-            {group.description && (
-              <p className="text-sm text-gray-500 mt-1 line-clamp-2">{group.description}</p>
-            )}
           </div>
         </div>
         
