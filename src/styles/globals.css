@@ -137,7 +137,7 @@
 }
 
 /* Dark Theme Colors */
-[data-theme="dark"] {
+.dark {
   --bg-primary: #0B1220;
   --bg-secondary: #1A2332;
   --bg-tertiary: #243447;
