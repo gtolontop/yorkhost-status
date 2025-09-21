@@ -27,7 +27,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50 transition-colors">
+      <header className="bg-[#0C0C14] dark:bg-[#0C0C14] border-b border-[#27272a] dark:border-[#27272a] sticky top-0 z-50 transition-colors">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Brand */}
@@ -38,21 +38,21 @@ export default function Header() {
                   alt="Yorkhost"
                   className="h-7 sm:h-8 w-auto"
                 />
-                <span className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Status</span>
+                <span className="text-lg sm:text-xl font-bold text-white">Status</span>
               </Link>
             </div>
 
             {/* Desktop Navigation - Centered */}
             <nav className="hidden lg:flex items-center justify-center gap-6 xl:gap-8 flex-1">
-              <Link href="/" className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium group">
+              <Link href="/" className="relative text-gray-300 hover:text-white transition-colors font-medium group">
                 Overview
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </Link>
-              <Link href="/maintenance" className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium group">
+              <Link href="/maintenance" className="relative text-gray-300 hover:text-white transition-colors font-medium group">
                 Maintenance
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </Link>
-              <Link href="/previous-incidents" className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium group whitespace-nowrap">
+              <Link href="/previous-incidents" className="relative text-gray-300 hover:text-white transition-colors font-medium group whitespace-nowrap">
                 Previous Incidents
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </Link>
@@ -63,7 +63,7 @@ export default function Header() {
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="p-2 text-gray-300 hover:text-white transition-colors rounded-lg hover:bg-[#1A1A24]"
                 aria-label="Toggle theme"
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
@@ -83,13 +83,13 @@ export default function Header() {
               {/* Mobile Menu Button */}
               <button
                 onClick={toggleMenu}
-                className="lg:hidden relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="lg:hidden relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[#1A1A24] transition-colors"
                 aria-label="Toggle menu"
               >
                 <div className="w-6 h-5 relative flex flex-col justify-between">
-                  <span className={`block h-0.5 w-full bg-gray-600 dark:bg-gray-300 transition-all duration-300 origin-left ${isMenuOpen ? 'rotate-45 translate-x-0.5' : ''}`}></span>
-                  <span className={`block h-0.5 w-full bg-gray-600 dark:bg-gray-300 transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></span>
-                  <span className={`block h-0.5 w-full bg-gray-600 dark:bg-gray-300 transition-all duration-300 origin-left ${isMenuOpen ? '-rotate-45 translate-x-0.5' : ''}`}></span>
+                  <span className={`block h-0.5 w-full bg-gray-300 transition-all duration-300 origin-left ${isMenuOpen ? 'rotate-45 translate-x-0.5' : ''}`}></span>
+                  <span className={`block h-0.5 w-full bg-gray-300 transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></span>
+                  <span className={`block h-0.5 w-full bg-gray-300 transition-all duration-300 origin-left ${isMenuOpen ? '-rotate-45 translate-x-0.5' : ''}`}></span>
                 </div>
               </button>
             </div>
