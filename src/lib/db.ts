@@ -54,6 +54,10 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
       dailyData[dateKey].successful++
     }
   })
+  
+  // Debug: log daily data for today
+  const todayKey = new Date().toISOString().split('T')[0]
+  console.log(`Today's data for service ${serviceId}:`, todayKey, dailyData[todayKey] || 'No data')
 
   // Convert to UptimeData array
   const uptimeData: UptimeData[] = []
