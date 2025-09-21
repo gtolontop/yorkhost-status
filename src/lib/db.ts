@@ -207,7 +207,7 @@ export async function getServiceStats(serviceId: string) {
  * Get overall status overview
  */
 export async function getStatusOverview() {
-  const [services, activeIncidents, machines] = await Promise.all([
+  const [services, activeIncidents] = await Promise.all([
     prisma.service.findMany({
       include: {
         machine: true,
