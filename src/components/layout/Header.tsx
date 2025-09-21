@@ -20,10 +20,12 @@ export default function Header() {
           {/* Brand */}
           <div className="flex items-center flex-1">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">Y</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">Yorkhost Status</span>
+              <img 
+                src="https://yorkhost.fr/images/logo.png" 
+                alt="Yorkhost"
+                className="h-8 w-auto"
+              />
+              <span className="text-xl font-bold text-gray-900">Status</span>
             </Link>
           </div>
 
