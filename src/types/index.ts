@@ -33,6 +33,11 @@ export interface ServiceWithStats extends Service {
   averageResponseTime?: number
 }
 
+export interface ServiceWithEnhancedStatus extends ServiceWithStats {
+  enhancedStatus: 'operational' | 'degraded' | 'outage' | 'outage-with-incident' | 'maintenance'
+  activeIncident?: Incident | null
+}
+
 export interface CheckWithResults extends Check {
   results: CheckResult[]
   service: Service
