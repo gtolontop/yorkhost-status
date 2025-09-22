@@ -16,7 +16,7 @@ import {
   CheckCircle
 } from 'lucide-react'
 import styles from './AdminNavbar.module.scss'
-import { useTheme } from '@/contexts/ThemeContext'
+import { useTheme } from '@/components/providers/ThemeProvider'
 
 interface AdminNavbarProps {
   title: string
