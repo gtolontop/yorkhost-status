@@ -118,8 +118,7 @@ export default function CollapsibleGroup({
                 </div>
               )
             }
-          })()
-          </div>
+          })()}
           <div className="text-gray-400 transition-transform duration-200 flex-shrink-0" style={{
             transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)'
           }}>
