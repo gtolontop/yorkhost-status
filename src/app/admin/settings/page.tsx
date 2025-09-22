@@ -16,7 +16,7 @@ import {
   AlertTriangle,
   CheckCircle
 } from 'lucide-react'
-import { useTheme } from '@/contexts/ThemeContext'
+import { useTheme } from '@/components/providers/ThemeProvider'
 
 interface Settings {
   general: {
