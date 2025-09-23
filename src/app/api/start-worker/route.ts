@@ -141,7 +141,8 @@ async function runScheduledChecks() {
           check.type,
           check.target,
           check.port,
-          30000 // 30 seconds timeout
+          30000, // 30 seconds timeout
+          check.acceptedStatusCodes // Pass the accepted status codes from the check config
         )
         
         console.log(`${result.success ? '✅' : '❌'} ${check.service.name}: ${result.success ? 'UP' : 'DOWN'} (${result.responseTime}ms)`)
