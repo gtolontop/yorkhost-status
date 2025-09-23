@@ -71,6 +71,7 @@ export default function CreateMonitorModal({ isOpen, onClose, onSuccess }: Creat
           retryInterval: '5',
           expectedStatus: '',
           expectedBody: '',
+          acceptedStatusCodes: '',
           followRedirects: true,
           sslCheck: true,
           group: 'default'
