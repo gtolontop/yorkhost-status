@@ -7,34 +7,47 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code')
   const error = searchParams.get('error')
 
+  // Get the base URL with proper proxy handling
+  const getBaseUrl = () => {
+    const forwardedHost = request.headers.get('x-forwarded-host')
+    const forwardedProto = request.headers.get('x-forwarded-proto') || 'http'
+
+    if (forwardedHost) {
+      return `${forwardedProto}://${forwardedHost}`
+    }
+
+    const url = new URL(request.url)
+    return `${url.protocol}//${url.host}`
+  }
+
+  const baseUrl = getBaseUrl()
+
   if (error) {
     console.error('Discord OAuth error:', error)
-    return NextResponse.redirect(
-      new URL('/auth/error?error=discord_oauth_error', request.url)
-    )
+    return NextResponse.redirect(`${baseUrl}/auth/error?error=discord_oauth_error`)
   }
 
   if (!code) {
-    return NextResponse.redirect(
-      new URL('/auth/error?error=missing_auth_code', request.url)
-    )
+    return NextResponse.redirect(`${baseUrl}/auth/error?error=missing_auth_code`)
   }
 
   try {
-    // Authenticate user with Discord
-    const authResult = await discordAuth.authenticateUser(code)
+    // Authenticate user with Discord, passing the full request URL for redirect URI
+    const requestUrl = request.headers.get('x-forwarded-host')
+      ? `${request.headers.get('x-forwarded-proto') || 'http'}://${request.headers.get('x-forwarded-host')}`
+      : request.url
+
+    const authResult = await discordAuth.authenticateUser(code, requestUrl)
 
     if (!authResult.hasAccess) {
-      return NextResponse.redirect(
-        new URL('/auth/error?error=insufficient_permissions', request.url)
-      )
+      return NextResponse.redirect(`${baseUrl}/auth/error?error=insufficient_permissions`)
     }
 
     // Create JWT session
     const sessionData = await createUserSession(authResult.dbUser)
 
     // Create response with redirect to admin dashboard
-    const response = NextResponse.redirect(new URL('/admin', request.url))
+    const response = NextResponse.redirect(`${baseUrl}/admin`)
 
     // Set secure HTTP-only cookie with JWT
     response.cookies.set('auth-token', sessionData.token, {
@@ -48,9 +61,7 @@ export async function GET(request: NextRequest) {
     return response
   } catch (error) {
     console.error('Discord callback error:', error)
-    
-    return NextResponse.redirect(
-      new URL('/auth/error?error=authentication_failed', request.url)
-    )
+
+    return NextResponse.redirect(`${baseUrl}/auth/error?error=authentication_failed`)
   }
 }
