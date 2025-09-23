@@ -120,15 +120,20 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
       // Use real data if available
       const uptime = dayData ? (dayData.uptime !== null ? dayData.uptime : -1) : -1 // -1 indicates no data
       const incidents = dayData?.incidents || []
+      const maintenances = dayData?.maintenances || []
       
       const getBarColor = () => {
         if (!dayData || uptime === -1) return 'bg-gray-300 dark:bg-gray-600' // No data = gray
+        if (maintenances.length > 0) return 'bg-blue-500' // Blue for maintenance (priority)
         if (uptime >= 99.9) return 'bg-green-500'
         if (uptime >= 90) return 'bg-yellow-500'
         return 'bg-red-500'
       }
 
       const getStatus = () => {
+        if (maintenances.length > 0) {
+          return `${maintenances.length} maintenance${maintenances.length > 1 ? 's' : ''}`
+        }
         if (incidents.length > 0) {
           return `${incidents.length} incident${incidents.length > 1 ? 's' : ''}`
         }
@@ -147,6 +152,11 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
             <div className="font-medium">{date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
             <div>{uptime === -1 ? 'No data' : `${uptime.toFixed(1)}% - ${getStatus()}`}</div>
+            {maintenances.length > 0 && (
+              <div className="text-xs text-blue-300 mt-0.5">
+                {maintenances.map((mnt: any) => mnt.title).join(', ')}
+              </div>
+            )}
             {incidents.length > 0 && (
               <div className="text-xs text-gray-300 mt-0.5">
                 {incidents.map((inc: any) => inc.title).join(', ')}
