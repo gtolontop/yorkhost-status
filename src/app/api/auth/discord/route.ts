@@ -4,9 +4,17 @@ import { discordAuth } from '@/lib/auth/discord'
 export async function GET(request: NextRequest) {
   try {
     // Get the full request URL to handle proxy redirects properly
-    const requestUrl = request.headers.get('x-forwarded-host')
-      ? `${request.headers.get('x-forwarded-proto') || 'http'}://${request.headers.get('x-forwarded-host')}`
-      : request.url
+    // Force HTTPS if NEXTAUTH_URL in env uses HTTPS
+    const forwardedHost = request.headers.get('x-forwarded-host')
+    const envUrl = process.env.NEXTAUTH_URL
+
+    let requestUrl: string
+    if (forwardedHost) {
+      const proto = envUrl?.startsWith('https://') ? 'https' : (request.headers.get('x-forwarded-proto') || 'http')
+      requestUrl = `${proto}://${forwardedHost}`
+    } else {
+      requestUrl = request.url
+    }
 
     const authUrl = discordAuth.getAuthUrl(requestUrl)
 
