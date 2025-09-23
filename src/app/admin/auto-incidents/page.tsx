@@ -101,32 +101,24 @@ export default function AutoIncidentsPage() {
     setExpandedGroups(newExpanded)
   }
 
-  const toggleService = (serviceId: string) => {
-    setSelectedServices(prev =>
-      prev.includes(serviceId)
-        ? prev.filter(id => id !== serviceId)
-        : [...prev, serviceId]
-    )
-  }
 
-  const toggleAllServicesInGroup = (groupServices: any[]) => {
-    const groupServiceIds = groupServices.map(s => s.id)
-    const allSelected = groupServiceIds.every(id => selectedServices.includes(id))
+  const toggleGroupSelection = (machine: any) => {
+    const groupServiceIds = machine.services?.map((s: any) => s.id) || []
+    const allSelected = groupServiceIds.every((id: string) => selectedServices.includes(id))
 
     if (allSelected) {
-      // Deselect all services in group
-      setSelectedServices(prev => prev.filter(id => !groupServiceIds.includes(id)))
+      setSelectedServices(selectedServices.filter(id => !groupServiceIds.includes(id)))
     } else {
-      // Select all services in group
-      setSelectedServices(prev => {
-        const newSelected = [...prev]
-        groupServiceIds.forEach(id => {
-          if (!newSelected.includes(id)) {
-            newSelected.push(id)
-          }
-        })
-        return newSelected
-      })
+      const newSelection = Array.from(new Set([...selectedServices, ...groupServiceIds]))
+      setSelectedServices(newSelection)
+    }
+  }
+
+  const toggleServiceSelection = (serviceId: string) => {
+    if (selectedServices.includes(serviceId)) {
+      setSelectedServices(selectedServices.filter(id => id !== serviceId))
+    } else {
+      setSelectedServices([...selectedServices, serviceId])
     }
   }
 
@@ -243,9 +235,19 @@ export default function AutoIncidentsPage() {
                 <Settings size={20} />
                 Service Filter
               </h3>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                {selectedServices.length} service(s) selected
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  {selectedServices.length} service(s) selected
+                </span>
+                {selectedServices.length > 0 && (
+                  <button
+                    onClick={() => setSelectedServices([])}
+                    className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-full transition-colors"
+                  >
+                    Clear All
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -268,27 +270,39 @@ export default function AutoIncidentsPage() {
                         )}
                       </button>
                       <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={machine.services.length > 0 && machine.services.every((s: any) => selectedServices.includes(s.id))}
-                          onChange={() => toggleAllServicesInGroup(machine.services)}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
                         <span className="font-medium text-gray-900 dark:text-white">{machine.name}</span>
-                        <span className="text-sm text-gray-500">({machine.services.length} services)</span>
+                        <span className="text-sm text-gray-500">
+                          ({machine.services.length} services)
+                        </span>
                       </div>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => toggleGroupSelection(machine)}
+                      className={`px-3 py-1 text-xs rounded-full transition-colors ${
+                        machine.services?.every((s: any) => selectedServices.includes(s.id))
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                          : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                      }`}
+                    >
+                      {machine.services?.every((s: any) => selectedServices.includes(s.id))
+                        ? 'Deselect All'
+                        : 'Select All'}
+                    </button>
                   </div>
 
                   {/* Services in Group */}
                   {expandedGroups.has(machine.id) && (
                     <div className="bg-gray-50 dark:bg-gray-800">
                       {machine.services.map((service: any) => (
-                        <div key={service.id} className="flex items-center gap-3 p-3 pl-10 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <label
+                          key={service.id}
+                          className="flex items-center gap-3 p-3 pl-10 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                        >
                           <input
                             type="checkbox"
                             checked={selectedServices.includes(service.id)}
-                            onChange={() => toggleService(service.id)}
+                            onChange={() => toggleServiceSelection(service.id)}
                             className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                           />
                           <div className="flex-1">
@@ -306,7 +320,7 @@ export default function AutoIncidentsPage() {
                               {service.autoIncidentEnabled ? 'Auto' : 'Manual'}
                             </span>
                           </div>
-                        </div>
+                        </label>
                       ))}
                     </div>
                   )}
@@ -372,10 +386,21 @@ export default function AutoIncidentsPage() {
         {/* Services List */}
         <div className="bg-white dark:bg-yorkhost-darkCard rounded-lg shadow-sm border border-gray-200 dark:border-yorkhost-darkBorder">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-yorkhost-darkBorder">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <Settings size={20} />
-              Service Settings
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <Settings size={20} />
+                Service Settings
+              </h3>
+              {selectedServices.length === 0 ? (
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  Showing all services
+                </span>
+              ) : (
+                <span className="text-sm text-blue-600 dark:text-blue-400">
+                  Filtered to {selectedServices.length} service(s)
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="divide-y divide-gray-200 dark:divide-yorkhost-darkBorder">
