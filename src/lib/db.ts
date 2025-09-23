@@ -60,35 +60,79 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
   const periodStart = new Date()
   periodStart.setUTCDate(periodStart.getUTCDate() - days)
   periodStart.setUTCHours(0, 0, 0, 0)
-  
+
   const allIncidents = await prisma.incident.findMany({
     where: {
-      serviceId: serviceId,
-      startTime: {
-        gte: periodStart
-      }
+      OR: [
+        {
+          serviceId: serviceId,
+          type: 'INCIDENT',
+          startTime: {
+            gte: periodStart
+          }
+        },
+        {
+          type: 'MAINTENANCE',
+          OR: [
+            {
+              scheduledFor: {
+                gte: periodStart
+              }
+            },
+            {
+              startTime: {
+                gte: periodStart
+              }
+            }
+          ],
+          affectedServices: {
+            has: serviceId
+          }
+        }
+      ]
     },
     select: {
       id: true,
+      type: true,
       title: true,
       status: true,
       severity: true,
       startTime: true,
-      endTime: true
+      endTime: true,
+      scheduledFor: true,
+      scheduledEnd: true,
+      affectedServices: true
     }
   })
-  
-  // Group incidents by date
+
+  // Group incidents and maintenances by date
   const incidentsByDate: { [key: string]: any[] } = {}
+  const maintenancesByDate: { [key: string]: any[] } = {}
+
   allIncidents.forEach(incident => {
-    const dateKey = incident.startTime.toISOString().split('T')[0]
-    if (!incidentsByDate[dateKey]) {
-      incidentsByDate[dateKey] = []
+    // For maintenances, use scheduledFor date if available, otherwise startTime
+    const relevantDate = incident.type === 'MAINTENANCE' && incident.scheduledFor
+      ? incident.scheduledFor
+      : incident.startTime
+    const dateKey = relevantDate.toISOString().split('T')[0]
+
+    if (incident.type === 'MAINTENANCE') {
+      if (!maintenancesByDate[dateKey]) {
+        maintenancesByDate[dateKey] = []
+      }
+      maintenancesByDate[dateKey].push({
+        ...incident,
+        endTime: incident.endTime || undefined
+      })
+    } else {
+      if (!incidentsByDate[dateKey]) {
+        incidentsByDate[dateKey] = []
+      }
+      incidentsByDate[dateKey].push({
+        ...incident,
+        endTime: incident.endTime || undefined
+      })
     }
-    incidentsByDate[dateKey].push({
-      ...incident,
-      endTime: incident.endTime || undefined
-    })
   })
 
   // Convert to UptimeData array
@@ -113,7 +157,8 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
     uptimeData.push({
       date: dateKey,
       uptime: uptime !== null ? Math.round(uptime * 100) / 100 : null as any,
-      incidents: incidentsByDate[dateKey] || []
+      incidents: incidentsByDate[dateKey] || [],
+      maintenances: maintenancesByDate[dateKey] || []
     })
   }
 

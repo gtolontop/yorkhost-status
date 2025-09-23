@@ -85,6 +85,16 @@ export interface UptimeData {
     startTime: Date
     endTime?: Date
   }>
+  maintenances: Array<{
+    id: string
+    title: string
+    status: IncidentStatus
+    severity: IncidentSeverity
+    startTime: Date
+    endTime?: Date
+    scheduledFor?: Date
+    scheduledEnd?: Date
+  }>
 }
 
 // Chart data types
