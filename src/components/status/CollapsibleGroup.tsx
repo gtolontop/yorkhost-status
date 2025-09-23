@@ -18,6 +18,8 @@ interface CollapsibleGroupProps {
   isFirst?: boolean
   isLast?: boolean
   isExpandedByDefault?: boolean
+  forceExpanded?: boolean
+  onToggle?: (isExpanded: boolean) => void
 }
 
 export default function CollapsibleGroup({
@@ -26,11 +28,40 @@ export default function CollapsibleGroup({
   onToggleService,
   isFirst = false,
   isLast = false,
-  isExpandedByDefault = true
+  isExpandedByDefault = true,
+  forceExpanded,
+  onToggle
 }: CollapsibleGroupProps) {
-  const [isCollapsed, setIsCollapsed] = useState(!isExpandedByDefault)
+  // Check if group has issues (should be auto-expanded)
+  const hasIssues = group.services.some(s =>
+    s.enhancedStatus === 'outage' ||
+    s.enhancedStatus === 'outage-with-incident' ||
+    s.enhancedStatus === 'degraded' ||
+    s.enhancedStatus === 'maintenance'
+  )
+
+  // Auto-expand if has issues, otherwise use default setting
+  const initialState = hasIssues ? false : !isExpandedByDefault
+
+  const [isCollapsed, setIsCollapsed] = useState(initialState)
+  const [userHasToggled, setUserHasToggled] = useState(false)
   const [height, setHeight] = useState<number | undefined>(undefined)
   const contentRef = useRef<HTMLDivElement>(null)
+
+  // Auto-expand when issues occur (but respect user choice if they manually toggled)
+  useEffect(() => {
+    if (hasIssues && !userHasToggled && isCollapsed) {
+      setIsCollapsed(false)
+    }
+  }, [hasIssues, userHasToggled, isCollapsed])
+
+  // Handle forced expand/collapse state from parent (Expand All/Collapse All buttons)
+  useEffect(() => {
+    if (forceExpanded !== undefined) {
+      setIsCollapsed(!forceExpanded)
+      setUserHasToggled(false) // Reset user toggle when using global controls
+    }
+  }, [forceExpanded])
 
   useEffect(() => {
     if (contentRef.current) {
@@ -56,23 +87,51 @@ export default function CollapsibleGroup({
   }, [isCollapsed])
 
   const toggleCollapse = () => {
-    setIsCollapsed(!isCollapsed)
+    const newState = !isCollapsed
+    setIsCollapsed(newState)
+    setUserHasToggled(true) // Mark that user has manually toggled
+    if (onToggle) {
+      onToggle(!newState)
+    }
   }
 
   return (
     <div className={`${!isLast ? 'border-b border-gray-200 dark:border-gray-700' : ''}`}>
-      <div 
-        className="px-4 sm:px-6 py-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-yorkhost-dark/50 transition-colors flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+      <div
+        className="px-4 sm:px-6 py-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-yorkhost-dark/50 transition-colors"
         onClick={toggleCollapse}
       >
-        <div className="flex-1">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-0">
-            {group.name}
-          </h3>
-        </div>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+          <div className="flex-1">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5">
+                {isCollapsed ?
+                  <ChevronRight size={20} className="text-gray-400 dark:text-gray-500 flex-shrink-0 transition-transform duration-200" /> :
+                  <ChevronDown size={20} className="text-gray-400 dark:text-gray-500 flex-shrink-0 transition-transform duration-200" />
+                }
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-0">
+                    {group.name}
+                  </h3>
+                  {hasIssues && !isCollapsed && !userHasToggled && (
+                    <span className="text-xs text-gray-500 dark:text-gray-400 italic">
+                      (auto-expanded)
+                    </span>
+                  )}
+                </div>
+                {group.description && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">
+                    {group.description}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
         
-        {/* Group status summary */}
-        <div className="flex items-center gap-2 sm:gap-4">
+          {/* Group status summary */}
+          <div className="flex items-center gap-2 sm:gap-4 mt-3 sm:mt-0">
           {(() => {
             const hasOutage = group.services.some(s => s.enhancedStatus === 'outage' || s.enhancedStatus === 'outage-with-incident')
             const hasDegraded = group.services.some(s => s.enhancedStatus === 'degraded')
@@ -121,10 +180,6 @@ export default function CollapsibleGroup({
               )
             }
           })()}
-          <div className="text-gray-400 transition-transform duration-200 flex-shrink-0" style={{
-            transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)'
-          }}>
-            <ChevronDown size={20} />
           </div>
         </div>
       </div>
