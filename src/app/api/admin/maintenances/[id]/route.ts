@@ -51,8 +51,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       data: {
         ...data,
         scheduledFor: data.scheduledFor ? new Date(data.scheduledFor) : undefined,
-        scheduledEnd: data.scheduledEnd ? new Date(data.scheduledEnd) : undefined,
-        updatedAt: new Date()
+        scheduledEnd: data.scheduledEnd ? new Date(data.scheduledEnd) : undefined
       },
       include: {
         updates: {
