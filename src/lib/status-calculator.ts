@@ -1,27 +1,28 @@
+import { determineServiceStatus, statusAffectsUptime, MONITORING_THRESHOLDS } from '@/config/monitoring-thresholds'
+
 interface CheckResult {
   success: boolean
   timestamp: Date
   responseTime?: number | null
   error?: string | null
+  rtt?: number | null
+  latency?: number | null
+  packetLoss?: number | null
+  errorRate?: number | null
+  jitter?: number | null
+  retransmissions?: number | null
+  synTimeout?: number | null
+  protocol?: 'HTTP' | 'PING' | 'TCP' | 'UDP'
 }
 
 /**
  * Calcule le statut d'un service basé sur l'historique des checks
  *
- * Règles de transition:
- * - OPERATIONAL → DEGRADED: 1 échec
- * - DEGRADED → OUTAGE: 1 échec supplémentaire (2 échecs consécutifs total)
- * - OUTAGE → DEGRADED: 2 succès consécutifs
- * - DEGRADED → OPERATIONAL: 1 succès supplémentaire (3 succès consécutifs total depuis OUTAGE)
- *
- * Si on part de OPERATIONAL:
- * - 1er échec → DEGRADED
- * - 2ème échec consécutif → OUTAGE
- *
- * Pour revenir à OPERATIONAL depuis OUTAGE:
- * - 1er succès → reste OUTAGE
- * - 2ème succès consécutif → DEGRADED
- * - 3ème succès consécutif → OPERATIONAL
+ * Utilise les nouveaux seuils de monitoring définis:
+ * - HTTP: Dégradé > 300ms (3 min), Down > 1500ms ou 50% erreurs 5xx (2 min)
+ * - PING: Dégradé RTT > 100ms, Down RTT > 500ms ou perte > 50%
+ * - TCP: Dégradé RTT > 150ms p95 (3 min), Down RTT > 600ms p95 (2 min)
+ * - UDP: Dégradé latence > 120ms p95 (3 min), Down latence > 500ms p95 (2 min)
  */
 export function calculateServiceStatus(results: CheckResult[]): 'operational' | 'degraded' | 'outage' {
   if (results.length === 0) return 'operational' // No data = assume operational
@@ -33,6 +34,37 @@ export function calculateServiceStatus(results: CheckResult[]): 'operational' | 
 
   // Nous allons analyser les N derniers résultats pour déterminer l'état
   const recentResults = sortedResults.slice(0, Math.min(10, sortedResults.length))
+
+  // If we have protocol-specific data, use the new thresholds
+  const latestResult = recentResults[0]
+  if (latestResult.protocol) {
+    // Calculate sustained duration in minutes
+    const sustainedMinutes = calculateSustainedDuration(recentResults)
+
+    const metrics = {
+      responseTime: latestResult.responseTime || undefined,
+      rtt: latestResult.rtt || undefined,
+      latency: latestResult.latency || undefined,
+      packetLoss: latestResult.packetLoss || undefined,
+      errorRate: latestResult.errorRate || undefined,
+      jitter: latestResult.jitter || undefined,
+      retransmissions: latestResult.retransmissions || undefined,
+      synTimeout: latestResult.synTimeout || undefined
+    }
+
+    const status = determineServiceStatus(
+      latestResult.protocol as keyof typeof MONITORING_THRESHOLDS,
+      metrics,
+      sustainedMinutes
+    )
+
+    // Convert to our status format
+    switch (status) {
+      case 'operational': return 'operational'
+      case 'degraded': return 'degraded'
+      case 'down': return 'outage'
+    }
+  }
 
   // Comptons les succès et échecs consécutifs depuis le dernier check
   let consecutiveSuccesses = 0
@@ -120,8 +152,45 @@ export function calculateServiceStatus(results: CheckResult[]): 'operational' | 
 export function calculateUptime(results: CheckResult[]): number {
   if (results.length === 0) return 100 // No data = assume 100% uptime
 
-  const successfulChecks = results.filter(r => r.success).length
-  return Math.round((successfulChecks / results.length) * 10000) / 100
+  // IMPORTANT: Uptime is only affected by DOWN status, not DEGRADED
+  // A service can be degraded but still counted as "up" for uptime calculations
+
+  let uptimeCount = 0
+
+  for (const result of results) {
+    if (result.success) {
+      // Success always counts as uptime
+      uptimeCount++
+    } else if (result.protocol && result.responseTime !== undefined) {
+      // Check if it's degraded or down based on thresholds
+      const metrics = {
+        responseTime: result.responseTime || undefined,
+        rtt: result.rtt || undefined,
+        latency: result.latency || undefined,
+        packetLoss: result.packetLoss || undefined,
+        errorRate: result.errorRate || undefined,
+        jitter: result.jitter || undefined,
+        retransmissions: result.retransmissions || undefined,
+        synTimeout: result.synTimeout || undefined
+      }
+
+      const status = determineServiceStatus(result.protocol as keyof typeof MONITORING_THRESHOLDS, metrics)
+
+      // Only count as downtime if status is 'down', not 'degraded'
+      if (!statusAffectsUptime(status)) {
+        uptimeCount++ // Degraded still counts as uptime
+      }
+    } else {
+      // No protocol info, use traditional logic
+      // Only complete failures count against uptime
+      if (result.responseTime && result.responseTime < 5000) {
+        // If there's a response time < 5s, consider it as up (even if degraded)
+        uptimeCount++
+      }
+    }
+  }
+
+  return Math.round((uptimeCount / results.length) * 10000) / 100
 }
 
 export function getLatestResponseTime(results: CheckResult[]): number {
@@ -150,6 +219,16 @@ export function getLastCheckTime(results: CheckResult[]): string {
 
   const latestResult = sortedResults[0]
   return latestResult?.timestamp?.toString() || new Date().toISOString()
+}
+
+// Helper function to calculate how long a condition has been sustained
+function calculateSustainedDuration(results: CheckResult[]): number {
+  if (results.length < 2) return 0
+
+  const firstTimestamp = new Date(results[results.length - 1].timestamp).getTime()
+  const lastTimestamp = new Date(results[0].timestamp).getTime()
+
+  return Math.round((lastTimestamp - firstTimestamp) / (1000 * 60)) // Convert to minutes
 }
 
 // Convert between different status formats for compatibility

@@ -1,24 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAuth, requirePermission } from '@/lib/auth/jwt'
+import { requireAuth } from '@/lib/auth/jwt'
 import { prisma } from '@/lib/db'
 import { z } from 'zod'
 import { IncidentSeverity, IncidentStatus } from '@prisma/client'
 
-const createIncidentSchema = z.object({
+const createMaintenanceSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().min(1),
-  severity: z.nativeEnum(IncidentSeverity),
-  isScheduled: z.boolean().default(false),
-  scheduledFor: z.string().datetime().optional(),
-  eta: z.string().datetime().optional(),
-  serviceId: z.string().cuid().optional(),
-  machineId: z.string().cuid().optional(),
-  tags: z.array(z.string()).default([])
-})
-
-const updateIncidentSchema = z.object({
-  title: z.string().optional(),
-  message: z.string().min(1)
+  severity: z.nativeEnum(IncidentSeverity).default('MEDIUM'),
+  scheduledFor: z.string().datetime(),
+  scheduledEnd: z.string().datetime(),
+  impact: z.string().optional(),
+  affectedServices: z.array(z.string()).default([])
 })
 
 export async function GET(request: NextRequest) {
@@ -32,9 +25,10 @@ export async function GET(request: NextRequest) {
       }, { status: 401 })
     }
 
-    const incidents = await prisma.incident.findMany({
+    // Fetch only MAINTENANCE type incidents
+    const maintenances = await prisma.incident.findMany({
       where: {
-        type: 'INCIDENT'
+        type: 'MAINTENANCE'
       },
       include: {
         updates: {
@@ -65,14 +59,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: incidents
+      data: maintenances
     })
   } catch (error) {
-    console.error('Admin incidents fetch error:', error)
-    
+    console.error('Admin maintenances fetch error:', error)
+
     return NextResponse.json({
       success: false,
-      error: 'Failed to fetch incidents'
+      error: 'Failed to fetch maintenances'
     }, { status: 500 })
   }
 }
@@ -88,55 +82,32 @@ export async function POST(request: NextRequest) {
       }, { status: 401 })
     }
 
-    // Permission check disabled for now
-
     const body = await request.json()
-    const data = createIncidentSchema.parse(body)
-
-    // Verify service/machine exists if provided
-    if (data.serviceId) {
-      const service = await prisma.service.findUnique({
-        where: { id: data.serviceId }
-      })
-      if (!service) {
-        return NextResponse.json({
-          success: false,
-          error: 'Service not found'
-        }, { status: 404 })
-      }
-    }
-
-    if (data.machineId) {
-      const machine = await prisma.machine.findUnique({
-        where: { id: data.machineId }
-      })
-      if (!machine) {
-        return NextResponse.json({
-          success: false,
-          error: 'Machine not found'
-        }, { status: 404 })
-      }
-    }
+    const data = createMaintenanceSchema.parse(body)
 
     // Generate slug from title
     const slug = data.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '') + 
+      .replace(/(^-|-$)/g, '') +
       '-' + Date.now()
 
-    const incident = await prisma.incident.create({
+    const maintenance = await prisma.incident.create({
       data: {
-        ...data,
+        title: data.title,
+        description: data.description,
         slug,
-        type: 'INCIDENT',
-        scheduledFor: data.scheduledFor ? new Date(data.scheduledFor) : undefined,
-        eta: data.eta ? new Date(data.eta) : undefined,
-        status: data.isScheduled ? IncidentStatus.SCHEDULED : IncidentStatus.INVESTIGATING,
+        type: 'MAINTENANCE',
+        severity: data.severity,
+        status: IncidentStatus.SCHEDULED,
+        scheduledFor: new Date(data.scheduledFor),
+        scheduledEnd: data.scheduledEnd ? new Date(data.scheduledEnd) : undefined,
+        isScheduled: true,
         createdBy: auth.user!.userId,
+        affectedServices: data.affectedServices,
         updates: {
           create: {
-            title: 'Incident Created',
+            title: 'Maintenance Scheduled',
             message: data.description
           }
         }
@@ -160,25 +131,23 @@ export async function POST(request: NextRequest) {
       data: {
         userId: auth.user!.userId,
         action: 'CREATE',
-        resource: 'INCIDENT',
-        resourceId: incident.id,
+        resource: 'MAINTENANCE',
+        resourceId: maintenance.id,
         details: {
-          title: incident.title,
-          severity: incident.severity,
-          serviceId: incident.serviceId
+          title: maintenance.title,
+          scheduledFor: maintenance.scheduledFor,
+          scheduledEnd: maintenance.scheduledEnd
         }
       }
     })
 
-    // TODO: Send real-time notification
-
     return NextResponse.json({
       success: true,
-      data: incident
+      data: maintenance
     })
   } catch (error) {
-    console.error('Create incident error:', error)
-    
+    console.error('Create maintenance error:', error)
+
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
@@ -189,7 +158,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: false,
-      error: 'Failed to create incident'
+      error: 'Failed to create maintenance'
     }, { status: 500 })
   }
 }

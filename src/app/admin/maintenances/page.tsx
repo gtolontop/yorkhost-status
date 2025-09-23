@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
-import CreateIncidentModal from '@/components/admin/CreateIncidentModal'
+import CreateMaintenanceModal from '@/components/admin/CreateMaintenanceModal'
 import { formatDistanceToNow } from 'date-fns'
 import { Calendar, Wrench, Clock, Edit, Trash2, Eye, Plus, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Server } from 'lucide-react'
 import Link from 'next/link'
@@ -68,12 +68,10 @@ export default function MaintenancesPage() {
 
   const fetchMaintenances = async () => {
     try {
-      const response = await fetch('/api/admin/incidents')
+      const response = await fetch('/api/admin/maintenances')
       const data = await response.json()
       if (data.success) {
-        // Filter only maintenance type incidents
-        const maintenanceOnly = data.data.filter((item: Maintenance) => item.type === 'MAINTENANCE')
-        setMaintenances(maintenanceOnly)
+        setMaintenances(data.data)
       }
     } catch (error) {
       console.error('Failed to fetch maintenances:', error)
@@ -127,7 +125,7 @@ export default function MaintenancesPage() {
     if (!confirm('Are you sure you want to delete this maintenance?')) return
 
     try {
-      const response = await fetch(`/api/admin/incidents/${id}`, {
+      const response = await fetch(`/api/admin/maintenances/${id}`, {
         method: 'DELETE',
       })
 
@@ -174,7 +172,7 @@ export default function MaintenancesPage() {
       }
 
       const response = await fetch(
-        editingMaintenance ? `/api/admin/incidents/${editingMaintenance.id}` : '/api/admin/incidents',
+        editingMaintenance ? `/api/admin/maintenances/${editingMaintenance.id}` : '/api/admin/maintenances',
         {
           method: editingMaintenance ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -499,8 +497,20 @@ export default function MaintenancesPage() {
           </div>
         </div>
 
-        {/* Advanced Modal with Service Selection */}
-        {showAdvancedModal && (
+        {/* Maintenance Modal */}
+        <CreateMaintenanceModal
+          isOpen={isCreateModalOpen || showAdvancedModal}
+          onClose={() => {
+            setIsCreateModalOpen(false)
+            setShowAdvancedModal(false)
+            setEditingMaintenance(null)
+          }}
+          onSuccess={handleCreateSuccess}
+          editData={editingMaintenance}
+        />
+
+        {/* Advanced Modal with Service Selection - DEPRECATED */}
+        {false && showAdvancedModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
             <div className="bg-white dark:bg-yorkhost-darkCard rounded-lg shadow-xl w-full max-w-4xl my-8">
               <div className="border-b border-gray-200 dark:border-yorkhost-darkBorder px-6 py-4 flex items-center justify-between">
