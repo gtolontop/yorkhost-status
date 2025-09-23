@@ -40,26 +40,34 @@ export default function PreviousIncidentsPage() {
         fetch('/api/incidents'),
         fetch('/api/incidents/history')
       ])
-      
+
       const activeResult = await activeResponse.json()
       const historyResult = await historyResponse.json()
-      
+
       const allIncidents = []
-      
+
       if (activeResult.success && activeResult.data?.incidents) {
-        allIncidents.push(...activeResult.data.incidents)
+        // Filter out maintenances - only show actual incidents
+        const incidentsOnly = activeResult.data.incidents.filter(
+          (item: Incident) => item.type !== 'MAINTENANCE'
+        )
+        allIncidents.push(...incidentsOnly)
       }
-      
+
       if (historyResult.success && historyResult.data) {
-        allIncidents.push(...historyResult.data)
+        // Filter out maintenances from history too
+        const historicIncidentsOnly = historyResult.data.filter(
+          (item: Incident) => item.type !== 'MAINTENANCE'
+        )
+        allIncidents.push(...historicIncidentsOnly)
       }
-      
+
       // Remove duplicates based on ID
       const uniqueIncidents = Array.from(
         new Map(allIncidents.map(item => [item.id, item])).values()
       )
-      
-      setIncidents(uniqueIncidents.sort((a, b) => 
+
+      setIncidents(uniqueIncidents.sort((a, b) =>
         new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
       ))
     } catch (error) {

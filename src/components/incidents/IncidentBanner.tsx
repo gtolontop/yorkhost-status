@@ -10,7 +10,7 @@ interface IncidentBannerProps {
 
 export default function IncidentBanner({ incidents }: IncidentBannerProps) {
   const safeIncidents = Array.isArray(incidents) ? incidents : []
-  
+
   if (safeIncidents.length === 0) {
     return null
   }
@@ -19,10 +19,20 @@ export default function IncidentBanner({ incidents }: IncidentBannerProps) {
   const incidentCount = safeIncidents.filter(i => i.type !== 'MAINTENANCE').length
   const maintenanceCount = safeIncidents.filter(i => i.type === 'MAINTENANCE').length
 
+  // Determine the link based on what's active
+  let href = '/previous-incidents'
+  if (maintenanceCount > 0 && incidentCount === 0) {
+    href = '/maintenance' // Only maintenances, go to maintenance page
+  } else if (incidentCount > 0 && maintenanceCount === 0) {
+    href = '/previous-incidents' // Only incidents
+  } else if (incidentCount > 0 && maintenanceCount > 0) {
+    href = '/previous-incidents' // Both, go to incidents page which shows both
+  }
+
   return (
     <div className="max-w-3xl mx-auto mb-12">
       <Link
-        href="/previous-incidents"
+        href={href}
         className="group flex items-center justify-between p-4 bg-gray-50 dark:bg-yorkhost-darkCard hover:bg-gray-100 dark:hover:bg-yorkhost-darkCard/80 rounded-lg border border-gray-200 dark:border-yorkhost-darkBorder shadow-sm hover:shadow-md transition-all"
       >
         <div className="flex items-center gap-3">
