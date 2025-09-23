@@ -85,6 +85,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         return { title: 'Users', subtitle: 'Access management' }
       case '/admin/notifications':
         return { title: 'Notifications', subtitle: 'Alert configuration' }
+      case '/admin/auto-incidents':
+        return { title: 'Auto-Incidents', subtitle: 'Automatic incident management' }
       case '/admin/settings':
         return { title: 'Settings', subtitle: 'System configuration' }
       default:
