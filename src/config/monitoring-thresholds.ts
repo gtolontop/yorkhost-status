@@ -98,53 +98,53 @@ export function determineServiceStatus(
   }
 
   // Check for DOWN status first
-  const downThreshold = thresholds.down
+  const downThreshold = thresholds.down as any
   if (downThreshold) {
     // Check response time
-    if (downThreshold.responseTime && metrics.responseTime !== undefined) {
+    if ('responseTime' in downThreshold && downThreshold.responseTime && metrics.responseTime !== undefined) {
       if (metrics.responseTime > downThreshold.responseTime) {
-        if (!downThreshold.duration || (sustainedMinutes && sustainedMinutes >= downThreshold.duration)) {
+        if (!('duration' in downThreshold) || !downThreshold.duration || (sustainedMinutes && sustainedMinutes >= downThreshold.duration)) {
           return 'down'
         }
       }
     }
 
     // Check RTT
-    if (downThreshold.rtt && metrics.rtt !== undefined) {
+    if ('rtt' in downThreshold && downThreshold.rtt && metrics.rtt !== undefined) {
       if (metrics.rtt > downThreshold.rtt) {
-        if (!downThreshold.duration || (sustainedMinutes && sustainedMinutes >= downThreshold.duration)) {
+        if (!('duration' in downThreshold) || !downThreshold.duration || (sustainedMinutes && sustainedMinutes >= downThreshold.duration)) {
           return 'down'
         }
       }
     }
 
     // Check latency
-    if (downThreshold.latency && metrics.latency !== undefined) {
+    if ('latency' in downThreshold && downThreshold.latency && metrics.latency !== undefined) {
       if (metrics.latency > downThreshold.latency) {
-        if (!downThreshold.duration || (sustainedMinutes && sustainedMinutes >= downThreshold.duration)) {
+        if (!('duration' in downThreshold) || !downThreshold.duration || (sustainedMinutes && sustainedMinutes >= downThreshold.duration)) {
           return 'down'
         }
       }
     }
 
     // Check packet loss
-    if (downThreshold.packetLoss && metrics.packetLoss !== undefined) {
+    if ('packetLoss' in downThreshold && downThreshold.packetLoss && metrics.packetLoss !== undefined) {
       if (metrics.packetLoss > downThreshold.packetLoss) {
         return 'down'
       }
     }
 
     // Check error rate (5xx errors)
-    if (downThreshold.errorRate && metrics.errorRate !== undefined) {
+    if ('errorRate' in downThreshold && downThreshold.errorRate && metrics.errorRate !== undefined) {
       if (metrics.errorRate > downThreshold.errorRate) {
-        if (!downThreshold.duration || (sustainedMinutes && sustainedMinutes >= downThreshold.duration)) {
+        if (!('duration' in downThreshold) || !downThreshold.duration || (sustainedMinutes && sustainedMinutes >= downThreshold.duration)) {
           return 'down'
         }
       }
     }
 
     // Check SYN timeout
-    if (downThreshold.synTimeout && metrics.synTimeout !== undefined) {
+    if ('synTimeout' in downThreshold && downThreshold.synTimeout && metrics.synTimeout !== undefined) {
       if (metrics.synTimeout > downThreshold.synTimeout) {
         return 'down'
       }
@@ -152,49 +152,49 @@ export function determineServiceStatus(
   }
 
   // Check for DEGRADED status
-  const degradedThreshold = thresholds.degraded
+  const degradedThreshold = thresholds.degraded as any
   if (degradedThreshold) {
     // Check response time
-    if (degradedThreshold.responseTime && metrics.responseTime !== undefined) {
+    if ('responseTime' in degradedThreshold && degradedThreshold.responseTime && metrics.responseTime !== undefined) {
       if (metrics.responseTime > degradedThreshold.responseTime) {
-        if (!degradedThreshold.duration || (sustainedMinutes && sustainedMinutes >= degradedThreshold.duration)) {
+        if (!('duration' in degradedThreshold) || !degradedThreshold.duration || (sustainedMinutes && sustainedMinutes >= degradedThreshold.duration)) {
           return 'degraded'
         }
       }
     }
 
     // Check RTT
-    if (degradedThreshold.rtt && metrics.rtt !== undefined) {
+    if ('rtt' in degradedThreshold && degradedThreshold.rtt && metrics.rtt !== undefined) {
       if (metrics.rtt > degradedThreshold.rtt) {
         return 'degraded'
       }
     }
 
     // Check latency
-    if (degradedThreshold.latency && metrics.latency !== undefined) {
+    if ('latency' in degradedThreshold && degradedThreshold.latency && metrics.latency !== undefined) {
       if (metrics.latency > degradedThreshold.latency) {
-        if (!degradedThreshold.duration || (sustainedMinutes && sustainedMinutes >= degradedThreshold.duration)) {
+        if (!('duration' in degradedThreshold) || !degradedThreshold.duration || (sustainedMinutes && sustainedMinutes >= degradedThreshold.duration)) {
           return 'degraded'
         }
       }
     }
 
     // Check jitter
-    if (degradedThreshold.jitter && metrics.jitter !== undefined) {
+    if ('jitter' in degradedThreshold && degradedThreshold.jitter && metrics.jitter !== undefined) {
       if (metrics.jitter > degradedThreshold.jitter) {
         return 'degraded'
       }
     }
 
     // Check packet loss
-    if (degradedThreshold.packetLoss && metrics.packetLoss !== undefined) {
+    if ('packetLoss' in degradedThreshold && degradedThreshold.packetLoss && metrics.packetLoss !== undefined) {
       if (metrics.packetLoss > degradedThreshold.packetLoss) {
         return 'degraded'
       }
     }
 
     // Check retransmissions
-    if (degradedThreshold.retransmissions && metrics.retransmissions !== undefined) {
+    if ('retransmissions' in degradedThreshold && degradedThreshold.retransmissions && metrics.retransmissions !== undefined) {
       if (metrics.retransmissions > degradedThreshold.retransmissions) {
         return 'degraded'
       }
