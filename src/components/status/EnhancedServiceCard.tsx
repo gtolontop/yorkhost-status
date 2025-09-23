@@ -146,50 +146,45 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
       bars.push(
         <div
           key={i}
-          data-bar={i}
+          ref={(el) => { barRefs.current[i] = el }}
           className={`h-8 flex-1 ${getBarColor()} hover:opacity-80 transition-opacity cursor-pointer relative group rounded-sm`}
           title={`${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}: ${uptime === -1 ? 'No data' : `${uptime.toFixed(1)}% uptime - ${getStatus()}`}`}
-          onMouseEnter={() => setActiveTooltip(i)}
+          onMouseEnter={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect()
+            const tooltipWidth = 320
+            const windowWidth = window.innerWidth
+            let x = rect.left + rect.width / 2
+
+            // Adjust if tooltip would go off screen
+            if (x - tooltipWidth / 2 < 16) {
+              x = tooltipWidth / 2 + 16
+            } else if (x + tooltipWidth / 2 > windowWidth - 16) {
+              x = windowWidth - tooltipWidth / 2 - 16
+            }
+
+            setTooltipPosition({
+              x,
+              y: rect.top - 12
+            })
+            setActiveTooltip(i)
+          }}
           onMouseLeave={() => {
             // Small delay to allow moving to tooltip
             setTimeout(() => setActiveTooltip(null), 150)
           }}
         >
-          {/* Enhanced Tooltip with better positioning and interactions */}
-          <div
-            className={`fixed transition-all duration-200 mb-3 ${
-              activeTooltip === i ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-            }`}
-            style={{
-              zIndex: 9999,
-              // Calculate position dynamically
-              left: (() => {
-                if (typeof window === 'undefined') return '50%'
-                const rect = document.querySelector(`[data-bar="${i}"]`)?.getBoundingClientRect()
-                if (!rect) return '50%'
-                const tooltipWidth = 320 // max width
-                const windowWidth = window.innerWidth
-                let left = rect.left + rect.width / 2
-
-                // Adjust if tooltip would go off screen
-                if (left - tooltipWidth / 2 < 16) {
-                  left = tooltipWidth / 2 + 16
-                } else if (left + tooltipWidth / 2 > windowWidth - 16) {
-                  left = windowWidth - tooltipWidth / 2 - 16
-                }
-                return `${left}px`
-              })(),
-              top: (() => {
-                if (typeof window === 'undefined') return '0px'
-                const rect = document.querySelector(`[data-bar="${i}"]`)?.getBoundingClientRect()
-                if (!rect) return '0px'
-                return `${rect.top - 12}px` // 12px above the bar
-              })(),
-              transform: 'translate(-50%, -100%)'
-            }}
-            onMouseEnter={() => setActiveTooltip(i)}
-            onMouseLeave={() => setActiveTooltip(null)}
-          >
+          {/* Tooltip Portal */}
+          {activeTooltip === i && typeof window !== 'undefined' && createPortal(
+            <div
+              className="fixed z-[9999] pointer-events-auto"
+              style={{
+                left: tooltipPosition.x,
+                top: tooltipPosition.y,
+                transform: 'translate(-50%, -100%)'
+              }}
+              onMouseEnter={() => setActiveTooltip(i)}
+              onMouseLeave={() => setActiveTooltip(null)}
+            >
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl p-4 min-w-[220px] max-w-[320px] backdrop-blur-sm">
               {/* Date Header */}
               <div className="font-semibold text-gray-900 dark:text-white text-sm border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
@@ -280,9 +275,10 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-px">
                 <div className="border-6 border-transparent border-t-gray-200 dark:border-t-gray-600"></div>
               </div>
-            </div>,
-            document.body
-          )}
+            </div>
+          </div>,
+          document.body
+        )}
         </div>
       )
     }
