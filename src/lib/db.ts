@@ -415,14 +415,25 @@ export async function getServicesWithEnhancedStatus() {
       // Determine enhanced status based on:
       // 1. Operational status (operational, degraded, outage)
       // 2. Whether there's a linked incident
+      // 3. Active incidents for this service (even if created manually)
       let enhancedStatus: 'operational' | 'degraded' | 'outage' | 'outage-with-incident' | 'maintenance' = 'operational'
-      
+
       const hasActiveIncident = service.incidents.length > 0 && service.incidents[0].type === 'INCIDENT'
       const hasActiveMaintenance = service.incidents.length > 0 && service.incidents[0].type === 'MAINTENANCE'
       const isInMaintenance = servicesInMaintenance.has(service.id)
 
+      // Check if there are any active incidents for this service
+      const hasAnyActiveIncident = activeIncidents.some(incident =>
+        incident.serviceId === service.id &&
+        incident.type === 'INCIDENT' &&
+        ['INVESTIGATING', 'IDENTIFIED', 'MONITORING'].includes(incident.status)
+      )
+
       if (hasActiveMaintenance || isInMaintenance) {
         enhancedStatus = 'maintenance'
+      } else if (hasAnyActiveIncident) {
+        // Force status to outage-with-incident if there's an active incident
+        enhancedStatus = 'outage-with-incident'
       } else if (stats.currentStatus === 'outage') {
         enhancedStatus = hasActiveIncident ? 'outage-with-incident' : 'outage'
       } else if (stats.currentStatus === 'degraded') {
@@ -431,11 +442,20 @@ export async function getServicesWithEnhancedStatus() {
         enhancedStatus = 'operational'
       }
 
+      // Find the correct active incident (prioritize the one from activeIncidents list)
+      const correctActiveIncident = hasAnyActiveIncident
+        ? activeIncidents.find(incident =>
+            incident.serviceId === service.id &&
+            incident.type === 'INCIDENT' &&
+            ['INVESTIGATING', 'IDENTIFIED', 'MONITORING'].includes(incident.status)
+          )
+        : service.incidents[0]
+
       return {
         ...service,
         ...stats,
         enhancedStatus,
-        activeIncident: service.incidents[0] || null
+        activeIncident: correctActiveIncident || null
       }
     })
   )
