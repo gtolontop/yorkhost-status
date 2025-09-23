@@ -16,7 +16,11 @@
       "Bash(taskkill:*)",
       "Bash(psql:*)",
       "Bash(tsx:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Read(//c//**)",
+      "Bash(npx next build:*)",
+      "Bash(cmd /c:*)",
+      "Bash(timeout 10 npm run dev:*)"
     ],
     "deny": [],
     "ask": []
