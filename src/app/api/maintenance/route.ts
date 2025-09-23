@@ -15,9 +15,40 @@ export async function GET() {
       orderBy: { startTime: 'desc' }
     })
 
+    // Get all unique service IDs from all maintenances
+    const serviceIds = new Set<string>()
+    maintenances.forEach(maintenance => {
+      maintenance.affectedServices.forEach(serviceId => {
+        serviceIds.add(serviceId)
+      })
+    })
+
+    // Fetch all services in one query
+    const services = await prisma.service.findMany({
+      where: {
+        id: { in: Array.from(serviceIds) }
+      },
+      select: {
+        id: true,
+        name: true
+      }
+    })
+
+    // Create a map of service ID to service name
+    const serviceMap = new Map(services.map(service => [service.id, service.name]))
+
+    // Transform the maintenances to include service names
+    const maintenancesWithServiceNames = maintenances.map(maintenance => ({
+      ...maintenance,
+      affectedServicesWithNames: maintenance.affectedServices.map(serviceId => ({
+        id: serviceId,
+        name: serviceMap.get(serviceId) || serviceId // fallback to ID if name not found
+      }))
+    }))
+
     return NextResponse.json({
       success: true,
-      data: maintenances
+      data: maintenancesWithServiceNames
     })
   } catch (error) {
     console.error('Maintenance API error:', error)

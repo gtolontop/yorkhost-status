@@ -18,6 +18,10 @@ interface Maintenance {
   startTime: string
   endTime?: string
   affectedServices?: string[]
+  affectedServicesWithNames?: Array<{
+    id: string
+    name: string
+  }>
   service?: { name: string }
   updates?: Array<{
     title: string
@@ -157,15 +161,15 @@ export default function MaintenancePage() {
                       )}
                     </div>
 
-                    {maintenance.affectedServices && maintenance.affectedServices.length > 0 && (
+                    {maintenance.affectedServicesWithNames && maintenance.affectedServicesWithNames.length > 0 && (
                       <div className="pt-4 border-t border-gray-200 dark:border-yorkhost-darkBorder">
                         <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Affected Services ({maintenance.affectedServices.length})
+                          Affected Services ({maintenance.affectedServicesWithNames.length})
                         </p>
                         <div className="flex flex-wrap gap-2">
-                          {maintenance.affectedServices.map((service, idx) => (
-                            <span key={idx} className="px-2 py-1 bg-gray-100 dark:bg-yorkhost-darkBg rounded text-xs text-gray-700 dark:text-gray-300">
-                              {service}
+                          {maintenance.affectedServicesWithNames.map((service, idx) => (
+                            <span key={service.id} className="px-2 py-1 bg-gray-100 dark:bg-yorkhost-darkBg rounded text-xs text-gray-700 dark:text-gray-300">
+                              {service.name}
                             </span>
                           ))}
                         </div>
