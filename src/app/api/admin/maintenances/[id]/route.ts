@@ -12,7 +12,7 @@ const updateMaintenanceSchema = z.object({
   affectedServices: z.array(z.string()).optional()
 })
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const auth = await requireAuth(request)
 
@@ -27,8 +27,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const data = updateMaintenanceSchema.parse(body)
 
     // Verify maintenance exists and is of type MAINTENANCE
+    const { id } = await params
     const existing = await prisma.incident.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existing) {
@@ -46,7 +47,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     const updated = await prisma.incident.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...data,
         scheduledFor: data.scheduledFor ? new Date(data.scheduledFor) : undefined,
@@ -102,7 +103,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const auth = await requireAuth(request)
 
@@ -114,8 +115,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     // Verify maintenance exists and is of type MAINTENANCE
+    const { id } = await params
     const existing = await prisma.incident.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existing) {
@@ -133,7 +135,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     await prisma.incident.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     // Create audit log
@@ -142,7 +144,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
         userId: auth.user!.userId,
         action: 'DELETE',
         resource: 'MAINTENANCE',
-        resourceId: params.id,
+        resourceId: id,
         details: {
           title: existing.title
         }
