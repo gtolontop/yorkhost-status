@@ -44,7 +44,11 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
   const dailyData: { [key: string]: { total: number; successful: number } } = {}
   
   checkResults.forEach(result => {
-    const dateKey = result.timestamp.toISOString().split('T')[0]
+    // Utiliser la date locale au lieu d'UTC pour correspondre au frontend
+    const year = result.timestamp.getFullYear()
+    const month = String(result.timestamp.getMonth() + 1).padStart(2, '0')
+    const day = String(result.timestamp.getDate()).padStart(2, '0')
+    const dateKey = `${year}-${month}-${day}`
     
     if (!dailyData[dateKey]) {
       dailyData[dateKey] = { total: 0, successful: 0 }
