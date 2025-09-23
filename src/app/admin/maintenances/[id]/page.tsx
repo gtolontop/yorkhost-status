@@ -102,10 +102,24 @@ export default function MaintenanceDetailPage() {
 
   useEffect(() => {
     fetchMaintenance()
+    checkAutoStatus()
     // Set up polling for real-time updates
-    const interval = setInterval(fetchMaintenance, 5000)
+    const interval = setInterval(() => {
+      fetchMaintenance()
+      checkAutoStatus()
+    }, 30000) // Check every 30 seconds
     return () => clearInterval(interval)
   }, [params.id])
+
+  const checkAutoStatus = async () => {
+    try {
+      await fetch('/api/admin/maintenances/auto-status', {
+        method: 'POST'
+      })
+    } catch (error) {
+      console.error('Failed to check auto status:', error)
+    }
+  }
 
   const fetchMaintenance = async () => {
     try {
@@ -283,13 +297,22 @@ export default function MaintenanceDetailPage() {
             <ArrowLeft size={20} />
           </button>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Maintenance Details</h1>
-          <button
-            onClick={fetchMaintenance}
-            className="ml-auto p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            title="Refresh"
-          >
-            <RefreshCw size={20} />
-          </button>
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={() => window.open(`/maintenance/${maintenance?.id}`, '_blank')}
+              className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              title="View public maintenance page"
+            >
+              View Public Page
+            </button>
+            <button
+              onClick={fetchMaintenance}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              title="Refresh"
+            >
+              <RefreshCw size={20} />
+            </button>
+          </div>
         </motion.div>
 
         {/* Error Alert */}

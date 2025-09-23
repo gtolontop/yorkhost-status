@@ -303,6 +303,27 @@ export async function getServicesWithEnhancedStatus() {
   const now = new Date()
   const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000)
 
+  // Get active maintenances to check affected services
+  const activeMaintenances = await prisma.incident.findMany({
+    where: {
+      type: 'MAINTENANCE',
+      status: 'IN_PROGRESS'
+    },
+    select: {
+      id: true,
+      title: true,
+      affectedServices: true
+    }
+  })
+
+  // Create a map of service IDs that are in maintenance
+  const servicesInMaintenance = new Set<string>()
+  activeMaintenances.forEach(maintenance => {
+    maintenance.affectedServices.forEach(serviceId => {
+      servicesInMaintenance.add(serviceId)
+    })
+  })
+
   // Get all services with their recent check results and active incidents
   const services = await prisma.service.findMany({
     where: {
@@ -353,8 +374,9 @@ export async function getServicesWithEnhancedStatus() {
       
       const hasActiveIncident = service.incidents.length > 0 && service.incidents[0].type === 'INCIDENT'
       const hasActiveMaintenance = service.incidents.length > 0 && service.incidents[0].type === 'MAINTENANCE'
-      
-      if (hasActiveMaintenance) {
+      const isInMaintenance = servicesInMaintenance.has(service.id)
+
+      if (hasActiveMaintenance || isInMaintenance) {
         enhancedStatus = 'maintenance'
       } else if (stats.currentStatus === 'outage') {
         enhancedStatus = hasActiveIncident ? 'outage-with-incident' : 'outage'
