@@ -10,6 +10,7 @@ interface ServiceGroup {
   description?: string
   color: string
   services: ServiceWithEnhancedStatus[]
+  isExpandedByDefault?: boolean
 }
 
 interface GroupedServiceGridProps {
@@ -47,7 +48,8 @@ export default function GroupedServiceGrid({ services, groups }: GroupedServiceG
     name: group.name,
     description: group.description,
     color: group.color,
-    services: servicesByGroup.get(group.id) || []
+    services: servicesByGroup.get(group.id) || [],
+    isExpandedByDefault: group.isExpandedByDefault
   }))
 
   // Add ungrouped services if any
@@ -57,7 +59,8 @@ export default function GroupedServiceGrid({ services, groups }: GroupedServiceG
       id: 'ungrouped',
       name: 'Other Services',
       color: '#6b7280',
-      services: ungroupedServices
+      services: ungroupedServices,
+      isExpandedByDefault: true
     })
   }
 
@@ -84,6 +87,7 @@ export default function GroupedServiceGrid({ services, groups }: GroupedServiceG
             onToggleService={toggleService}
             isFirst={index === 0}
             isLast={index === nonEmptyGroups.length - 1}
+            isExpandedByDefault={group.isExpandedByDefault}
           />
         ))}
       </div>

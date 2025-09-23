@@ -63,7 +63,7 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://support.yorkhost.fr" 
+                  href="https://clients.yorkhost.fr/index.php/tickets/new/" 
                   className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -90,7 +90,7 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://twitter.com/yorkhost" 
+                  href="https://x.com/yorkhost_fr" 
                   className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -100,7 +100,7 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://github.com/yorkhost" 
+                  href="https://github.com/yorkhost-fr" 
                   className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -117,14 +117,45 @@ export default function Footer() {
           <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 md:mb-0">
             © {currentYear} Yorkhost. All rights reserved.
           </p>
-          <div className="flex items-center gap-6">
-            <Link href="/privacy" className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors">
-              Terms of Service
-            </Link>
-          </div>
+<div className="flex flex-wrap items-center gap-6">
+  <Link
+    href="https://yorkhost.fr/mentions-legales"
+    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
+  >
+    Legal Notice
+  </Link>
+  <Link
+    href="https://yorkhost.fr/conditions-de-vente"
+    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
+  >
+    Terms & Conditions
+  </Link>
+  <Link
+    href="https://yorkhost.fr/conditions-utilisations"
+    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
+  >
+    Terms of Use
+  </Link>
+  <Link
+    href="https://yorkhost.fr/confidentialite"
+    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
+  >
+    Privacy Policy
+  </Link>
+  <Link
+    href="https://yorkhost.fr/dpa"
+    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
+  >
+    Data Processing Agreement
+  </Link>
+  <Link
+    href="https://yorkhost.fr/cookies"
+    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
+  >
+    Cookie Policy
+  </Link>
+</div>
+
         </div>
       </div>
     </footer>
