@@ -99,7 +99,11 @@ export async function PUT(
         name: body.name,
         description: body.description,
         url: body.url,
-        isActive: body.isActive
+        isActive: body.isActive,
+        autoIncidentEnabled: body.autoIncidentEnabled,
+        checksBeforeDown: body.checksBeforeDown,
+        checksBeforeMonitoring: body.checksBeforeMonitoring,
+        checksBeforeUp: body.checksBeforeUp
       },
       include: {
         machine: true,

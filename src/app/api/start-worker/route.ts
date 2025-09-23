@@ -5,6 +5,20 @@ import { executeCheck } from '@/lib/monitoring/checker'
 let workerInterval: NodeJS.Timeout | null = null
 let isWorkerRunning = false
 
+// Auto-start worker when module is loaded
+if (typeof window === 'undefined') { // Server-side only
+  setTimeout(async () => {
+    if (!isWorkerRunning) {
+      console.log('🚀 AUTO-STARTING MONITORING WORKER ON SERVER STARTUP...')
+      try {
+        await startWorker()
+      } catch (error) {
+        console.error('❌ Failed to auto-start worker:', error)
+      }
+    }
+  }, 5000) // Démarrer après 5 secondes pour laisser le serveur s'initialiser
+}
+
 export async function GET() {
   return NextResponse.json({
     success: true,
@@ -12,37 +26,39 @@ export async function GET() {
   })
 }
 
+async function startWorker() {
+  if (isWorkerRunning) {
+    console.log('Worker is already running')
+    return { success: false, message: 'Worker is already running' }
+  }
+
+  console.log('🚀 STARTING AUTOMATIC CHECKS WORKER...')
+
+  // Start worker that runs every 30 seconds to check which services need checking
+  workerInterval = setInterval(async () => {
+    try {
+      await runScheduledChecks()
+    } catch (error) {
+      console.error('❌ Worker error:', error)
+    }
+  }, 30000) // 30 seconds
+
+  isWorkerRunning = true
+
+  // Run initial check immediately
+  await runScheduledChecks()
+
+  return {
+    success: true,
+    message: 'Worker started successfully - checks will run based on individual intervals',
+    interval: '30 seconds check interval'
+  }
+}
+
 export async function POST() {
   try {
-    if (isWorkerRunning) {
-      return NextResponse.json({
-        success: false,
-        message: 'Worker is already running'
-      })
-    }
-
-    console.log('🚀 STARTING AUTOMATIC CHECKS WORKER...')
-    
-    // Start worker that runs every 30 seconds to check which services need checking
-    workerInterval = setInterval(async () => {
-      try {
-        await runScheduledChecks()
-      } catch (error) {
-        console.error('❌ Worker error:', error)
-      }
-    }, 30000) // 30 seconds
-    
-    isWorkerRunning = true
-    
-    // Run initial check immediately
-    await runScheduledChecks()
-    
-    return NextResponse.json({
-      success: true,
-      message: 'Worker started successfully - checks will run based on individual intervals',
-      interval: '30 seconds check interval'
-    })
-    
+    const result = await startWorker()
+    return NextResponse.json(result)
   } catch (error) {
     console.error('❌ Start worker error:', error)
     return NextResponse.json({

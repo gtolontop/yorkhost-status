@@ -16,6 +16,10 @@ interface Service {
   timeout?: number
   expectedStatusCode?: number
   acceptedStatusCodes?: number[]
+  autoIncidentEnabled?: boolean
+  checksBeforeDown?: number
+  checksBeforeMonitoring?: number
+  checksBeforeUp?: number
 }
 
 
@@ -39,7 +43,11 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
     timeout: 10,
     expectedStatusCodes: [200],
     expectedIP: '',
-    packetCount: 4
+    packetCount: 4,
+    autoIncidentEnabled: true,
+    checksBeforeDown: 2,
+    checksBeforeMonitoring: 2,
+    checksBeforeUp: 2
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -86,7 +94,11 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
         timeout: service.timeout ? Math.floor(service.timeout / 1000) : 10, // Convert ms to seconds
         expectedStatusCodes: service.acceptedStatusCodes || [200],
         expectedIP: '',
-        packetCount: 4
+        packetCount: 4,
+        autoIncidentEnabled: service.autoIncidentEnabled ?? true,
+        checksBeforeDown: service.checksBeforeDown ?? 2,
+        checksBeforeMonitoring: service.checksBeforeMonitoring ?? 2,
+        checksBeforeUp: service.checksBeforeUp ?? 2
       })
     }
   }, [isOpen, service])
@@ -111,7 +123,11 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
           port: formData.port ? parseInt(formData.port) : null,
           expectedStatusCodes: formData.type === 'HTTP' ? formData.expectedStatusCodes : undefined,
           timeout: formData.timeout,
-          interval: formData.interval
+          interval: formData.interval,
+          autoIncidentEnabled: formData.autoIncidentEnabled,
+          checksBeforeDown: formData.checksBeforeDown,
+          checksBeforeMonitoring: formData.checksBeforeMonitoring,
+          checksBeforeUp: formData.checksBeforeUp
         })
       })
 
@@ -366,6 +382,81 @@ export default function EditServiceModal({ isOpen, onClose, onSuccess, service }
               />
               Active service
             </label>
+          </div>
+
+          {/* Auto-Incident Settings */}
+          <div className="mb-6 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Auto-Incident Settings</h3>
+
+            <div className="mb-4">
+              <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.autoIncidentEnabled}
+                  onChange={(e) => setFormData({ ...formData, autoIncidentEnabled: e.target.checked })}
+                  className="mr-2 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-900"
+                />
+                Enable automatic incident management
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Automatically create incidents when service is down and resolve them when restored
+              </p>
+            </div>
+
+            {formData.autoIncidentEnabled && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                    Checks before DOWN
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.checksBeforeDown}
+                    onChange={(e) => setFormData({ ...formData, checksBeforeDown: parseInt(e.target.value) || 2 })}
+                    min="1"
+                    max="10"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Number of consecutive failed checks before declaring service DOWN
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                    Checks before MONITORING
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.checksBeforeMonitoring}
+                    onChange={(e) => setFormData({ ...formData, checksBeforeMonitoring: parseInt(e.target.value) || 2 })}
+                    min="1"
+                    max="10"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Number of failed checks before transitioning incident to MONITORING
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                    Checks before UP
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.checksBeforeUp}
+                    onChange={(e) => setFormData({ ...formData, checksBeforeUp: parseInt(e.target.value) || 2 })}
+                    min="1"
+                    max="10"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Number of consecutive successful checks before resolving incident
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex gap-4 justify-end">

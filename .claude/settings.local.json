@@ -21,7 +21,9 @@
       "Bash(npx next build:*)",
       "Bash(cmd /c:*)",
       "Bash(timeout 10 npm run dev:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(node:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []
