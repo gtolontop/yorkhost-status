@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { ServiceWithEnhancedStatus, UptimeData } from '@/types'
 import { formatResponseTime, formatRelativeTime } from '@/lib/utils'
 import { ChevronDown, ChevronUp, CheckCircle, AlertTriangle, XCircle, HelpCircle, AlertCircle, Wrench, Info } from 'lucide-react'
@@ -22,6 +23,8 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
   const historyContext = useUptimeHistory(service.id)
   const [isMobile, setIsMobile] = useState(false)
   const [activeTooltip, setActiveTooltip] = useState<number | null>(null)
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+  const barRefs = useRef<{ [key: number]: HTMLDivElement | null }>({})
   
   useEffect(() => {
     const checkMobile = () => {
