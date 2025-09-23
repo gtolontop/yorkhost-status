@@ -21,9 +21,9 @@ export default function IncidentBanner({ incidents }: IncidentBannerProps) {
 
   return (
     <div className="max-w-3xl mx-auto mb-12">
-      <Link 
-        href="/previous-incidents" 
-        className="group flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-all"
+      <Link
+        href="/previous-incidents"
+        className="group flex items-center justify-between p-4 bg-gray-50 dark:bg-yorkhost-darkCard hover:bg-gray-100 dark:hover:bg-yorkhost-darkCard/80 rounded-lg border border-gray-200 dark:border-yorkhost-darkBorder shadow-sm hover:shadow-md transition-all"
       >
         <div className="flex items-center gap-3">
           {incidentCount > 0 ? (
@@ -33,22 +33,22 @@ export default function IncidentBanner({ incidents }: IncidentBannerProps) {
           )}
           <div className="text-sm">
             {incidentCount > 0 && (
-              <span className="font-medium text-gray-900">
+              <span className="font-medium text-gray-900 dark:text-white">
                 {incidentCount} active incident{incidentCount > 1 ? 's' : ''}
                 {maintenanceCount > 0 && ' • '}
               </span>
             )}
             {maintenanceCount > 0 && (
-              <span className="font-medium text-gray-900">
+              <span className="font-medium text-gray-900 dark:text-white">
                 {maintenanceCount} scheduled maintenance
               </span>
             )}
-            <span className="text-gray-600 ml-2">
+            <span className="text-gray-600 dark:text-gray-400 ml-2">
               Click to view details
             </span>
           </div>
         </div>
-        <ArrowRight className="text-gray-400 group-hover:text-gray-600 transition-colors" size={16} />
+        <ArrowRight className="text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" size={16} />
       </Link>
     </div>
   )
