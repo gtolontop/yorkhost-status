@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ServiceWithStats, ServiceWithEnhancedStatus } from '@/types'
 import CollapsibleGroup from './CollapsibleGroup'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 
 interface ServiceGroup {
   id: string
@@ -10,6 +11,7 @@ interface ServiceGroup {
   description?: string
   color: string
   services: ServiceWithEnhancedStatus[]
+  isExpandedByDefault?: boolean
 }
 
 interface GroupedServiceGridProps {
@@ -19,6 +21,8 @@ interface GroupedServiceGridProps {
 
 export default function GroupedServiceGrid({ services, groups }: GroupedServiceGridProps) {
   const [expandedServices, setExpandedServices] = useState<Set<string>>(new Set())
+  const [groupStates, setGroupStates] = useState<Map<string, boolean>>(new Map())
+  const [allExpanded, setAllExpanded] = useState<boolean | null>(null)
 
   const toggleService = (serviceId: string) => {
     const newExpanded = new Set(expandedServices)
@@ -28,6 +32,14 @@ export default function GroupedServiceGrid({ services, groups }: GroupedServiceG
       newExpanded.add(serviceId)
     }
     setExpandedServices(newExpanded)
+  }
+
+  const handleGroupToggle = (groupId: string, isExpanded: boolean) => {
+    setGroupStates(prev => {
+      const newStates = new Map(prev)
+      newStates.set(groupId, isExpanded)
+      return newStates
+    })
   }
 
   // Group services by machineId
@@ -47,7 +59,8 @@ export default function GroupedServiceGrid({ services, groups }: GroupedServiceG
     name: group.name,
     description: group.description,
     color: group.color,
-    services: servicesByGroup.get(group.id) || []
+    services: servicesByGroup.get(group.id) || [],
+    isExpandedByDefault: group.isExpandedByDefault
   }))
 
   // Add ungrouped services if any
@@ -57,12 +70,31 @@ export default function GroupedServiceGrid({ services, groups }: GroupedServiceG
       id: 'ungrouped',
       name: 'Other Services',
       color: '#6b7280',
-      services: ungroupedServices
+      services: ungroupedServices,
+      isExpandedByDefault: true
     })
   }
 
   // Filter out empty groups
   const nonEmptyGroups = groupedData.filter(group => group.services.length > 0)
+
+  const expandAll = () => {
+    const newStates = new Map<string, boolean>()
+    nonEmptyGroups.forEach(group => {
+      newStates.set(group.id, true)
+    })
+    setGroupStates(newStates)
+    setAllExpanded(true)
+  }
+
+  const collapseAll = () => {
+    const newStates = new Map<string, boolean>()
+    nonEmptyGroups.forEach(group => {
+      newStates.set(group.id, false)
+    })
+    setGroupStates(newStates)
+    setAllExpanded(false)
+  }
 
   if (services.length === 0) {
     return (
@@ -75,7 +107,29 @@ export default function GroupedServiceGrid({ services, groups }: GroupedServiceG
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="bg-[#1A1A24] rounded-lg shadow-lg overflow-hidden">
+      {/* Expand/Collapse All Controls */}
+      {nonEmptyGroups.length > 1 && (
+        <div className="flex justify-end gap-2 mb-4">
+          <button
+            onClick={expandAll}
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-yorkhost-darkCard border border-gray-300 dark:border-yorkhost-darkBorder rounded-lg hover:bg-gray-50 dark:hover:bg-yorkhost-dark/50 transition-colors"
+            title="Expand all groups"
+          >
+            <ChevronDown size={16} />
+            <span>Expand All</span>
+          </button>
+          <button
+            onClick={collapseAll}
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-yorkhost-darkCard border border-gray-300 dark:border-yorkhost-darkBorder rounded-lg hover:bg-gray-50 dark:hover:bg-yorkhost-dark/50 transition-colors"
+            title="Collapse all groups"
+          >
+            <ChevronUp size={16} />
+            <span>Collapse All</span>
+          </button>
+        </div>
+      )}
+
+      <div className="dark:bg-yorkhost-darkCard rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-yorkhost-darkBorder">
         {nonEmptyGroups.map((group, index) => (
           <CollapsibleGroup
             key={group.id}
@@ -84,6 +138,9 @@ export default function GroupedServiceGrid({ services, groups }: GroupedServiceG
             onToggleService={toggleService}
             isFirst={index === 0}
             isLast={index === nonEmptyGroups.length - 1}
+            isExpandedByDefault={group.isExpandedByDefault}
+            forceExpanded={groupStates.get(group.id)}
+            onToggle={(isExpanded) => handleGroupToggle(group.id, isExpanded)}
           />
         ))}
       </div>

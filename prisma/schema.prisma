@@ -45,13 +45,14 @@ model Machine {
   category    String     @default("general")
   location    String?
   tags        String[]   @default([])
+  order       Int        @default(0)
   isActive    Boolean    @default(true)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  
+
   services    Service[]
   incidents   Incident[]
-  
+
   @@map("machines")
 }
 
@@ -78,17 +79,18 @@ model Service {
 }
 
 model ServiceGroup {
-  id           String        @id @default(cuid())
-  name         String
-  description  String?
-  color        String        @default("#6b7280")
-  icon         String?
-  order        Int           @default(0)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  
-  services     Service[]
-  
+  id                  String        @id @default(cuid())
+  name                String
+  description         String?
+  color               String        @default("#6b7280")
+  icon                String?
+  order               Int           @default(0)
+  isExpandedByDefault Boolean       @default(true)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  services            Service[]
+
   @@map("service_groups")
 }
 
@@ -101,28 +103,29 @@ enum CheckType {
 }
 
 model Check {
-  id              String       @id @default(cuid())
-  serviceId       String
-  name            String
-  type            CheckType
-  target          String
-  port            Int?
-  timeout         Int          @default(10000)
-  interval        Int          @default(60)
-  retryAttempts   Int          @default(3)
-  retryInterval   Int          @default(5)
-  expectedStatus  Int?
-  expectedBody    String?
-  headers         Json         @default("{}")
-  followRedirects Boolean      @default(true)
-  sslCheck        Boolean      @default(false)
-  isActive        Boolean      @default(true)
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  
-  service         Service      @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  results         CheckResult[]
-  
+  id                  String       @id @default(cuid())
+  serviceId           String
+  name                String
+  type                CheckType
+  target              String
+  port                Int?
+  timeout             Int          @default(10000)
+  interval            Int          @default(60)
+  retryAttempts       Int          @default(3)
+  retryInterval       Int          @default(5)
+  expectedStatus      Int?
+  expectedBody        String?
+  acceptedStatusCodes Int[]        @default([200, 201, 202, 203, 204, 301, 302, 303, 304, 307, 308])
+  headers             Json         @default("{}")
+  followRedirects     Boolean      @default(true)
+  sslCheck            Boolean      @default(false)
+  isActive            Boolean      @default(true)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  service             Service      @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  results             CheckResult[]
+
   @@map("checks")
 }
 

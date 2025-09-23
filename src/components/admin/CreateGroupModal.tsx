@@ -14,7 +14,8 @@ export default function CreateGroupModal({ isOpen, onClose, onSuccess }: CreateG
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    color: '#3b82f6'
+    color: '#3b82f6',
+    isExpandedByDefault: true
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,7 +36,7 @@ export default function CreateGroupModal({ isOpen, onClose, onSuccess }: CreateG
       if (result.success) {
         onSuccess()
         onClose()
-        setFormData({ name: '', description: '', color: '#3b82f6' })
+        setFormData({ name: '', description: '', color: '#3b82f6', isExpandedByDefault: true })
       } else {
         alert(result.error || 'Erreur lors de la création du groupe')
       }
@@ -98,7 +99,7 @@ export default function CreateGroupModal({ isOpen, onClose, onSuccess }: CreateG
             />
           </div>
 
-          <div className="mb-8">
+          <div className="mb-4">
             <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
               Couleur
             </label>
@@ -109,8 +110,8 @@ export default function CreateGroupModal({ isOpen, onClose, onSuccess }: CreateG
                   type="button"
                   onClick={() => setFormData({ ...formData, color: color.value })}
                   className={`w-10 h-10 rounded-lg cursor-pointer flex items-center justify-center transition-all ${
-                    formData.color === color.value 
-                      ? 'ring-2 ring-offset-2 ring-gray-900 dark:ring-white dark:ring-offset-gray-800' 
+                    formData.color === color.value
+                      ? 'ring-2 ring-offset-2 ring-gray-900 dark:ring-white dark:ring-offset-gray-800'
                       : 'ring-1 ring-gray-300 dark:ring-gray-600'
                   }`}
                   style={{ backgroundColor: color.value }}
@@ -122,6 +123,29 @@ export default function CreateGroupModal({ isOpen, onClose, onSuccess }: CreateG
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="mb-8">
+            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
+              État par défaut
+            </label>
+            <div className="flex items-center space-x-3">
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={formData.isExpandedByDefault}
+                  onChange={(e) => setFormData({ ...formData, isExpandedByDefault: e.target.checked })}
+                />
+                <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              </label>
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {formData.isExpandedByDefault ? 'Déployé' : 'Réduit'}
+              </span>
+            </div>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              Définit si le groupe sera déployé ou réduit par défaut sur la page publique
+            </p>
           </div>
 
           <div className="flex gap-4 justify-end">

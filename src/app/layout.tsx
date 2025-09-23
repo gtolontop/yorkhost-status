@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import '@/styles/globals.css'
+import '@/styles/theme-fix.css'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
+import { themeInitScript } from '@/lib/theme-init'
 
 export const metadata: Metadata = {
   title: 'Yorkhost Status',
@@ -33,6 +35,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body>
         <ThemeProvider>
           <div id="__next">

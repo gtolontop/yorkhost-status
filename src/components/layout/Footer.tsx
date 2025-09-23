@@ -4,33 +4,33 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-gray-50 border-t border-gray-200 mt-auto py-16">
+    <footer className="bg-gray-50 dark:bg-[#0c0c14] border-t border-gray-200 dark:border-gray-800 mt-auto py-16">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="md:col-span-1">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Yorkhost Status</h3>
-            <p className="text-gray-600 text-sm">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Yorkhost Status</h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
               Real-time monitoring and status updates for all Yorkhost services.
             </p>
           </div>
 
           {/* Status Links */}
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Status</h4>
+            <h4 className="font-medium text-gray-900 dark:text-white mb-3">Status</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+                <Link href="/" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm">
                   Current Status
                 </Link>
               </li>
               <li>
-                <Link href="/incidents" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+                <Link href="/incidents" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm">
                   Incident History
                 </Link>
               </li>
               <li>
-                <Link href="/maintenance" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+                <Link href="/maintenance" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm">
                   Maintenance
                 </Link>
               </li>
@@ -39,12 +39,12 @@ export default function Footer() {
 
           {/* Resources Links */}
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Resources</h4>
+            <h4 className="font-medium text-gray-900 dark:text-white mb-3">Resources</h4>
             <ul className="space-y-2">
               <li>
                 <a 
                   href="https://yorkhost.fr" 
-                  className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -54,7 +54,7 @@ export default function Footer() {
               <li>
                 <a 
                   href="https://docs.yorkhost.fr" 
-                  className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -63,8 +63,8 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://support.yorkhost.fr" 
-                  className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  href="https://clients.yorkhost.fr/index.php/tickets/new/" 
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -76,12 +76,12 @@ export default function Footer() {
 
           {/* Connect Links */}
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Connect</h4>
+            <h4 className="font-medium text-gray-900 dark:text-white mb-3">Connect</h4>
             <ul className="space-y-2">
               <li>
                 <a 
                   href="https://discord.gg/yorkhost" 
-                  className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -90,8 +90,8 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://twitter.com/yorkhost" 
-                  className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  href="https://x.com/yorkhost_fr" 
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -100,8 +100,8 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://github.com/yorkhost" 
-                  className="text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                  href="https://github.com/yorkhost-fr" 
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -113,18 +113,49 @@ export default function Footer() {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between">
-          <p className="text-gray-500 text-sm mb-4 md:mb-0">
+        <div className="border-t border-gray-200 dark:border-gray-800 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between">
+          <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 md:mb-0">
             © {currentYear} Yorkhost. All rights reserved.
           </p>
-          <div className="flex items-center gap-6">
-            <Link href="/privacy" className="text-gray-500 hover:text-gray-700 text-sm transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="text-gray-500 hover:text-gray-700 text-sm transition-colors">
-              Terms of Service
-            </Link>
-          </div>
+<div className="flex flex-wrap items-center gap-6">
+  <Link
+    href="https://yorkhost.fr/mentions-legales"
+    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
+  >
+    Legal Notice
+  </Link>
+  <Link
+    href="https://yorkhost.fr/conditions-de-vente"
+    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
+  >
+    Terms & Conditions
+  </Link>
+  <Link
+    href="https://yorkhost.fr/conditions-utilisations"
+    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
+  >
+    Terms of Use
+  </Link>
+  <Link
+    href="https://yorkhost.fr/confidentialite"
+    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
+  >
+    Privacy Policy
+  </Link>
+  <Link
+    href="https://yorkhost.fr/dpa"
+    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
+  >
+    Data Processing Agreement
+  </Link>
+  <Link
+    href="https://yorkhost.fr/cookies"
+    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
+  >
+    Cookie Policy
+  </Link>
+</div>
+
         </div>
       </div>
     </footer>

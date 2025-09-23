@@ -27,7 +27,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-[#0C0C14] dark:bg-[#0C0C14] border-b border-[#27272a] dark:border-[#27272a] sticky top-0 z-50 transition-colors">
+      <header className="bg-white dark:bg-[#0c0c14] border-b border-gray-200 dark:border-[#1a1a24] sticky top-0 z-50 transition-colors">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Brand */}
@@ -38,21 +38,21 @@ export default function Header() {
                   alt="Yorkhost"
                   className="h-7 sm:h-8 w-auto"
                 />
-                <span className="text-lg sm:text-xl font-bold text-white">Status</span>
+                <span className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Status</span>
               </Link>
             </div>
 
             {/* Desktop Navigation - Centered */}
             <nav className="hidden lg:flex items-center justify-center gap-6 xl:gap-8 flex-1">
-              <Link href="/" className="relative text-gray-300 hover:text-white transition-colors font-medium group">
+              <Link href="/" className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium group">
                 Overview
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </Link>
-              <Link href="/maintenance" className="relative text-gray-300 hover:text-white transition-colors font-medium group">
+              <Link href="/maintenance" className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium group">
                 Maintenance
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </Link>
-              <Link href="/previous-incidents" className="relative text-gray-300 hover:text-white transition-colors font-medium group whitespace-nowrap">
+              <Link href="/previous-incidents" className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium group whitespace-nowrap">
                 Previous Incidents
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </Link>
@@ -63,7 +63,7 @@ export default function Header() {
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className="p-2 text-gray-300 hover:text-white transition-colors rounded-lg hover:bg-[#1A1A24]"
+                className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-[#1a1a24]"
                 aria-label="Toggle theme"
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
@@ -83,13 +83,13 @@ export default function Header() {
               {/* Mobile Menu Button */}
               <button
                 onClick={toggleMenu}
-                className="lg:hidden relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[#1A1A24] transition-colors"
+                className="lg:hidden relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#1a1a24] transition-colors"
                 aria-label="Toggle menu"
               >
                 <div className="w-6 h-5 relative flex flex-col justify-between">
-                  <span className={`block h-0.5 w-full bg-gray-300 transition-all duration-300 origin-left ${isMenuOpen ? 'rotate-45 translate-x-0.5' : ''}`}></span>
-                  <span className={`block h-0.5 w-full bg-gray-300 transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></span>
-                  <span className={`block h-0.5 w-full bg-gray-300 transition-all duration-300 origin-left ${isMenuOpen ? '-rotate-45 translate-x-0.5' : ''}`}></span>
+                  <span className={`block h-0.5 w-full bg-gray-600 dark:bg-gray-300 transition-all duration-300 origin-left ${isMenuOpen ? 'rotate-45 translate-x-0.5' : ''}`}></span>
+                  <span className={`block h-0.5 w-full bg-gray-600 dark:bg-gray-300 transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></span>
+                  <span className={`block h-0.5 w-full bg-gray-600 dark:bg-gray-300 transition-all duration-300 origin-left ${isMenuOpen ? '-rotate-45 translate-x-0.5' : ''}`}></span>
                 </div>
               </button>
             </div>
@@ -107,19 +107,19 @@ export default function Header() {
 
       {/* Mobile Menu */}
       <div 
-        className={`lg:hidden fixed top-0 right-0 h-full w-full max-w-sm bg-[#0C0C14] z-50 transition-transform duration-300 ease-out ${
+        className={`lg:hidden fixed top-0 right-0 h-full w-full max-w-sm bg-white dark:bg-[#0c0c14] z-50 transition-transform duration-300 ease-out ${
           isMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="p-4 border-b border-[#27272a]">
+        <div className="p-4 border-b border-gray-200 dark:border-[#1a1a24]">
           <div className="flex items-center justify-between">
-            <span className="text-lg font-semibold text-white">Menu</span>
+            <span className="text-lg font-semibold text-gray-900 dark:text-white">Menu</span>
             <button
               onClick={toggleMenu}
-              className="p-2 rounded-lg hover:bg-[#1A1A24] transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#1a1a24] transition-colors"
               aria-label="Close menu"
             >
-              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -129,7 +129,7 @@ export default function Header() {
         <nav className="p-4 space-y-1">
           <Link 
             href="/" 
-            className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-[#1A1A24] rounded-lg transition-colors"
+            className="flex items-center gap-3 px-4 py-3 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1a1a24] rounded-lg transition-colors"
             onClick={() => setIsMenuOpen(false)}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,7 +139,7 @@ export default function Header() {
           </Link>
           <Link 
             href="/maintenance" 
-            className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-[#1A1A24] rounded-lg transition-colors"
+            className="flex items-center gap-3 px-4 py-3 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1a1a24] rounded-lg transition-colors"
             onClick={() => setIsMenuOpen(false)}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,7 +150,7 @@ export default function Header() {
           </Link>
           <Link 
             href="/previous-incidents" 
-            className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-[#1A1A24] rounded-lg transition-colors"
+            className="flex items-center gap-3 px-4 py-3 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1a1a24] rounded-lg transition-colors"
             onClick={() => setIsMenuOpen(false)}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@ export default function Header() {
             <span className="font-medium">Previous Incidents</span>
           </Link>
 
-          <div className="pt-4 mt-4 border-t border-[#27272a]">
+          <div className="pt-4 mt-4 border-t border-gray-200 dark:border-[#1a1a24]">
             <a
               href="https://discord.gg/yorkhost"
               target="_blank"

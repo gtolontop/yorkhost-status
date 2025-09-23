@@ -3,13 +3,11 @@ import { prisma } from '@/lib/db'
 
 export async function GET() {
   try {
-    // Get all resolved incidents and completed maintenances
+    // Get all resolved incidents (NOT maintenances)
     const incidents = await prisma.incident.findMany({
       where: {
-        OR: [
-          { status: 'RESOLVED' },
-          { status: 'COMPLETED' }
-        ]
+        type: 'INCIDENT',  // Only fetch incidents, not maintenances
+        status: 'RESOLVED'
       },
       include: {
         updates: {

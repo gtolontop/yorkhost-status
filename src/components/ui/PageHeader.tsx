@@ -36,8 +36,8 @@ export default function PageHeader({ icon, title, subtitle, status, lastUpdate }
         </div>
       </div>
       
-      <h1 
-        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 whitespace-nowrap text-white"
+      <h1
+        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 whitespace-nowrap text-gray-900 dark:text-white"
         style={{
           lineHeight: '1.2'
         }}

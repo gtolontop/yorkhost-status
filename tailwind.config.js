@@ -35,6 +35,13 @@ module.exports = {
           light: '#dbeafe',
           dark: '#2563eb',
         },
+        // Custom dark mode colors
+        yorkhost: {
+          dark: '#0C0C14',
+          darkCard: '#1A1A24',
+          darkHover: '#252530',
+          darkBorder: '#27272a',
+        },
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],

@@ -101,6 +101,12 @@ export default function IncidentDetailPage() {
         throw new Error('Failed to fetch incident')
       }
       const result = await response.json()
+
+      // Ensure this is actually an incident, not a maintenance
+      if (result.data && result.data.type === 'MAINTENANCE') {
+        throw new Error('This is a maintenance record, not an incident')
+      }
+
       setIncident(result.data)
       
       // Set initial status for form
@@ -258,7 +264,7 @@ export default function IncidentDetailPage() {
           >
             <ArrowLeft size={20} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">Incident Details</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Incident Details</h1>
           <button
             onClick={fetchIncident}
             className="ml-auto p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -303,11 +309,8 @@ export default function IncidentDetailPage() {
                 <p className="mt-2 text-gray-600">{incident.description}</p>
               </div>
               <div className="flex items-center gap-2">
-                <span className={clsx(
-                  'px-3 py-1 text-xs font-medium rounded-full',
-                  !incident.isScheduled ? 'text-red-600 bg-red-50' : 'text-blue-600 bg-blue-50'
-                )}>
-                  {incident.isScheduled ? 'MAINTENANCE' : 'INCIDENT'}
+                <span className="px-3 py-1 text-xs font-medium rounded-full text-red-600 bg-red-50">
+                  INCIDENT
                 </span>
               </div>
             </div>

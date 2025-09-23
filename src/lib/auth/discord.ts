@@ -18,16 +18,32 @@ export interface DiscordGuildMember {
 export class DiscordAuth {
   private clientId: string
   private clientSecret: string
-  private redirectUri: string
   private guildId: string
   private requiredRoleId: string
 
   constructor() {
     this.clientId = process.env.DISCORD_CLIENT_ID || ''
     this.clientSecret = process.env.DISCORD_CLIENT_SECRET || ''
-    this.redirectUri = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/discord/callback`
     this.guildId = process.env.DISCORD_GUILD_ID || ''
     this.requiredRoleId = process.env.DISCORD_ROLE_ID || ''
+  }
+
+  private getRedirectUri(requestUrl?: string): string {
+    // Priority: Use NEXTAUTH_URL from env if it's a full URL with https
+    const envUrl = process.env.NEXTAUTH_URL
+    if (envUrl && envUrl.startsWith('https://')) {
+      return `${envUrl}/api/auth/discord/callback`
+    }
+
+    // Otherwise use request URL if provided
+    if (requestUrl) {
+      const url = new URL(requestUrl)
+      // Force HTTPS in production or if NEXTAUTH_URL contains https
+      const protocol = process.env.NODE_ENV === 'production' || envUrl?.includes('https') ? 'https:' : url.protocol
+      return `${protocol}//${url.host}/api/auth/discord/callback`
+    }
+
+    return `${envUrl || 'http://localhost:3000'}/api/auth/discord/callback`
   }
 
   private checkConfig() {
@@ -36,11 +52,11 @@ export class DiscordAuth {
     }
   }
 
-  getAuthUrl(): string {
+  getAuthUrl(requestUrl?: string): string {
     this.checkConfig()
     const params = new URLSearchParams({
       client_id: this.clientId,
-      redirect_uri: this.redirectUri,
+      redirect_uri: this.getRedirectUri(requestUrl),
       response_type: 'code',
       scope: 'identify guilds guilds.members.read',
     })
@@ -48,7 +64,7 @@ export class DiscordAuth {
     return `https://discord.com/api/oauth2/authorize?${params.toString()}`
   }
 
-  async exchangeCodeForToken(code: string): Promise<{
+  async exchangeCodeForToken(code: string, requestUrl?: string): Promise<{
     access_token: string
     refresh_token: string
     expires_in: number
@@ -62,7 +78,7 @@ export class DiscordAuth {
           client_secret: this.clientSecret,
           grant_type: 'authorization_code',
           code,
-          redirect_uri: this.redirectUri,
+          redirect_uri: this.getRedirectUri(requestUrl),
         }),
         {
           headers: {
@@ -155,7 +171,7 @@ export class DiscordAuth {
     }
   }
 
-  async authenticateUser(code: string): Promise<{
+  async authenticateUser(code: string, requestUrl?: string): Promise<{
     user: DiscordUser
     hasAccess: boolean
     dbUser?: any
@@ -163,7 +179,7 @@ export class DiscordAuth {
     this.checkConfig()
     try {
       // Exchange code for token
-      const tokenData = await this.exchangeCodeForToken(code)
+      const tokenData = await this.exchangeCodeForToken(code, requestUrl)
       
       // Get user data
       const discordUser = await this.getUser(tokenData.access_token)

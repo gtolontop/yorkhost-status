@@ -156,33 +156,19 @@ export default function AdminDashboard() {
       <div className="admin-page">
         {/* Alert Banner for Services Down Without Incident */}
         {servicesDownWithoutIncident > 0 && (
-          <div style={{ 
-            background: '#fef2f2', 
-            border: '1px solid #fecaca', 
-            borderRadius: '8px', 
-            padding: '1rem', 
-            marginBottom: '1.5rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem'
-          }}>
-            <AlertTriangle size={20} style={{ color: '#dc2626' }} />
-            <div style={{ flex: 1 }}>
-              <p style={{ margin: 0, fontWeight: 600, color: '#991b1b' }}>
+          <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+            <AlertTriangle className="text-red-600 dark:text-red-400" size={20} />
+            <div className="flex-1">
+              <p className="m-0 font-semibold text-red-900 dark:text-red-200">
                 Action requise: {servicesDownWithoutIncident} service{servicesDownWithoutIncident > 1 ? 's' : ''} en panne sans incident déclaré
               </p>
-              <p style={{ margin: 0, fontSize: '0.875rem', color: '#7f1d1d', marginTop: '0.25rem' }}>
+              <p className="m-0 text-sm text-red-800 dark:text-red-300 mt-1">
                 Veuillez créer des incidents pour les services affectés afin d'informer les utilisateurs.
               </p>
             </div>
             <a 
-              href="/admin/incidents" 
-              className="btn btn-primary"
-              style={{ 
-                fontSize: '0.875rem',
-                padding: '0.5rem 1rem',
-                whiteSpace: 'nowrap'
-              }}
+              href="/admin/incidents"
+              className="btn btn-primary text-sm px-4 py-2 whitespace-nowrap"
             >
               Créer un incident
             </a>
@@ -191,22 +177,19 @@ export default function AdminDashboard() {
 
         {/* Page Header */}
         <div className="page-header">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="flex items-center justify-between">
             <div>
               <h1>Dashboard</h1>
               <p>Vue d'ensemble de vos services et infrastructure</p>
             </div>
-            <button 
-              className="btn btn-secondary"
+            <button
               onClick={fetchDashboardData}
               disabled={refreshing}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              className="btn btn-secondary flex items-center gap-2"
             >
-              <RefreshCw 
-                size={16} 
-                style={{ 
-                  animation: refreshing ? 'spin 1s linear infinite' : 'none' 
-                }} 
+              <RefreshCw
+                size={16}
+                className={refreshing ? 'animate-spin' : ''}
               />
               Actualiser
             </button>
@@ -298,65 +281,48 @@ export default function AdminDashboard() {
               </button>
             </div>
             <div className="panel-content">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div className="flex flex-col gap-4">
                 {services.map((service) => (
                   <div
                     key={service.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '1rem',
-                      background: '#f9fafb',
-                      borderRadius: '12px',
-                      border: '1px solid #e5e7eb'
-                    }}
+                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-yorkhost-dark rounded-xl border border-gray-200 dark:border-gray-700"
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div className="flex items-center gap-4">
                       <div
-                        style={{
-                          width: '12px',
-                          height: '12px',
-                          borderRadius: '50%',
-                          background: getStatusColor(service.status)
-                        }}
+                        className="w-3 h-3 rounded-full"
+                        style={{ background: getStatusColor(service.status) }}
                       />
                       <div>
-                        <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>
+                        <h4 className="m-0 text-sm font-semibold text-gray-900 dark:text-gray-100">
                           {service.name}
                         </h4>
-                        <p style={{ 
-                          margin: 0, 
-                          fontSize: '0.8rem', 
-                          color: '#6b7280',
-                          textTransform: 'capitalize'
-                        }}>
+                        <p className="m-0 text-xs text-gray-600 dark:text-gray-400 capitalize">
                           {service.status === 'operational' ? 'Opérationnel' :
                            service.status === 'degraded' ? 'Dégradé' : 'Hors ligne'}
                         </p>
                       </div>
                     </div>
                     
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                    <div className="flex items-center gap-8">
+                      <div className="text-right">
+                        <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                           {service.uptime}%
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
                           Uptime
                         </div>
                       </div>
-                      
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+
+                      <div className="text-right">
+                        <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                           {service.responseTime}ms
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
                           Réponse
                         </div>
                       </div>
-                      
-                      <ChevronRight size={16} style={{ color: '#d1d5db' }} />
+
+                      <ChevronRight className="text-gray-300 dark:text-gray-600" size={16} />
                     </div>
                   </div>
                 ))}
@@ -370,60 +336,32 @@ export default function AdminDashboard() {
               <h3>Activité récente</h3>
             </div>
             <div className="panel-content">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div className="flex flex-col gap-4">
                 {activities.map((activity) => {
                   const IconComponent = getActivityIcon(activity.type)
                   return (
                     <div
                       key={activity.id}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '0.75rem',
-                        padding: '1rem',
-                        background: '#f9fafb',
-                        borderRadius: '12px',
-                        border: '1px solid #e5e7eb'
-                      }}
+                      className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-yorkhost-dark rounded-xl border border-gray-200 dark:border-gray-700"
                     >
                       <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                         style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '8px',
                           background: `${getStatusColor(activity.status)}15`,
-                          color: getStatusColor(activity.status),
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0
+                          color: getStatusColor(activity.status)
                         }}
                       >
                         <IconComponent size={16} />
                       </div>
                       
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <h4 style={{ 
-                          margin: 0, 
-                          fontSize: '0.875rem', 
-                          fontWeight: 600,
-                          marginBottom: '0.25rem'
-                        }}>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="m-0 text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">
                           {activity.title}
                         </h4>
-                        <p style={{ 
-                          margin: 0, 
-                          fontSize: '0.8rem', 
-                          color: '#6b7280',
-                          lineHeight: 1.4,
-                          marginBottom: '0.5rem'
-                        }}>
+                        <p className="m-0 text-xs text-gray-600 dark:text-gray-400 leading-relaxed mb-2">
                           {activity.description}
                         </p>
-                        <span style={{ 
-                          fontSize: '0.75rem', 
-                          color: '#9ca3af' 
-                        }}>
+                        <span className="text-xs text-gray-500 dark:text-gray-500">
                           {formatRelativeTime(activity.timestamp)}
                         </span>
                       </div>

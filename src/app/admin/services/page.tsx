@@ -5,6 +5,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import AdminLayout from '@/components/admin/AdminLayout'
 import CreateServiceModal from '@/components/admin/CreateServiceModal'
 import CreateGroupModal from '@/components/admin/CreateGroupModal'
+import EditGroupModal from '@/components/admin/EditGroupModal'
 import EditServiceModal from '@/components/admin/EditServiceModal'
 import ServiceIncidentBadge from '@/components/admin/ServiceIncidentBadge'
 import '../admin.css'
@@ -32,6 +33,13 @@ interface Service {
   name: string
   description?: string
   url?: string
+  type?: string
+  target?: string
+  port?: number | null
+  timeout?: number
+  interval?: number
+  acceptedStatusCodes?: number[]
+  expectedStatusCode?: number
   status: 'operational' | 'degraded' | 'outage' | 'unknown'
   uptime: number
   responseTime: number
@@ -49,6 +57,7 @@ interface ServiceGroup {
   order: number
   services: Service[]
   isCollapsed?: boolean
+  isExpandedByDefault?: boolean
 }
 
 export default function AdminServicesPage() {
@@ -60,7 +69,9 @@ export default function AdminServicesPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showEditGroupModal, setShowEditGroupModal] = useState(false)
   const [editingService, setEditingService] = useState<Service | null>(null)
+  const [editingGroup, setEditingGroup] = useState<ServiceGroup | null>(null)
   const [checking, setChecking] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
 
@@ -84,6 +95,12 @@ export default function AdminServicesPage() {
           name: service.name,
           description: service.description,
           url: service.url,
+          type: service.type,
+          target: service.target,
+          port: service.port,
+          timeout: service.timeout,
+          interval: service.interval,
+          acceptedStatusCodes: service.acceptedStatusCodes,
           status: service.status || 'unknown',
           uptime: service.uptime || 0,
           responseTime: service.responseTime || 0,
@@ -107,13 +124,29 @@ export default function AdminServicesPage() {
     try {
       const response = await fetch('/api/admin/groups')
       const result = await response.json()
-      
+
       if (result.success) {
-        const groupsWithServices = result.data.map((group: any) => ({
+        // Sort groups by order to ensure correct display
+        const sortedGroups = result.data.sort((a: any, b: any) => {
+          // Keep 'ungrouped' at the end
+          if (a.id === 'ungrouped') return 1
+          if (b.id === 'ungrouped') return -1
+          return (a.order || 0) - (b.order || 0)
+        })
+
+        const groupsWithServices = sortedGroups.map((group: any) => ({
           ...group,
           services: [],  // Will be populated by useEffect
-          isCollapsed: false
+          isCollapsed: false,
+          isExpandedByDefault: group.isExpandedByDefault
         }))
+
+        console.log('Fetched groups with order:', groupsWithServices.map((g: any) => ({
+          id: g.id,
+          name: g.name,
+          order: g.order
+        })))
+
         setGroups(groupsWithServices)
       }
     } catch (error) {
@@ -132,16 +165,55 @@ export default function AdminServicesPage() {
   const handleDragEnd = async (result: any) => {
     if (!result.destination) return
 
-    const { source, destination, draggableId } = result
-    
+    const { source, destination, draggableId, type } = result
+
     if (source.droppableId === destination.droppableId && source.index === destination.index) {
       return
     }
 
-    // Update local state optimistically
+    // Handle group reordering
+    if (type === 'GROUP') {
+      const reorderedGroups = Array.from(groups)
+      const [removed] = reorderedGroups.splice(source.index, 1)
+      reorderedGroups.splice(destination.index, 0, removed)
+
+      // Update order values
+      const updatedGroups = reorderedGroups.map((group, index) => ({
+        ...group,
+        order: index
+      }))
+
+      setGroups(updatedGroups)
+
+      // Update server
+      try {
+        console.log('Sending reorder request for groups:', updatedGroups.map((g, idx) => ({ id: g.id, name: g.name, order: idx })))
+        const response = await fetch('/api/admin/groups/reorder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            groups: updatedGroups.map((g, idx) => ({ id: g.id, order: idx }))
+          })
+        })
+
+        const result = await response.json()
+        console.log('Reorder response:', result)
+
+        if (!result.success) {
+          console.error('Failed to reorder groups:', result.error)
+          fetchGroups() // Reload groups on error
+        }
+      } catch (error) {
+        console.error('Failed to reorder groups:', error)
+        fetchGroups()
+      }
+      return
+    }
+
+    // Handle service moving (existing code)
     const serviceId = draggableId
     const newGroupId = destination.droppableId
-    
+
     setServices(prev => prev.map(service => {
       if (service.id === serviceId) {
         return { ...service, groupId: newGroupId, order: destination.index }
@@ -357,15 +429,29 @@ export default function AdminServicesPage() {
 
         {/* Services by Groups */}
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="flex flex-col gap-4">
-            {filteredGroups.map(group => (
-              <div key={group.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+          <Droppable droppableId="groups" type="GROUP">
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef} className="flex flex-col gap-4">
+                {filteredGroups.map((group, index) => (
+                  <Draggable key={group.id} draggableId={group.id} index={index} isDragDisabled={group.id === 'ungrouped'}>
+                    {(dragProvided, dragSnapshot) => (
+                      <div
+                        ref={dragProvided.innerRef}
+                        {...dragProvided.draggableProps}
+                        className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden ${dragSnapshot.isDragging ? 'shadow-lg' : ''}`}
+                        style={dragProvided.draggableProps.style}
+                      >
                 <div 
                   className="p-4 px-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between cursor-pointer"
                   style={{ backgroundColor: `${group.color}10` }}
                   onClick={() => toggleGroup(group.id)}
                 >
                   <div className="flex items-center gap-3">
+                    {group.id !== 'ungrouped' && (
+                      <div {...dragProvided.dragHandleProps} className="cursor-grab">
+                        <GripVertical size={20} className="text-gray-400 dark:text-gray-500" />
+                      </div>
+                    )}
                     {group.isCollapsed ? <ChevronRight size={20} className="text-gray-600 dark:text-gray-400" /> : <ChevronDown size={20} className="text-gray-600 dark:text-gray-400" />}
                     <div 
                       className="w-3 h-3 rounded-full"
@@ -379,16 +465,29 @@ export default function AdminServicesPage() {
                     </span>
                   </div>
                   {group.id !== 'ungrouped' && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteGroup(group.id);
-                      }}
-                      className="py-1 px-2 bg-transparent border border-red-500 dark:border-red-400 rounded-lg text-red-500 dark:text-red-400 text-xs cursor-pointer flex items-center gap-1 transition-all hover:bg-red-500 hover:text-white dark:hover:bg-red-400"
-                    >
-                      <Trash2 size={14} />
-                      Delete
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingGroup(group);
+                          setShowEditGroupModal(true);
+                        }}
+                        className="py-1 px-2 bg-transparent border border-blue-500 dark:border-blue-400 rounded-lg text-blue-500 dark:text-blue-400 text-xs cursor-pointer flex items-center gap-1 transition-all hover:bg-blue-500 hover:text-white dark:hover:bg-blue-400"
+                      >
+                        <Edit size={14} />
+                        Éditer
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteGroup(group.id);
+                        }}
+                        className="py-1 px-2 bg-transparent border border-red-500 dark:border-red-400 rounded-lg text-red-500 dark:text-red-400 text-xs cursor-pointer flex items-center gap-1 transition-all hover:bg-red-500 hover:text-white dark:hover:bg-red-400"
+                      >
+                        <Trash2 size={14} />
+                        Supprimer
+                      </button>
+                    </div>
                   )}
                 </div>
                 
@@ -504,9 +603,14 @@ export default function AdminServicesPage() {
                     )}
                   </Droppable>
                 )}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
               </div>
-            ))}
-          </div>
+            )}
+          </Droppable>
         </DragDropContext>
 
         {/* Modals */}
@@ -519,7 +623,7 @@ export default function AdminServicesPage() {
           }}
         />
 
-        <CreateGroupModal 
+        <CreateGroupModal
           isOpen={showCreateGroupModal}
           onClose={() => setShowCreateGroupModal(false)}
           onSuccess={async () => {
@@ -527,6 +631,23 @@ export default function AdminServicesPage() {
             await fetchServices()
           }}
         />
+
+        {editingGroup && (
+          <EditGroupModal
+            isOpen={showEditGroupModal}
+            onClose={() => {
+              setShowEditGroupModal(false)
+              setEditingGroup(null)
+            }}
+            onSuccess={async () => {
+              await fetchGroups()
+              await fetchServices()
+              setShowEditGroupModal(false)
+              setEditingGroup(null)
+            }}
+            group={editingGroup}
+          />
+        )}
 
         {editingService && (
           <EditServiceModal 

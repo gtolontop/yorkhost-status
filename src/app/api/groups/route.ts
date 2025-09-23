@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     // Use machines table as groups
     const machines = await prisma.machine.findMany({
       where: { isActive: true },
-      orderBy: { name: 'asc' },
+      orderBy: { order: 'asc' },
       include: {
         services: {
           where: { isActive: true }
@@ -21,14 +21,18 @@ export async function GET(request: NextRequest) {
       // Extract color from tags
       const colorTag = machine.tags.find(tag => tag.startsWith('color:'))
       const color = colorTag ? colorTag.replace('color:', '') : '#6b7280'
-      
+
+      // Extract isExpandedByDefault from tags
+      const isExpandedByDefault = !machine.tags.includes('collapsed')
+
       return {
         id: machine.id,
         name: machine.name,
         description: machine.description || '',
         color,
-        order: 0,
-        servicesCount: machine.services.length
+        order: machine.order,
+        servicesCount: machine.services.length,
+        isExpandedByDefault
       }
     })
 

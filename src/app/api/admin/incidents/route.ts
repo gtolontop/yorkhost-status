@@ -33,6 +33,9 @@ export async function GET(request: NextRequest) {
     }
 
     const incidents = await prisma.incident.findMany({
+      where: {
+        type: 'INCIDENT'
+      },
       include: {
         updates: {
           orderBy: { timestamp: 'desc' }
@@ -126,6 +129,7 @@ export async function POST(request: NextRequest) {
       data: {
         ...data,
         slug,
+        type: 'INCIDENT',
         scheduledFor: data.scheduledFor ? new Date(data.scheduledFor) : undefined,
         eta: data.eta ? new Date(data.eta) : undefined,
         status: data.isScheduled ? IncidentStatus.SCHEDULED : IncidentStatus.INVESTIGATING,

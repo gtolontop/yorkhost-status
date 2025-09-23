@@ -30,7 +30,8 @@ interface UptimeChartProps {
 export default function UptimeChart({ data }: UptimeChartProps) {
   const chartRef = useRef<ChartJS<'bar'>>(null)
 
-  const getBarColor = (uptime: number) => {
+  const getBarColor = (uptime: number, hasMaintenance: boolean) => {
+    if (hasMaintenance) return '#3b82f6' // Blue for maintenance (priority)
     if (uptime >= 99.5) return '#22c55e' // Success
     if (uptime >= 95) return '#f59e0b'   // Warning
     return '#ef4444'                     // Danger
@@ -48,8 +49,8 @@ export default function UptimeChart({ data }: UptimeChartProps) {
       {
         label: 'Uptime %',
         data: data.map(d => d.uptime),
-        backgroundColor: data.map(d => getBarColor(d.uptime)),
-        borderColor: data.map(d => getBarColor(d.uptime)),
+        backgroundColor: data.map(d => getBarColor(d.uptime, d.maintenances && d.maintenances.length > 0)),
+        borderColor: data.map(d => getBarColor(d.uptime, d.maintenances && d.maintenances.length > 0)),
         borderWidth: 1,
         borderRadius: 2,
         borderSkipped: false,
@@ -93,16 +94,23 @@ export default function UptimeChart({ data }: UptimeChartProps) {
             const index = context.dataIndex
             const dayData = data[index]
             const lines = [
-              `Uptime: ${dayData.uptime.toFixed(2)}%`
+              `Uptime: ${dayData.uptime ? dayData.uptime.toFixed(2) : 'N/A'}%`
             ]
-            
+
+            if (dayData.maintenances && dayData.maintenances.length > 0) {
+              lines.push(`Maintenances: ${dayData.maintenances.length}`)
+              dayData.maintenances.forEach(maintenance => {
+                lines.push(`• ${maintenance.title}`)
+              })
+            }
+
             if (dayData.incidents && dayData.incidents.length > 0) {
               lines.push(`Incidents: ${dayData.incidents.length}`)
               dayData.incidents.forEach(incident => {
                 lines.push(`• ${incident.title}`)
               })
             }
-            
+
             return lines
           }
         }
