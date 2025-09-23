@@ -188,8 +188,8 @@ export default function AutoIncidentsPage() {
   if (loading) {
     return (
       <AdminLayout>
-        <div className=\"flex items-center justify-center h-64\">
-          <div className=\"animate-spin rounded-full h-12 w-12 border-b-2 border-primary\"></div>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       </AdminLayout>
     )
@@ -197,19 +197,19 @@ export default function AutoIncidentsPage() {
 
   return (
     <AdminLayout>
-      <div className=\"space-y-6\">
+      <div className="space-y-6">
         {/* Header */}
-        <div className=\"flex items-center justify-between\">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className=\"text-2xl font-bold text-gray-900 dark:text-white\">Auto-Incidents</h1>
-            <p className=\"text-gray-500 dark:text-gray-400 mt-1\">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Auto-Incidents</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">
               Manage automatic incident creation and monitoring
             </p>
           </div>
           <button
             onClick={fetchData}
-            className=\"p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors\"
-            title=\"Refresh\"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            title="Refresh"
           >
             <RefreshCw size={20} />
           </button>
@@ -222,13 +222,13 @@ export default function AutoIncidentsPage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className=\"bg-red-50 text-red-700 p-4 rounded-lg flex items-start gap-3\"
+              className="bg-red-50 text-red-700 p-4 rounded-lg flex items-start gap-3"
             >
-              <div className=\"flex-1\">
-                <p className=\"font-medium\">Error</p>
-                <p className=\"text-sm mt-1\">{error}</p>
+              <div className="flex-1">
+                <p className="font-medium">Error</p>
+                <p className="text-sm mt-1">{error}</p>
               </div>
-              <button onClick={() => setError('')} className=\"text-red-500 hover:text-red-700\">
+              <button onClick={() => setError('')} className="text-red-500 hover:text-red-700">
                 ×
               </button>
             </motion.div>
@@ -318,51 +318,51 @@ export default function AutoIncidentsPage() {
 
         {/* Stats Cards */}
         {stats && (
-          <div className=\"grid grid-cols-1 md:grid-cols-4 gap-4\">
-            <div className=\"bg-white dark:bg-yorkhost-darkCard rounded-lg p-6 border border-gray-200 dark:border-yorkhost-darkBorder\">
-              <div className=\"flex items-center gap-3\">
-                <div className=\"p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg\">
-                  <BarChart3 size={20} className=\"text-blue-600 dark:text-blue-400\" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-white dark:bg-yorkhost-darkCard rounded-lg p-6 border border-gray-200 dark:border-yorkhost-darkBorder">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <BarChart3 size={20} className="text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <p className=\"text-2xl font-bold text-gray-900 dark:text-white\">{stats.total}</p>
-                  <p className=\"text-sm text-gray-500 dark:text-gray-400\">Total Auto-Incidents</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Total Auto-Incidents</p>
                 </div>
               </div>
             </div>
 
-            <div className=\"bg-white dark:bg-yorkhost-darkCard rounded-lg p-6 border border-gray-200 dark:border-yorkhost-darkBorder\">
-              <div className=\"flex items-center gap-3\">
-                <div className=\"p-2 bg-green-100 dark:bg-green-900/30 rounded-lg\">
-                  <CheckCircle size={20} className=\"text-green-600 dark:text-green-400\" />
+            <div className="bg-white dark:bg-yorkhost-darkCard rounded-lg p-6 border border-gray-200 dark:border-yorkhost-darkBorder">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                  <CheckCircle size={20} className="text-green-600 dark:text-green-400" />
                 </div>
                 <div>
-                  <p className=\"text-2xl font-bold text-gray-900 dark:text-white\">{stats.resolved}</p>
-                  <p className=\"text-sm text-gray-500 dark:text-gray-400\">Resolved</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.resolved}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Resolved</p>
                 </div>
               </div>
             </div>
 
-            <div className=\"bg-white dark:bg-yorkhost-darkCard rounded-lg p-6 border border-gray-200 dark:border-yorkhost-darkBorder\">
-              <div className=\"flex items-center gap-3\">
-                <div className=\"p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg\">
-                  <AlertTriangle size={20} className=\"text-orange-600 dark:text-orange-400\" />
+            <div className="bg-white dark:bg-yorkhost-darkCard rounded-lg p-6 border border-gray-200 dark:border-yorkhost-darkBorder">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+                  <AlertTriangle size={20} className="text-orange-600 dark:text-orange-400" />
                 </div>
                 <div>
-                  <p className=\"text-2xl font-bold text-gray-900 dark:text-white\">{stats.byStatus.INVESTIGATING || 0}</p>
-                  <p className=\"text-sm text-gray-500 dark:text-gray-400\">Investigating</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.byStatus.INVESTIGATING || 0}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Investigating</p>
                 </div>
               </div>
             </div>
 
-            <div className=\"bg-white dark:bg-yorkhost-darkCard rounded-lg p-6 border border-gray-200 dark:border-yorkhost-darkBorder\">
-              <div className=\"flex items-center gap-3\">
-                <div className=\"p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg\">
-                  <Zap size={20} className=\"text-purple-600 dark:text-purple-400\" />
+            <div className="bg-white dark:bg-yorkhost-darkCard rounded-lg p-6 border border-gray-200 dark:border-yorkhost-darkBorder">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                  <Zap size={20} className="text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
-                  <p className=\"text-2xl font-bold text-gray-900 dark:text-white\">{stats.resolutionRate.toFixed(1)}%</p>
-                  <p className=\"text-sm text-gray-500 dark:text-gray-400\">Resolution Rate</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.resolutionRate.toFixed(1)}%</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Resolution Rate</p>
                 </div>
               </div>
             </div>
@@ -370,15 +370,15 @@ export default function AutoIncidentsPage() {
         )}
 
         {/* Services List */}
-        <div className=\"bg-white dark:bg-yorkhost-darkCard rounded-lg shadow-sm border border-gray-200 dark:border-yorkhost-darkBorder\">
-          <div className=\"px-6 py-4 border-b border-gray-200 dark:border-yorkhost-darkBorder\">
-            <h3 className=\"text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2\">
+        <div className="bg-white dark:bg-yorkhost-darkCard rounded-lg shadow-sm border border-gray-200 dark:border-yorkhost-darkBorder">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-yorkhost-darkBorder">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <Settings size={20} />
               Service Settings
             </h3>
           </div>
 
-          <div className=\"divide-y divide-gray-200 dark:divide-yorkhost-darkBorder\">
+          <div className="divide-y divide-gray-200 dark:divide-yorkhost-darkBorder">
             {services
               .filter(service => selectedServices.length === 0 || selectedServices.includes(service.id))
               .map((service) => (
@@ -386,37 +386,37 @@ export default function AutoIncidentsPage() {
                 key={service.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className=\"p-6\"
+                className="p-6"
               >
-                <div className=\"flex items-start justify-between\">
-                  <div className=\"flex-1\">
-                    <div className=\"flex items-center gap-3 mb-4\">
-                      <h4 className=\"text-lg font-medium text-gray-900 dark:text-white\">{service.name}</h4>
-                      <div className=\"flex items-center gap-2\">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-4">
+                      <h4 className="text-lg font-medium text-gray-900 dark:text-white">{service.name}</h4>
+                      <div className="flex items-center gap-2">
                         <div className={clsx(
                           'w-3 h-3 rounded-full',
                           service.autoIncidentEnabled ? 'bg-green-500' : 'bg-gray-400'
                         )}></div>
-                        <span className=\"text-sm text-gray-500 dark:text-gray-400\">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
                           {service.autoIncidentEnabled ? 'Enabled' : 'Disabled'}
                         </span>
                       </div>
                     </div>
 
-                    <div className=\"grid grid-cols-1 md:grid-cols-3 gap-4 mb-4\">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                       {/* Enable/Disable Toggle */}
                       <div>
-                        <label className=\"flex items-center gap-2\">
+                        <label className="flex items-center gap-2">
                           <input
-                            type=\"checkbox\"
+                            type="checkbox"
                             checked={service.autoIncidentEnabled}
                             onChange={(e) => updateServiceSettings(service.id, {
                               autoIncidentEnabled: e.target.checked
                             })}
-                            className=\"rounded border-gray-300 text-blue-600 focus:ring-blue-500\"
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                             disabled={saving === service.id}
                           />
-                          <span className=\"text-sm font-medium text-gray-700 dark:text-gray-300\">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Auto-incidents enabled
                           </span>
                         </label>
@@ -424,44 +424,44 @@ export default function AutoIncidentsPage() {
 
                       {/* Threshold Setting */}
                       <div>
-                        <label className=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1\">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Failure Threshold
                         </label>
-                        <div className=\"flex items-center gap-2\">
+                        <div className="flex items-center gap-2">
                           <input
-                            type=\"number\"
-                            min=\"1\"
-                            max=\"10\"
+                            type="number"
+                            min="1"
+                            max="10"
                             value={service.autoIncidentThreshold}
                             onChange={(e) => updateServiceSettings(service.id, {
                               autoIncidentThreshold: parseInt(e.target.value)
                             })}
-                            className=\"w-20 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-800 dark:text-white\"
+                            className="w-20 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-800 dark:text-white"
                             disabled={saving === service.id || !service.autoIncidentEnabled}
                           />
-                          <span className=\"text-sm text-gray-500 dark:text-gray-400\">failed checks</span>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">failed checks</span>
                         </div>
                       </div>
 
                       {/* Cooldown Setting */}
                       <div>
-                        <label className=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1\">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Cooldown Period
                         </label>
-                        <div className=\"flex items-center gap-2\">
+                        <div className="flex items-center gap-2">
                           <input
-                            type=\"number\"
-                            min=\"60\"
-                            max=\"3600\"
-                            step=\"60\"
+                            type="number"
+                            min="60"
+                            max="3600"
+                            step="60"
                             value={service.autoIncidentCooldown}
                             onChange={(e) => updateServiceSettings(service.id, {
                               autoIncidentCooldown: parseInt(e.target.value)
                             })}
-                            className=\"w-20 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-800 dark:text-white\"
+                            className="w-20 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-800 dark:text-white"
                             disabled={saving === service.id || !service.autoIncidentEnabled}
                           />
-                          <span className=\"text-sm text-gray-500 dark:text-gray-400\">seconds</span>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">seconds</span>
                         </div>
                       </div>
                     </div>
@@ -469,49 +469,49 @@ export default function AutoIncidentsPage() {
                     {/* Recent Auto-Incidents */}
                     {service.incidents.length > 0 && (
                       <div>
-                        <h5 className=\"text-sm font-medium text-gray-700 dark:text-gray-300 mb-2\">
+                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Recent Auto-Incidents
                         </h5>
-                        <div className=\"space-y-2\">
+                        <div className="space-y-2">
                           {service.incidents.map((incident) => (
                             <div
                               key={incident.id}
-                              className=\"flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg\"
+                              className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
                             >
-                              <div className=\"flex items-center gap-3\">
+                              <div className="flex items-center gap-3">
                                 <span className={clsx(
                                   'px-2 py-1 text-xs font-medium rounded-full',
                                   getStatusColor(incident.status)
                                 )}>
                                   {incident.status}
                                 </span>
-                                <span className=\"text-sm text-gray-900 dark:text-white\">
+                                <span className="text-sm text-gray-900 dark:text-white">
                                   {incident.title}
                                 </span>
                                 {incident.manualTakeover && (
-                                  <div className=\"flex items-center gap-1\">
-                                    <User size={12} className=\"text-blue-600\" />
-                                    <span className=\"text-xs text-blue-600\">Manual Control</span>
+                                  <div className="flex items-center gap-1">
+                                    <User size={12} className="text-blue-600" />
+                                    <span className="text-xs text-blue-600">Manual Control</span>
                                   </div>
                                 )}
                               </div>
-                              <div className=\"flex items-center gap-2\">
-                                <span className=\"text-xs text-gray-500\">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500">
                                   {new Date(incident.startTime).toLocaleDateString()}
                                 </span>
                                 {incident.isAutoGenerated && !incident.manualTakeover && (
                                   <button
                                     onClick={() => takeControl(incident.id)}
-                                    className=\"p-1 text-blue-600 hover:text-blue-700 transition-colors\"
-                                    title=\"Take manual control\"
+                                    className="p-1 text-blue-600 hover:text-blue-700 transition-colors"
+                                    title="Take manual control"
                                   >
                                     <UserCheck size={14} />
                                   </button>
                                 )}
                                 <button
                                   onClick={() => window.open(`/admin/incidents/${incident.id}`, '_blank')}
-                                  className=\"p-1 text-gray-500 hover:text-gray-700 transition-colors\"
-                                  title=\"View incident\"
+                                  className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+                                  title="View incident"
                                 >
                                   <Eye size={14} />
                                 </button>
@@ -524,9 +524,9 @@ export default function AutoIncidentsPage() {
                   </div>
 
                   {saving === service.id && (
-                    <div className=\"flex items-center gap-2 text-blue-600\">
-                      <div className=\"animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600\"></div>
-                      <span className=\"text-sm\">Saving...</span>
+                    <div className="flex items-center gap-2 text-blue-600">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                      <span className="text-sm">Saving...</span>
                     </div>
                   )}
                 </div>
