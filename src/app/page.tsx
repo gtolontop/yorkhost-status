@@ -19,7 +19,8 @@ export default function HomePage() {
   useEffect(() => {
     fetchStatus()
     fetchGroups()
-    
+    checkAutoStatus()
+
     // Subscribe to real-time updates
     const unsubscribe = useStatusUpdates((data) => {
       console.log('Real-time status update:', data)
@@ -27,8 +28,27 @@ export default function HomePage() {
       fetchStatus()
     })
 
-    return unsubscribe
+    // Check maintenance auto-status every 30 seconds
+    const statusInterval = setInterval(() => {
+      checkAutoStatus()
+      fetchStatus()
+    }, 30000)
+
+    return () => {
+      unsubscribe()
+      clearInterval(statusInterval)
+    }
   }, [])
+
+  const checkAutoStatus = async () => {
+    try {
+      await fetch('/api/admin/maintenances/auto-status', {
+        method: 'POST'
+      })
+    } catch (error) {
+      console.error('Failed to check auto status:', error)
+    }
+  }
 
   const fetchStatus = async () => {
     try {
