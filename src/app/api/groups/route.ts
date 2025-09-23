@@ -21,14 +21,18 @@ export async function GET(request: NextRequest) {
       // Extract color from tags
       const colorTag = machine.tags.find(tag => tag.startsWith('color:'))
       const color = colorTag ? colorTag.replace('color:', '') : '#6b7280'
-      
+
+      // Extract isExpandedByDefault from tags
+      const isExpandedByDefault = !machine.tags.includes('collapsed')
+
       return {
         id: machine.id,
         name: machine.name,
         description: machine.description || '',
         color,
         order: machine.order,
-        servicesCount: machine.services.length
+        servicesCount: machine.services.length,
+        isExpandedByDefault
       }
     })
 

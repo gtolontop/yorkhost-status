@@ -17,16 +17,18 @@ interface CollapsibleGroupProps {
   onToggleService: (serviceId: string) => void
   isFirst?: boolean
   isLast?: boolean
+  isExpandedByDefault?: boolean
 }
 
-export default function CollapsibleGroup({ 
-  group, 
-  expandedServices, 
+export default function CollapsibleGroup({
+  group,
+  expandedServices,
   onToggleService,
   isFirst = false,
-  isLast = false
+  isLast = false,
+  isExpandedByDefault = true
 }: CollapsibleGroupProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(!isExpandedByDefault)
   const [height, setHeight] = useState<number | undefined>(undefined)
   const contentRef = useRef<HTMLDivElement>(null)
 

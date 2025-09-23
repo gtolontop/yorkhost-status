@@ -7,7 +7,8 @@ const createGroupSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().optional(),
   color: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
-  icon: z.string().optional()
+  icon: z.string().optional(),
+  isExpandedByDefault: z.boolean().optional()
 })
 
 export async function GET(request: NextRequest) {
@@ -30,14 +31,18 @@ export async function GET(request: NextRequest) {
       // Extract color from tags
       const colorTag = machine.tags.find(tag => tag.startsWith('color:'))
       const color = colorTag ? colorTag.replace('color:', '') : '#6b7280'
-      
+
+      // Extract isExpandedByDefault from tags
+      const isExpandedByDefault = !machine.tags.includes('collapsed')
+
       return {
         id: machine.id,
         name: machine.name,
         description: machine.description || '',
         color,
         order: machine.order || 0,
-        servicesCount: machine.services.length
+        servicesCount: machine.services.length,
+        isExpandedByDefault
       }
     })
 
@@ -52,7 +57,8 @@ export async function GET(request: NextRequest) {
       description: 'Services not assigned to any group',
       color: '#94a3b8',
       order: 999,
-      servicesCount: ungroupedCount
+      servicesCount: ungroupedCount,
+      isExpandedByDefault: true
     })
 
     return NextResponse.json({
@@ -75,13 +81,18 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const data = createGroupSchema.parse(body)
 
-    // Create machine as group (store color in tags)
+    // Create machine as group (store color and collapsed state in tags)
+    const tags = [`color:${data.color || '#6b7280'}`]
+    if (data.isExpandedByDefault === false) {
+      tags.push('collapsed')
+    }
+
     const machine = await prisma.machine.create({
       data: {
         name: data.name,
         category: data.name.toLowerCase().replace(/\s+/g, '-'),
         description: data.description,
-        tags: [`color:${data.color || '#6b7280'}`]
+        tags
       }
     })
 
@@ -93,7 +104,8 @@ export async function POST(request: NextRequest) {
         description: machine.description || '',
         color: data.color || '#6b7280',
         order: 0,
-        servicesCount: 0
+        servicesCount: 0,
+        isExpandedByDefault: data.isExpandedByDefault !== false
       }
     })
   } catch (error) {

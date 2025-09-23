@@ -1,15 +1,22 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 
-interface CreateGroupModalProps {
+interface EditGroupModalProps {
   isOpen: boolean
   onClose: () => void
   onSuccess: () => void
+  group: {
+    id: string
+    name: string
+    description?: string
+    color: string
+    isExpandedByDefault?: boolean
+  }
 }
 
-export default function CreateGroupModal({ isOpen, onClose, onSuccess }: CreateGroupModalProps) {
+export default function EditGroupModal({ isOpen, onClose, onSuccess, group }: EditGroupModalProps) {
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
@@ -18,31 +25,41 @@ export default function CreateGroupModal({ isOpen, onClose, onSuccess }: CreateG
     isExpandedByDefault: true
   })
 
+  useEffect(() => {
+    if (group) {
+      setFormData({
+        name: group.name,
+        description: group.description || '',
+        color: group.color || '#3b82f6',
+        isExpandedByDefault: group.isExpandedByDefault !== false
+      })
+    }
+  }, [group])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     try {
-      const response = await fetch('/api/admin/groups', {
-        method: 'POST',
+      const response = await fetch(`/api/admin/groups/${group.id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
       })
-      
+
       const result = await response.json()
-      
+
       if (result.success) {
         onSuccess()
         onClose()
-        setFormData({ name: '', description: '', color: '#3b82f6', isExpandedByDefault: true })
       } else {
-        alert(result.error || 'Erreur lors de la création du groupe')
+        alert(result.error || 'Erreur lors de la mise à jour du groupe')
       }
     } catch (error) {
-      console.error('Failed to create group:', error)
-      alert('Erreur lors de la création du groupe')
+      console.error('Failed to update group:', error)
+      alert('Erreur lors de la mise à jour du groupe')
     } finally {
       setLoading(false)
     }
@@ -63,8 +80,8 @@ export default function CreateGroupModal({ isOpen, onClose, onSuccess }: CreateG
     <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-[1000]">
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-lg w-[90%] max-h-[90vh] overflow-auto">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="m-0 text-2xl font-semibold text-gray-900 dark:text-white">Créer un nouveau groupe</h2>
-          <button 
+          <h2 className="m-0 text-2xl font-semibold text-gray-900 dark:text-white">Modifier le groupe</h2>
+          <button
             onClick={onClose}
             className="bg-transparent border-0 cursor-pointer p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
@@ -149,19 +166,19 @@ export default function CreateGroupModal({ isOpen, onClose, onSuccess }: CreateG
           </div>
 
           <div className="flex gap-4 justify-end">
-            <button 
+            <button
               type="button"
               onClick={onClose}
               className="btn btn-secondary"
             >
               Annuler
             </button>
-            <button 
+            <button
               type="submit"
               className="btn btn-primary"
               disabled={loading}
             >
-              {loading ? 'Création...' : 'Créer le groupe'}
+              {loading ? 'Sauvegarde...' : 'Sauvegarder'}
             </button>
           </div>
         </form>

@@ -5,6 +5,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import AdminLayout from '@/components/admin/AdminLayout'
 import CreateServiceModal from '@/components/admin/CreateServiceModal'
 import CreateGroupModal from '@/components/admin/CreateGroupModal'
+import EditGroupModal from '@/components/admin/EditGroupModal'
 import EditServiceModal from '@/components/admin/EditServiceModal'
 import ServiceIncidentBadge from '@/components/admin/ServiceIncidentBadge'
 import '../admin.css'
@@ -56,6 +57,7 @@ interface ServiceGroup {
   order: number
   services: Service[]
   isCollapsed?: boolean
+  isExpandedByDefault?: boolean
 }
 
 export default function AdminServicesPage() {
@@ -67,7 +69,9 @@ export default function AdminServicesPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showEditGroupModal, setShowEditGroupModal] = useState(false)
   const [editingService, setEditingService] = useState<Service | null>(null)
+  const [editingGroup, setEditingGroup] = useState<ServiceGroup | null>(null)
   const [checking, setChecking] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
 
@@ -133,7 +137,8 @@ export default function AdminServicesPage() {
         const groupsWithServices = sortedGroups.map((group: any) => ({
           ...group,
           services: [],  // Will be populated by useEffect
-          isCollapsed: false
+          isCollapsed: false,
+          isExpandedByDefault: group.isExpandedByDefault
         }))
 
         console.log('Fetched groups with order:', groupsWithServices.map((g: any) => ({
@@ -460,16 +465,29 @@ export default function AdminServicesPage() {
                     </span>
                   </div>
                   {group.id !== 'ungrouped' && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteGroup(group.id);
-                      }}
-                      className="py-1 px-2 bg-transparent border border-red-500 dark:border-red-400 rounded-lg text-red-500 dark:text-red-400 text-xs cursor-pointer flex items-center gap-1 transition-all hover:bg-red-500 hover:text-white dark:hover:bg-red-400"
-                    >
-                      <Trash2 size={14} />
-                      Delete
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingGroup(group);
+                          setShowEditGroupModal(true);
+                        }}
+                        className="py-1 px-2 bg-transparent border border-blue-500 dark:border-blue-400 rounded-lg text-blue-500 dark:text-blue-400 text-xs cursor-pointer flex items-center gap-1 transition-all hover:bg-blue-500 hover:text-white dark:hover:bg-blue-400"
+                      >
+                        <Edit size={14} />
+                        Éditer
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteGroup(group.id);
+                        }}
+                        className="py-1 px-2 bg-transparent border border-red-500 dark:border-red-400 rounded-lg text-red-500 dark:text-red-400 text-xs cursor-pointer flex items-center gap-1 transition-all hover:bg-red-500 hover:text-white dark:hover:bg-red-400"
+                      >
+                        <Trash2 size={14} />
+                        Supprimer
+                      </button>
+                    </div>
                   )}
                 </div>
                 
@@ -605,7 +623,7 @@ export default function AdminServicesPage() {
           }}
         />
 
-        <CreateGroupModal 
+        <CreateGroupModal
           isOpen={showCreateGroupModal}
           onClose={() => setShowCreateGroupModal(false)}
           onSuccess={async () => {
@@ -613,6 +631,23 @@ export default function AdminServicesPage() {
             await fetchServices()
           }}
         />
+
+        {editingGroup && (
+          <EditGroupModal
+            isOpen={showEditGroupModal}
+            onClose={() => {
+              setShowEditGroupModal(false)
+              setEditingGroup(null)
+            }}
+            onSuccess={async () => {
+              await fetchGroups()
+              await fetchServices()
+              setShowEditGroupModal(false)
+              setEditingGroup(null)
+            }}
+            group={editingGroup}
+          />
+        )}
 
         {editingService && (
           <EditServiceModal 
