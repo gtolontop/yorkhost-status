@@ -71,8 +71,9 @@ model Service {
 
   // Auto-incident settings
   autoIncidentEnabled Boolean @default(true)
-  autoIncidentThreshold Int   @default(1) // Failed checks before creating incident
-  autoIncidentCooldown Int    @default(300) // Seconds between auto-incidents
+  checksBeforeDown Int     @default(2) // Number of failed checks before declaring DOWN
+  checksBeforeMonitoring Int @default(2) // Number of failed checks before declaring MONITORING
+  checksBeforeUp Int       @default(2) // Number of successful checks before declaring UP
   lastAutoIncident DateTime?
 
   machine      Machine?      @relation(fields: [machineId], references: [id], onDelete: Cascade)
