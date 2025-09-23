@@ -434,7 +434,7 @@ p {
 .fade-in {
   animation: fadeIn 0.3s ease-out;
 }
-
+ 
 /* Dark mode utilities */
 .dark .bg-white { background-color: var(--bg-secondary); }
 .dark .bg-gray-50 { background-color: var(--bg-tertiary); }

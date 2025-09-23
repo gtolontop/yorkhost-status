@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
           }
         }
       },
-      orderBy: { name: 'asc' }
+      orderBy: { order: 'asc' }
     })
 
     return NextResponse.json({

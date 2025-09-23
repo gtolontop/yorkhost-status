@@ -12,6 +12,11 @@
   padding: 0 2rem;
   z-index: 999;
   transition: left 0.2s ease;
+
+  :global(.dark) & {
+    background: #1A1A24;
+    border-bottom: 1px solid #374151;
+  }
   
   @media (max-width: 768px) {
     left: 0;
@@ -34,10 +39,19 @@
   padding: 0.5rem;
   border-radius: 6px;
   transition: all 0.15s ease;
-  
+
+  :global(.dark) & {
+    color: #94a3b8;
+  }
+
   &:hover {
     background: #f9fafb;
     color: #374151;
+
+    :global(.dark) & {
+      background: #374151;
+      color: #cbd5e1;
+    }
   }
   
   @media (max-width: 768px) {
@@ -54,13 +68,21 @@
     color: #111827;
     margin: 0;
     line-height: 1.2;
+
+    :global(.dark) & {
+      color: #f1f5f9;
+    }
   }
-  
+
   p {
     font-size: 0.875rem;
     color: #6b7280;
     margin: 0;
     margin-top: 0.25rem;
+
+    :global(.dark) & {
+      color: #94a3b8;
+    }
   }
 }
 
@@ -84,6 +106,10 @@
     left: 0.75rem;
     color: #9ca3af;
     z-index: 1;
+
+    :global(.dark) & {
+      color: #64748b;
+    }
   }
   
   input {
@@ -95,16 +121,32 @@
     font-size: 0.875rem;
     color: #111827;
     transition: all 0.15s ease;
+
+    :global(.dark) & {
+      background: #374151;
+      border: 1px solid #4b5563;
+      color: #f1f5f9;
+    }
     
     &:focus {
       outline: none;
       border-color: #3b82f6;
       background: #ffffff;
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+
+      :global(.dark) & {
+        background: #1f2937;
+        border-color: #6D96FF;
+        box-shadow: 0 0 0 3px rgba(109, 150, 255, 0.2);
+      }
     }
     
     &::placeholder {
       color: #9ca3af;
+
+      :global(.dark) & {
+        color: #64748b;
+      }
     }
   }
 }
@@ -124,10 +166,19 @@
   justify-content: center;
   border-radius: 4px;
   transition: all 0.15s ease;
-  
+
+  :global(.dark) & {
+    color: #64748b;
+  }
+
   &:hover {
     background: #f3f4f6;
     color: #6b7280;
+
+    :global(.dark) & {
+      background: #374151;
+      color: #94a3b8;
+    }
   }
 }
 
@@ -148,6 +199,12 @@
   font-size: 0.8rem;
   font-weight: 500;
   color: #166534;
+
+  :global(.dark) & {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+  }
   
   @media (max-width: 768px) {
     display: none;
@@ -185,10 +242,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
+  :global(.dark) & {
+    color: #94a3b8;
+  }
+
   &:hover {
     background: #f9fafb;
     color: #374151;
+
+    :global(.dark) & {
+      background: #374151;
+      color: #cbd5e1;
+    }
   }
 }
 
@@ -208,10 +274,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
+  :global(.dark) & {
+    color: #94a3b8;
+  }
+
   &:hover {
     background: #f9fafb;
     color: #374151;
+
+    :global(.dark) & {
+      background: #374151;
+      color: #cbd5e1;
+    }
   }
 }
 
@@ -243,6 +318,12 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   z-index: 1000;
+
+  :global(.dark) & {
+    background: #1A1A24;
+    border: 1px solid #374151;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  }
   
   @media (max-width: 480px) {
     width: 320px;
@@ -256,12 +337,20 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  
+
+  :global(.dark) & {
+    border-bottom: 1px solid #374151;
+  }
+
   h3 {
     font-size: 0.875rem;
     font-weight: 600;
     color: #111827;
     margin: 0;
+
+    :global(.dark) & {
+      color: #f1f5f9;
+    }
   }
 }
 
@@ -275,9 +364,17 @@
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   transition: all 0.15s ease;
-  
+
+  :global(.dark) & {
+    color: #6D96FF;
+  }
+
   &:hover {
     background: #eff6ff;
+
+    :global(.dark) & {
+      background: rgba(109, 150, 255, 0.1);
+    }
   }
 }
 
@@ -294,13 +391,25 @@
   gap: 0.75rem;
   cursor: pointer;
   transition: all 0.15s ease;
-  
+
+  :global(.dark) & {
+    border-bottom: 1px solid #374151;
+  }
+
   &:hover {
     background: #f9fafb;
+
+    :global(.dark) & {
+      background: #374151;
+    }
   }
-  
+
   &.unread {
     background: #eff6ff;
+
+    :global(.dark) & {
+      background: rgba(109, 150, 255, 0.05);
+    }
   }
   
   &:last-child {
@@ -320,16 +429,31 @@
   &.error {
     background: #fef2f2;
     color: #dc2626;
+
+    :global(.dark) & {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+    }
   }
-  
+
   &.warning {
     background: #fefbf2;
     color: #d97706;
+
+    :global(.dark) & {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+    }
   }
-  
+
   &.success {
     background: #f0fdf4;
     color: #059669;
+
+    :global(.dark) & {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+    }
   }
 }
 
@@ -342,25 +466,41 @@
     font-weight: 500;
     color: #111827;
     margin: 0 0 0.25rem 0;
+
+    :global(.dark) & {
+      color: #f1f5f9;
+    }
   }
-  
+
   p {
     font-size: 0.75rem;
     color: #6b7280;
     margin: 0 0 0.375rem 0;
     line-height: 1.4;
+
+    :global(.dark) & {
+      color: #94a3b8;
+    }
   }
 }
 
 .notificationTime {
   font-size: 0.7rem;
   color: #9ca3af;
+
+  :global(.dark) & {
+    color: #64748b;
+  }
 }
 
 .notificationFooter {
   padding: 0.75rem 1.25rem;
   border-top: 1px solid #f3f4f6;
   text-align: center;
+
+  :global(.dark) & {
+    border-top: 1px solid #374151;
+  }
   
   button {
     background: none;
@@ -372,9 +512,17 @@
     padding: 0.5rem 1rem;
     border-radius: 6px;
     transition: all 0.15s ease;
-    
+
+    :global(.dark) & {
+      color: #6D96FF;
+    }
+
     &:hover {
       background: #eff6ff;
+
+      :global(.dark) & {
+        background: rgba(109, 150, 255, 0.1);
+      }
     }
   }
 }

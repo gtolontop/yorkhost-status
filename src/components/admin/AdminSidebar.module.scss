@@ -10,6 +10,11 @@
   flex-direction: column;
   transition: width 0.2s ease;
   z-index: 1000;
+
+  :global(.dark) & {
+    background: #1A1A24;
+    border-right: 1px solid #374151;
+  }
   
   &.collapsed {
     width: 80px;
@@ -31,6 +36,10 @@
   align-items: center;
   justify-content: space-between;
   min-height: 80px;
+
+  :global(.dark) & {
+    border-bottom: 1px solid #374151;
+  }
 }
 
 .logo {
@@ -40,9 +49,17 @@
   color: #111827;
   font-weight: 600;
   font-size: 1.125rem;
-  
+
+  :global(.dark) & {
+    color: #f1f5f9;
+  }
+
   svg {
     color: #374151;
+
+    :global(.dark) & {
+      color: #94a3b8;
+    }
   }
 }
 
@@ -52,6 +69,10 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+
+  :global(.dark) & {
+    border-bottom: 1px solid #374151;
+  }
 }
 
 .userAvatar {
@@ -79,6 +100,11 @@
   font-weight: 500;
   font-size: 1rem;
   color: #6b7280;
+
+  :global(.dark) & {
+    background: #374151;
+    color: #94a3b8;
+  }
 }
 
 .userInfo {
@@ -93,12 +119,20 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    :global(.dark) & {
+      color: #f1f5f9;
+    }
   }
   
   p {
     color: #6b7280;
     font-size: 0.75rem;
     margin: 0;
+
+    :global(.dark) & {
+      color: #94a3b8;
+    }
   }
 }
 
@@ -124,6 +158,10 @@
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.025em;
+
+  :global(.dark) & {
+    color: #64748b;
+  }
 }
 
 .navItem {
@@ -140,19 +178,37 @@
   font-size: 0.875rem;
   font-weight: 400;
   text-align: left;
-  
+
+  :global(.dark) & {
+    color: #94a3b8;
+  }
+
   &:hover {
     background: #f9fafb;
     color: #374151;
+
+    :global(.dark) & {
+      background: #374151;
+      color: #cbd5e1;
+    }
   }
   
   &.active {
     background: #f3f4f6;
     color: #111827;
     font-weight: 500;
-    
+
+    :global(.dark) & {
+      background: #4b5563;
+      color: #f1f5f9;
+    }
+
     svg {
       color: #111827;
+
+      :global(.dark) & {
+        color: #f1f5f9;
+      }
     }
   }
   
@@ -179,10 +235,20 @@
   border-radius: 4px;
   min-width: 16px;
   text-align: center;
-  
+
+  :global(.dark) & {
+    background: #374151;
+    color: #94a3b8;
+  }
+
   &.danger {
     background: #fef2f2;
     color: #dc2626;
+
+    :global(.dark) & {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+    }
   }
 }
 
@@ -192,6 +258,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+
+  :global(.dark) & {
+    border-top: 1px solid #374151;
+  }
 }
 
 .footerBtn {
@@ -208,16 +278,30 @@
   font-size: 0.875rem;
   font-weight: 400;
   text-align: left;
-  
+
+  :global(.dark) & {
+    color: #94a3b8;
+  }
+
   &:hover {
     background: #f9fafb;
     color: #374151;
+
+    :global(.dark) & {
+      background: #374151;
+      color: #cbd5e1;
+    }
   }
   
   &.logoutBtn {
     &:hover {
       background: #fef2f2;
       color: #dc2626;
+
+      :global(.dark) & {
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+      }
     }
   }
   

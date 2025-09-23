@@ -9,21 +9,23 @@ interface Service {
 }
 
 interface CreateIncidentModalProps {
+  isOpen: boolean
   onClose: () => void
   onSuccess: () => void
   editData?: any
+  isMaintenanceMode?: boolean
 }
 
-export default function CreateIncidentModal({ onClose, onSuccess, editData }: CreateIncidentModalProps) {
+export default function CreateIncidentModal({ isOpen, onClose, onSuccess, editData, isMaintenanceMode = false }: CreateIncidentModalProps) {
   const [services, setServices] = useState<Service[]>([])
   const [formData, setFormData] = useState({
     title: editData?.title || '',
     description: editData?.description || '',
-    type: editData?.type || 'INCIDENT',
-    status: editData?.status || 'INVESTIGATING',
+    type: editData?.type || (isMaintenanceMode ? 'MAINTENANCE' : 'INCIDENT'),
+    status: editData?.status || (isMaintenanceMode ? 'SCHEDULED' : 'INVESTIGATING'),
     severity: editData?.severity || 'MEDIUM',
     impact: editData?.impact || '',
-    isScheduled: editData?.isScheduled || false,
+    isScheduled: editData?.isScheduled || isMaintenanceMode,
     scheduledFor: editData?.scheduledFor ? new Date(editData.scheduledFor).toISOString().slice(0, 16) : '',
     scheduledEnd: editData?.scheduledEnd ? new Date(editData.scheduledEnd).toISOString().slice(0, 16) : '',
     affectedServices: editData?.affectedServices || []
@@ -105,6 +107,8 @@ export default function CreateIncidentModal({ onClose, onSuccess, editData }: Cr
     ]
   }
 
+  if (!isOpen) return null
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
@@ -119,49 +123,51 @@ export default function CreateIncidentModal({ onClose, onSuccess, editData }: Cr
 
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="space-y-6">
-            {/* Type Selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, type: 'INCIDENT', status: 'INVESTIGATING' })}
-                  className={`p-3 rounded-lg border-2 transition-colors ${
-                    formData.type === 'INCIDENT'
-                      ? 'border-orange-500 bg-orange-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <AlertTriangle className={`w-6 h-6 mx-auto mb-1 ${
-                    formData.type === 'INCIDENT' ? 'text-orange-600' : 'text-gray-400'
-                  }`} />
-                  <div className={`text-sm font-medium ${
-                    formData.type === 'INCIDENT' ? 'text-orange-900' : 'text-gray-700'
-                  }`}>
-                    Incident
-                  </div>
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, type: 'MAINTENANCE', status: 'SCHEDULED', isScheduled: true })}
-                  className={`p-3 rounded-lg border-2 transition-colors ${
-                    formData.type === 'MAINTENANCE'
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <Wrench className={`w-6 h-6 mx-auto mb-1 ${
-                    formData.type === 'MAINTENANCE' ? 'text-blue-600' : 'text-gray-400'
-                  }`} />
-                  <div className={`text-sm font-medium ${
-                    formData.type === 'MAINTENANCE' ? 'text-blue-900' : 'text-gray-700'
-                  }`}>
-                    Maintenance
-                  </div>
-                </button>
+            {/* Type Selection - Only show if not forced mode */}
+            {!isMaintenanceMode && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, type: 'INCIDENT', status: 'INVESTIGATING' })}
+                    className={`p-3 rounded-lg border-2 transition-colors ${
+                      formData.type === 'INCIDENT'
+                        ? 'border-orange-500 bg-orange-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <AlertTriangle className={`w-6 h-6 mx-auto mb-1 ${
+                      formData.type === 'INCIDENT' ? 'text-orange-600' : 'text-gray-400'
+                    }`} />
+                    <div className={`text-sm font-medium ${
+                      formData.type === 'INCIDENT' ? 'text-orange-900' : 'text-gray-700'
+                    }`}>
+                      Incident
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, type: 'MAINTENANCE', status: 'SCHEDULED', isScheduled: true })}
+                    className={`p-3 rounded-lg border-2 transition-colors ${
+                      formData.type === 'MAINTENANCE'
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <Wrench className={`w-6 h-6 mx-auto mb-1 ${
+                      formData.type === 'MAINTENANCE' ? 'text-blue-600' : 'text-gray-400'
+                    }`} />
+                    <div className={`text-sm font-medium ${
+                      formData.type === 'MAINTENANCE' ? 'text-blue-900' : 'text-gray-700'
+                    }`}>
+                      Maintenance
+                    </div>
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Title */}
             <div>

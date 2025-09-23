@@ -43,7 +43,7 @@ export default function IncidentsPage() {
   const [error, setError] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingIncident, setEditingIncident] = useState<Incident | null>(null)
-  const [typeFilter, setTypeFilter] = useState<'all' | 'INCIDENT' | 'MAINTENANCE'>('all')
+  const [typeFilter, setTypeFilter] = useState<'all' | 'INCIDENT' | 'MAINTENANCE'>('INCIDENT')
   const [statusFilter, setStatusFilter] = useState<string>('all')
 
   // Form state
@@ -70,7 +70,11 @@ export default function IncidentsPage() {
       const response = await fetch('/api/admin/incidents')
       if (!response.ok) throw new Error('Failed to fetch incidents')
       const result = await response.json()
-      setIncidents(result.success ? result.data : [])
+      // Filter only INCIDENT type, not MAINTENANCE
+      const incidentsOnly = result.success
+        ? result.data.filter((item: Incident) => item.type === 'INCIDENT')
+        : []
+      setIncidents(incidentsOnly)
     } catch (err) {
       setError('Failed to load incidents')
       setIncidents([])
@@ -169,15 +173,15 @@ export default function IncidentsPage() {
     if (incident) {
       setEditingIncident(incident)
       setFormData({
-        type: incident.type,
+        type: 'INCIDENT', // Always INCIDENT on this page
         title: incident.title,
         description: incident.description,
         status: incident.status,
         severity: incident.severity,
         serviceId: incident.serviceId || '',
         machineId: incident.machineId || '',
-        scheduledFor: incident.scheduledFor || '',
-        scheduledUntil: incident.scheduledUntil || ''
+        scheduledFor: '',
+        scheduledUntil: ''
       })
     } else {
       setEditingIncident(null)
@@ -257,15 +261,15 @@ export default function IncidentsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Incidents & Maintenance</h1>
-            <p className="text-gray-600 mt-1">Manage incidents and scheduled maintenance</p>
+            <h1 className="text-2xl font-bold text-gray-900">Incident Management</h1>
+            <p className="text-gray-600 mt-1">Track and manage system incidents</p>
           </div>
           <button
             onClick={() => openModal()}
             className="flex items-center gap-2 px-4 py-2 bg-[#6D96FF] text-white rounded-lg hover:bg-[#5A84FF] transition-colors"
           >
             <Plus size={20} />
-            Create New
+            Create Incident
           </button>
         </div>
 
@@ -438,7 +442,7 @@ export default function IncidentsPage() {
             <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {editingIncident ? 'Edit' : 'Create'} {formData.type === 'INCIDENT' ? 'Incident' : 'Maintenance'}
+                  {editingIncident ? 'Edit' : 'Create'} Incident
                 </h2>
                 <button
                   onClick={closeModal}
@@ -449,25 +453,8 @@ export default function IncidentsPage() {
               </div>
 
               <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                {/* Type */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
-                  <select
-                    value={formData.type}
-                    onChange={(e) => {
-                      const newType = e.target.value as 'INCIDENT' | 'MAINTENANCE'
-                      setFormData({ 
-                        ...formData, 
-                        type: newType,
-                        status: newType === 'INCIDENT' ? 'INVESTIGATING' : 'SCHEDULED'
-                      })
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                  >
-                    <option value="INCIDENT">Incident</option>
-                    <option value="MAINTENANCE">Maintenance</option>
-                  </select>
-                </div>
+                {/* Type - Hidden for incidents page */}
+                <input type="hidden" value="INCIDENT" />
 
                 {/* Title */}
                 <div>
@@ -560,30 +547,7 @@ export default function IncidentsPage() {
                   </div>
                 </div>
 
-                {/* Scheduled Times (for maintenance) */}
-                {formData.type === 'MAINTENANCE' && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Scheduled Start</label>
-                      <input
-                        type="datetime-local"
-                        value={formData.scheduledFor}
-                        onChange={(e) => setFormData({ ...formData, scheduledFor: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Scheduled End</label>
-                      <input
-                        type="datetime-local"
-                        value={formData.scheduledUntil}
-                        onChange={(e) => setFormData({ ...formData, scheduledUntil: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                      />
-                    </div>
-                  </div>
-                )}
+                {/* Scheduled Times removed - not needed for incidents */}
 
                 {/* Actions */}
                 <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">

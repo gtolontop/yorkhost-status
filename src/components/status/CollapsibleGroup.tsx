@@ -58,9 +58,9 @@ export default function CollapsibleGroup({
   }
 
   return (
-    <div className={`${!isLast ? 'border-b border-gray-200 dark:border-gray-800' : ''}`}>
+    <div className={`${!isLast ? 'border-b border-gray-200 dark:border-gray-700' : ''}`}>
       <div 
-        className="px-4 sm:px-6 py-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#0c0c14]/50 transition-colors flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+        className="px-4 sm:px-6 py-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-yorkhost-dark/50 transition-colors flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
         onClick={toggleCollapse}
       >
         <div className="flex-1">
@@ -131,7 +131,7 @@ export default function CollapsibleGroup({
         className="overflow-hidden transition-all duration-300 ease-in-out"
         style={{ height: height !== undefined ? `${height}px` : 'auto' }}
       >
-        <div ref={contentRef} className="border-t border-gray-200 dark:border-gray-800">
+        <div ref={contentRef} className="border-t border-gray-200 dark:border-gray-700">
           <div className="p-3 sm:p-4 space-y-3">
             {group.services.map((service) => (
               <EnhancedServiceCard
