@@ -13,7 +13,7 @@ interface LayoutProps {
 
 export default function Layout({ children, className }: LayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col bg-white transition-colors">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#0c0c14] transition-colors">
       <Header />
       
       <main className={`flex-1 py-6 md:py-8 lg:py-12 ${className || ''}`}>

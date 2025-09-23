@@ -12,7 +12,10 @@ const createServiceSchema = z.object({
   target: z.string().min(1),
   port: z.union([z.number().int().min(1).max(65535), z.null()]).optional(),
   interval: z.number().int().min(10).default(60),
-  timeout: z.number().int().min(1).max(300).default(10)
+  timeout: z.number().int().min(1).max(300).default(10),
+  expectedStatusCodes: z.array(z.number()).optional(),
+  expectedIP: z.string().optional(),
+  packetCount: z.number().optional()
 }).refine((data) => {
   // TCP requires a port
   if (data.type === 'TCP' && (!data.port || data.port === null)) {
@@ -58,15 +61,29 @@ export async function GET(request: NextRequest) {
     // Transform services with consistent status calculation
     const transformedServices = services.map(service => {
       const allResults = service.checks.flatMap(check => check.results)
-      
+
       // Use shared status calculation logic
       const status = calculateServiceStatus(allResults)
       const uptime = calculateUptime(allResults)
       const responseTime = getLatestResponseTime(allResults)
       const lastCheck = getLastCheckTime(allResults)
 
+      // Get the type and target from the first check (assuming one check per service)
+      const type = service.checks.length > 0 ? service.checks[0].type : undefined
+      const target = service.checks.length > 0 ? service.checks[0].target : undefined
+      const port = service.checks.length > 0 ? service.checks[0].port : undefined
+      const timeout = service.checks.length > 0 ? service.checks[0].timeout : undefined
+      const interval = service.checks.length > 0 ? service.checks[0].interval : undefined
+      const acceptedStatusCodes = service.checks.length > 0 ? service.checks[0].acceptedStatusCodes : undefined
+
       return {
         ...service,
+        type,
+        target,
+        port,
+        timeout,
+        interval,
+        acceptedStatusCodes,
         status,
         uptime,
         responseTime,
@@ -129,10 +146,11 @@ export async function POST(request: NextRequest) {
         type: data.type as any, // Convert string to CheckType enum
         target: data.target,
         port: data.port,
-        timeout: data.timeout,
+        timeout: data.timeout * 1000, // Convert seconds to milliseconds
         interval: data.interval,
         serviceId: service.id,
-        isActive: true
+        isActive: true,
+        acceptedStatusCodes: data.expectedStatusCodes || (data.type === 'HTTP' || data.type === 'HTTPS' ? [200, 201, 202, 203, 204, 301, 302, 303, 304, 307, 308] : [])
       }
     })
 

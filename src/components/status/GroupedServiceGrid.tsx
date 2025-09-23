@@ -75,7 +75,7 @@ export default function GroupedServiceGrid({ services, groups }: GroupedServiceG
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="bg-[#1A1A24] rounded-lg shadow-lg overflow-hidden">
+      <div className="bg-gray-50 dark:bg-[#1a1a24] rounded-lg shadow-lg overflow-hidden">
         {nonEmptyGroups.map((group, index) => (
           <CollapsibleGroup
             key={group.id}

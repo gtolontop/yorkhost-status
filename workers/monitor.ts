@@ -1,5 +1,4 @@
 import { PrismaClient, CheckType } from '@prisma/client'
-import * as cron from 'node-cron'
 
 const prisma = new PrismaClient()
 
@@ -35,10 +34,10 @@ class MonitorWorker {
       await this.loadAndScheduleChecks()
 
       // Reload checks every 5 minutes to pick up changes
-      cron.schedule('*/5 * * * *', async () => {
+      setInterval(async () => {
         console.log('🔄 Reloading checks configuration...')
         await this.loadAndScheduleChecks()
-      })
+      }, 5 * 60 * 1000) // 5 minutes in milliseconds
 
       console.log('✅ Monitor Worker started successfully')
     } catch (error) {

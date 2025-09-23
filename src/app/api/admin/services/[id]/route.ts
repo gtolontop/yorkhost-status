@@ -114,6 +114,24 @@ export async function PUT(
       }
     })
 
+    // Update associated check if we have check-related data
+    if (service.checks.length > 0) {
+      const updateData: any = {}
+
+      if (body.expectedStatusCodes) updateData.acceptedStatusCodes = body.expectedStatusCodes
+      if (body.timeout) updateData.timeout = body.timeout * 1000 // Convert seconds to ms
+      if (body.interval) updateData.interval = body.interval
+      if (body.target) updateData.target = body.target
+      if (body.port !== undefined) updateData.port = body.port
+
+      if (Object.keys(updateData).length > 0) {
+        await prisma.check.update({
+          where: { id: service.checks[0].id },
+          data: updateData
+        })
+      }
+    }
+
     // Create audit log
     await prisma.auditLog.create({
       data: {

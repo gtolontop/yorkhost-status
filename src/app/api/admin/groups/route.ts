@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
     // Use machines table as groups
     const machines = await prisma.machine.findMany({
-      orderBy: { name: 'asc' },
+      orderBy: { order: 'asc' },
       include: {
         services: true
       }
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
         name: machine.name,
         description: machine.description || '',
         color,
-        order: 0,
+        order: machine.order || 0,
         servicesCount: machine.services.length
       }
     })
