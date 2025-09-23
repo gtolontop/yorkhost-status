@@ -118,7 +118,12 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
     const relevantDate = incident.type === 'MAINTENANCE' && incident.scheduledFor
       ? incident.scheduledFor
       : incident.startTime
-    const dateKey = relevantDate.toISOString().split('T')[0]
+
+    // Utiliser la même logique de date key locale
+    const year = relevantDate.getFullYear()
+    const month = String(relevantDate.getMonth() + 1).padStart(2, '0')
+    const day = String(relevantDate.getDate()).padStart(2, '0')
+    const dateKey = `${year}-${month}-${day}`
 
     if (incident.type === 'MAINTENANCE') {
       if (!maintenancesByDate[dateKey]) {
@@ -144,9 +149,14 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
   
   for (let i = 0; i < days; i++) {
     const date = new Date()
-    date.setUTCDate(date.getUTCDate() - (days - 1 - i))
-    date.setUTCHours(0, 0, 0, 0) // Reset time to start of day in UTC
-    const dateKey = date.toISOString().split('T')[0]
+    date.setDate(date.getDate() - (days - 1 - i))
+    date.setHours(0, 0, 0, 0) // Reset time to start of day in local time
+
+    // Utiliser la même logique de date key que pour les données
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const dateKey = `${year}-${month}-${day}`
     
     const dayData = dailyData[dateKey]
     const today = new Date()
