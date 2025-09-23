@@ -84,6 +84,23 @@ export async function POST() {
       })
     }
 
+    // Also toggle checks for maintenance services
+    try {
+      const toggleResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/admin/maintenances/toggle-checks`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (toggleResponse.ok) {
+        const toggleData = await toggleResponse.json()
+        console.log('Maintenance checks toggled:', toggleData.details)
+      }
+    } catch (error) {
+      console.error('Failed to toggle maintenance checks:', error)
+    }
+
     return NextResponse.json({
       success: true,
       updates: updates,
