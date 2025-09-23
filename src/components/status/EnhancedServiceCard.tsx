@@ -21,6 +21,7 @@ interface EnhancedServiceCardProps {
 export default function EnhancedServiceCard({ service, isExpanded, onToggle }: EnhancedServiceCardProps) {
   const historyContext = useUptimeHistory(service.id)
   const [isMobile, setIsMobile] = useState(false)
+  const [activeTooltip, setActiveTooltip] = useState<number | null>(null)
   
   useEffect(() => {
     const checkMobile = () => {
@@ -147,23 +148,115 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
           key={i}
           className={`h-8 flex-1 ${getBarColor()} hover:opacity-80 transition-opacity cursor-pointer relative group rounded-sm`}
           title={`${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}: ${uptime === -1 ? 'No data' : `${uptime.toFixed(1)}% uptime - ${getStatus()}`}`}
+          onMouseEnter={() => setActiveTooltip(i)}
+          onMouseLeave={() => {
+            // Small delay to allow moving to tooltip
+            setTimeout(() => setActiveTooltip(null), 150)
+          }}
         >
-          {/* Tooltip on hover */}
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-            <div className="font-medium">{date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-            <div>{uptime === -1 ? 'No data' : `${uptime.toFixed(1)}% - ${getStatus()}`}</div>
-            {maintenances.length > 0 && (
-              <div className="text-xs text-blue-300 mt-0.5">
-                {maintenances.map((mnt: any) => mnt.title).join(', ')}
+          {/* Enhanced Tooltip with better positioning and interactions */}
+          <div
+            className={`absolute bottom-full transition-all duration-200 z-50 mb-3 ${
+              activeTooltip === i ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            } ${
+              // Smart positioning based on bar position
+              i < 5 ? 'left-0' : i > daysToShow - 6 ? 'right-0' : 'left-1/2 transform -translate-x-1/2'
+            }`}
+            onMouseEnter={() => setActiveTooltip(i)}
+            onMouseLeave={() => setActiveTooltip(null)}
+          >
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl p-4 min-w-[220px] max-w-[320px] backdrop-blur-sm">
+              {/* Date Header */}
+              <div className="font-semibold text-gray-900 dark:text-white text-sm border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
+                {date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
               </div>
-            )}
-            {incidents.length > 0 && (
-              <div className="text-xs text-gray-300 mt-0.5">
-                {incidents.map((inc: any) => inc.title).join(', ')}
+
+              {/* Uptime Status */}
+              <div className="mb-2">
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Uptime</div>
+                <div className={`text-sm font-medium ${
+                  uptime === -1 ? 'text-gray-500' :
+                  uptime >= 99.9 ? 'text-green-600 dark:text-green-400' :
+                  uptime >= 90 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'
+                }`}>
+                  {uptime === -1 ? 'No data available' : `${uptime.toFixed(1)}% - ${getStatus()}`}
+                </div>
               </div>
-            )}
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
-              <div className="border-4 border-transparent border-t-gray-900"></div>
+
+              {/* Maintenances */}
+              {maintenances.length > 0 && (
+                <div className="mb-2">
+                  <div className="text-xs text-blue-600 dark:text-blue-400 uppercase tracking-wide font-medium">
+                    {maintenances.length} Maintenance{maintenances.length > 1 ? 's' : ''}
+                  </div>
+                  <div className="space-y-1 mt-1">
+                    {maintenances.slice(0, 3).map((mnt: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors p-1 -m-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          // Navigate to maintenance detail page
+                          window.open(`/maintenance/${mnt.id}`, '_blank')
+                        }}
+                      >
+                        • {mnt.title}
+                      </div>
+                    ))}
+                    {maintenances.length > 3 && (
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        +{maintenances.length - 3} more maintenance{maintenances.length - 3 > 1 ? 's' : ''}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Incidents */}
+              {incidents.length > 0 && (
+                <div className="mb-2">
+                  <div className="text-xs text-red-600 dark:text-red-400 uppercase tracking-wide font-medium">
+                    {incidents.length} Incident{incidents.length > 1 ? 's' : ''}
+                  </div>
+                  <div className="space-y-1 mt-1">
+                    {incidents.slice(0, 3).map((inc: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="text-sm text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 cursor-pointer transition-colors p-1 -m-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          // Navigate to incident detail page
+                          window.open(`/incident/${inc.id}`, '_blank')
+                        }}
+                      >
+                        • {inc.title}
+                      </div>
+                    ))}
+                    {incidents.length > 3 && (
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        +{incidents.length - 3} more incident{incidents.length - 3 > 1 ? 's' : ''}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Show message when no events */}
+              {maintenances.length === 0 && incidents.length === 0 && uptime !== -1 && (
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  No incidents or maintenances
+                </div>
+              )}
+            </div>
+
+            {/* Tooltip Arrow with smart positioning */}
+            <div className={`absolute top-full ${
+              i < 5 ? 'left-4' : i > daysToShow - 6 ? 'right-4' : 'left-1/2 transform -translate-x-1/2'
+            }`}>
+              <div className="border-6 border-transparent border-t-white dark:border-t-gray-800"></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-px">
+                <div className="border-6 border-transparent border-t-gray-200 dark:border-t-gray-600"></div>
+              </div>
             </div>
           </div>
         </div>
