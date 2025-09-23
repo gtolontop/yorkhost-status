@@ -235,19 +235,8 @@ class MonitorWorker {
         } (${result.responseTime}ms)`
       )
 
-      // Handle auto-incident logic
-      if (check.service) {
-        const { autoIncidentManager } = await import('../src/lib/auto-incident-manager')
-        await autoIncidentManager.handleCheckResult({
-          checkId: result.checkId,
-          serviceId: check.service.id,
-          serviceName: check.service.name,
-          success: result.success,
-          timestamp: result.timestamp,
-          error: result.error,
-          responseTime: result.responseTime
-        })
-      }
+      // Auto-incident logic will be handled directly in the monitoring worker
+      // based on the new service configuration fields (checksBeforeDown, etc.)
 
       // Cleanup old results for this check
       await this.cleanupCheckResults(result.checkId)
