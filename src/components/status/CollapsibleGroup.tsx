@@ -117,7 +117,6 @@ export default function CollapsibleGroup({
                   </h3>
                   {hasIssues && !isCollapsed && !userHasToggled && (
                     <span className="text-xs text-gray-500 dark:text-gray-400 italic">
-                      (auto-expanded)
                     </span>
                   )}
                 </div>
