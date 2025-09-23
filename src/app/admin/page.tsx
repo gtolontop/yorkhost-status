@@ -182,8 +182,7 @@ export default function AdminDashboard() {
               <h1>Dashboard</h1>
               <p>Vue d'ensemble de vos services et infrastructure</p>
             </div>
-            <button 
-              className="btn btn-secondary"
+            <button
               onClick={fetchDashboardData}
               disabled={refreshing}
               className="btn btn-secondary flex items-center gap-2"
