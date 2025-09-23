@@ -213,7 +213,7 @@ export default function MaintenancesPage() {
       setSelectedServices(selectedServices.filter(id => !groupServiceIds.includes(id)))
     } else {
       // Select all services from this group
-      const newSelection = [...new Set([...selectedServices, ...groupServiceIds])]
+      const newSelection = Array.from(new Set([...selectedServices, ...groupServiceIds]))
       setSelectedServices(newSelection)
     }
   }
