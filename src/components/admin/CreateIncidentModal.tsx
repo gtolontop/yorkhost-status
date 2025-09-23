@@ -115,28 +115,6 @@ export default function CreateIncidentModal({ isOpen, onClose, onSuccess, editDa
 
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="space-y-6">
-            {/* Remove type selection - incidents only */}
-            <div className="hidden">
-                    type="button"
-                    onClick={() => setFormData({ ...formData, type: 'MAINTENANCE', status: 'SCHEDULED', isScheduled: true })}
-                    className={`p-3 rounded-lg border-2 transition-colors ${
-                      formData.type === 'MAINTENANCE'
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <Wrench className={`w-6 h-6 mx-auto mb-1 ${
-                      formData.type === 'MAINTENANCE' ? 'text-blue-600' : 'text-gray-400'
-                    }`} />
-                    <div className={`text-sm font-medium ${
-                      formData.type === 'MAINTENANCE' ? 'text-blue-900' : 'text-gray-700'
-                    }`}>
-                      Maintenance
-                    </div>
-                  </button>
-                </div>
-              </div>
-            )}
 
             {/* Title */}
             <div>
@@ -150,7 +128,7 @@ export default function CreateIncidentModal({ isOpen, onClose, onSuccess, editDa
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder={formData.type === 'MAINTENANCE' ? 'Database maintenance' : 'API service outage'}
+                placeholder="API service outage"
               />
             </div>
 
@@ -226,7 +204,7 @@ export default function CreateIncidentModal({ isOpen, onClose, onSuccess, editDa
             </div>
 
             {/* Scheduled Dates (for maintenance) */}
-            {formData.type === 'MAINTENANCE' && (
+            {false && (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>

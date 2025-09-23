@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth/jwt'
 import { prisma } from '@/lib/db'
 import { z } from 'zod'
+import { IncidentStatus } from '@prisma/client'
 
 const updateMaintenanceSchema = z.object({
   title: z.string().min(1).max(200).optional(),
@@ -49,9 +50,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const updated = await prisma.incident.update({
       where: { id },
       data: {
-        ...data,
+        title: data.title,
+        description: data.description,
+        status: data.status ? (data.status as IncidentStatus) : undefined,
         scheduledFor: data.scheduledFor ? new Date(data.scheduledFor) : undefined,
-        scheduledEnd: data.scheduledEnd ? new Date(data.scheduledEnd) : undefined
+        scheduledEnd: data.scheduledEnd ? new Date(data.scheduledEnd) : undefined,
+        affectedServices: data.affectedServices
       },
       include: {
         updates: {

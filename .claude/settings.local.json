@@ -20,7 +20,8 @@
       "Read(//c//**)",
       "Bash(npx next build:*)",
       "Bash(cmd /c:*)",
-      "Bash(timeout 10 npm run dev:*)"
+      "Bash(timeout 10 npm run dev:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []
