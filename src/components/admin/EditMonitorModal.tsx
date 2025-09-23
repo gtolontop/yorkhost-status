@@ -11,6 +11,12 @@ interface Monitor {
   port?: number
   timeout?: number
   interval?: number
+  retryAttempts?: number
+  retryInterval?: number
+  expectedStatus?: number
+  expectedBody?: string
+  followRedirects?: boolean
+  sslCheck?: boolean
   isActive: boolean
   service?: {
     id: string
@@ -33,6 +39,12 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
     port: '',
     timeout: 10,
     interval: 60,
+    retryAttempts: 3,
+    retryInterval: 5,
+    expectedStatus: '',
+    expectedBody: '',
+    followRedirects: true,
+    sslCheck: true,
     isActive: true
   })
   const [loading, setLoading] = useState(false)
@@ -47,6 +59,12 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
         port: monitor.port?.toString() || '',
         timeout: monitor.timeout || 10,
         interval: monitor.interval || 60,
+        retryAttempts: monitor.retryAttempts || 3,
+        retryInterval: monitor.retryInterval || 5,
+        expectedStatus: monitor.expectedStatus?.toString() || '',
+        expectedBody: monitor.expectedBody || '',
+        followRedirects: monitor.followRedirects ?? true,
+        sslCheck: monitor.sslCheck ?? true,
         isActive: monitor.isActive
       })
     }
@@ -65,7 +83,8 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
         },
         body: JSON.stringify({
           ...formData,
-          port: formData.port ? parseInt(formData.port) : null
+          port: formData.port ? parseInt(formData.port) : null,
+          expectedStatus: formData.expectedStatus ? parseInt(formData.expectedStatus) : null
         })
       })
 
@@ -332,6 +351,152 @@ export default function EditMonitorModal({ isOpen, onClose, onSuccess, monitor }
               ))}
             </select>
           </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                marginBottom: '0.5rem',
+                color: '#374151'
+              }}>
+                Retry Attempts
+              </label>
+              <input
+                type="number"
+                value={formData.retryAttempts}
+                onChange={(e) => setFormData({ ...formData, retryAttempts: parseInt(e.target.value) || 3 })}
+                min="0"
+                max="10"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  fontSize: '0.875rem'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                marginBottom: '0.5rem',
+                color: '#374151'
+              }}>
+                Retry Interval (seconds)
+              </label>
+              <input
+                type="number"
+                value={formData.retryInterval}
+                onChange={(e) => setFormData({ ...formData, retryInterval: parseInt(e.target.value) || 5 })}
+                min="1"
+                max="60"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  fontSize: '0.875rem'
+                }}
+              />
+            </div>
+          </div>
+
+          {(formData.type === 'HTTP' || formData.type === 'HTTPS') && (
+            <>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  marginBottom: '0.5rem',
+                  color: '#374151'
+                }}>
+                  Expected HTTP Status (optional)
+                </label>
+                <input
+                  type="number"
+                  value={formData.expectedStatus}
+                  onChange={(e) => setFormData({ ...formData, expectedStatus: e.target.value })}
+                  placeholder="200, 301, etc."
+                  min="100"
+                  max="599"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '0.875rem'
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  marginBottom: '0.5rem',
+                  color: '#374151'
+                }}>
+                  Expected Response Body (optional)
+                </label>
+                <input
+                  type="text"
+                  value={formData.expectedBody}
+                  onChange={(e) => setFormData({ ...formData, expectedBody: e.target.value })}
+                  placeholder="Text to search in response"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '0.875rem'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '2rem', marginBottom: '1rem' }}>
+                <label style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: '#374151',
+                  cursor: 'pointer'
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={formData.followRedirects}
+                    onChange={(e) => setFormData({ ...formData, followRedirects: e.target.checked })}
+                    style={{ marginRight: '0.5rem' }}
+                  />
+                  Follow Redirects
+                </label>
+
+                <label style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: '#374151',
+                  cursor: 'pointer'
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={formData.sslCheck}
+                    onChange={(e) => setFormData({ ...formData, sslCheck: e.target.checked })}
+                    style={{ marginRight: '0.5rem' }}
+                  />
+                  Check SSL Certificate
+                </label>
+              </div>
+            </>
+          )}
 
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={{

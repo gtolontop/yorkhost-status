@@ -35,6 +35,15 @@ module.exports = {
           light: '#dbeafe',
           dark: '#2563eb',
         },
+        // Custom dark mode colors
+        dark: {
+          bg: {
+            primary: '#0C0C14',
+            secondary: '#1A1A24',
+            tertiary: '#252530',
+          },
+          border: '#27272a',
+        },
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],

@@ -18,7 +18,8 @@ export async function executeCheck(
   type: CheckType,
   target: string,
   port?: number | null,
-  timeout: number = 10000
+  timeout: number = 10000,
+  acceptedStatusCodes?: number[]
 ): Promise<CheckResult> {
   console.log(`[CHECKER] Starting ${type} check for ${target}${port ? `:${port}` : ''}`)
   
@@ -28,7 +29,7 @@ export async function executeCheck(
     switch (type) {
       case 'HTTP':
       case 'HTTPS':
-        result = await performHttpCheck(target, timeout)
+        result = await performHttpCheck(target, timeout, acceptedStatusCodes)
         break
       
       case 'TCP':
@@ -62,18 +63,24 @@ export async function executeCheck(
 }
 
 // HTTP/HTTPS CHECK - USING AXIOS FOR BETTER COMPATIBILITY
-async function performHttpCheck(target: string, timeout: number): Promise<CheckResult> {
+async function performHttpCheck(target: string, timeout: number, acceptedStatusCodes?: number[]): Promise<CheckResult> {
   const startTime = Date.now()
-  
+
+  // Default accepted status codes if not provided
+  const validStatusCodes = acceptedStatusCodes && acceptedStatusCodes.length > 0
+    ? acceptedStatusCodes
+    : [200, 201, 202, 203, 204, 301, 302, 303, 304, 307, 308]
+
   try {
     // Fix URL format
     let url = target
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       url = `https://${target}`
     }
-    
+
     console.log(`[HTTP] Testing: ${url}`)
-    
+    console.log(`[HTTP] Accepted status codes: ${validStatusCodes.join(', ')}`)
+
     const response = await axios({
       method: 'GET',
       url: url,
@@ -90,17 +97,17 @@ async function performHttpCheck(target: string, timeout: number): Promise<CheckR
         timeout: timeout
       })
     })
-    
+
     const responseTime = Date.now() - startTime
-    const success = response.status >= 200 && response.status < 400
-    
-    console.log(`[HTTP] Response: ${response.status} in ${responseTime}ms`)
-    
+    const success = validStatusCodes.includes(response.status)
+
+    console.log(`[HTTP] Response: ${response.status} in ${responseTime}ms - ${success ? 'SUCCESS' : 'FAILED'}`)
+
     return {
       success,
       responseTime,
       statusCode: response.status,
-      error: success ? undefined : `HTTP ${response.status}`
+      error: success ? undefined : `HTTP ${response.status} (not in accepted codes: ${validStatusCodes.join(', ')})`
     }
     
   } catch (error: any) {
@@ -217,7 +224,7 @@ async function performPingCheck(target: string, timeout: number): Promise<CheckR
       // If ICMP fails, try TCP on port 80 as fallback
       console.log(`[PING] ICMP failed, trying TCP:80 fallback`)
       try {
-        const tcpResult = await performTcpCheck(cleanTarget, 80, 3000)
+        const tcpResult = await performTcpCheck(cleanTarget, 80, 10000)
         if (tcpResult.success) {
           console.log(`[PING] TCP:80 fallback success`)
           return tcpResult
@@ -240,7 +247,7 @@ async function performPingCheck(target: string, timeout: number): Promise<CheckR
     // Fallback to TCP check on port 80 if ping command fails
     try {
       console.log(`[PING] Trying TCP:80 fallback after command error`)
-      const tcpResult = await performTcpCheck(cleanTarget, 80, 3000)
+      const tcpResult = await performTcpCheck(cleanTarget, 80, 10000)
       if (tcpResult.success) {
         console.log(`[PING] TCP:80 fallback success`)
         return tcpResult

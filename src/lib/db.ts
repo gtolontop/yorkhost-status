@@ -276,7 +276,7 @@ export async function getStatusOverview() {
     overallStatus = 'maintenance' as any
   } else if (hasOutage || activeIncidents.some(i => i.severity === 'CRITICAL')) {
     overallStatus = 'outage'
-  } else if (hasDegraded || hasActiveIncidents || averageUptime < 99) {
+  } else if (hasDegraded || hasActiveIncidents) {
     overallStatus = 'degraded'
   }
 

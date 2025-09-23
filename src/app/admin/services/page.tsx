@@ -32,6 +32,13 @@ interface Service {
   name: string
   description?: string
   url?: string
+  type?: string
+  target?: string
+  port?: number | null
+  timeout?: number
+  interval?: number
+  acceptedStatusCodes?: number[]
+  expectedStatusCode?: number
   status: 'operational' | 'degraded' | 'outage' | 'unknown'
   uptime: number
   responseTime: number
@@ -84,6 +91,12 @@ export default function AdminServicesPage() {
           name: service.name,
           description: service.description,
           url: service.url,
+          type: service.type,
+          target: service.target,
+          port: service.port,
+          timeout: service.timeout,
+          interval: service.interval,
+          acceptedStatusCodes: service.acceptedStatusCodes,
           status: service.status || 'unknown',
           uptime: service.uptime || 0,
           responseTime: service.responseTime || 0,
@@ -107,13 +120,28 @@ export default function AdminServicesPage() {
     try {
       const response = await fetch('/api/admin/groups')
       const result = await response.json()
-      
+
       if (result.success) {
-        const groupsWithServices = result.data.map((group: any) => ({
+        // Sort groups by order to ensure correct display
+        const sortedGroups = result.data.sort((a: any, b: any) => {
+          // Keep 'ungrouped' at the end
+          if (a.id === 'ungrouped') return 1
+          if (b.id === 'ungrouped') return -1
+          return (a.order || 0) - (b.order || 0)
+        })
+
+        const groupsWithServices = sortedGroups.map((group: any) => ({
           ...group,
           services: [],  // Will be populated by useEffect
           isCollapsed: false
         }))
+
+        console.log('Fetched groups with order:', groupsWithServices.map((g: any) => ({
+          id: g.id,
+          name: g.name,
+          order: g.order
+        })))
+
         setGroups(groupsWithServices)
       }
     } catch (error) {
@@ -132,16 +160,55 @@ export default function AdminServicesPage() {
   const handleDragEnd = async (result: any) => {
     if (!result.destination) return
 
-    const { source, destination, draggableId } = result
-    
+    const { source, destination, draggableId, type } = result
+
     if (source.droppableId === destination.droppableId && source.index === destination.index) {
       return
     }
 
-    // Update local state optimistically
+    // Handle group reordering
+    if (type === 'GROUP') {
+      const reorderedGroups = Array.from(groups)
+      const [removed] = reorderedGroups.splice(source.index, 1)
+      reorderedGroups.splice(destination.index, 0, removed)
+
+      // Update order values
+      const updatedGroups = reorderedGroups.map((group, index) => ({
+        ...group,
+        order: index
+      }))
+
+      setGroups(updatedGroups)
+
+      // Update server
+      try {
+        console.log('Sending reorder request for groups:', updatedGroups.map((g, idx) => ({ id: g.id, name: g.name, order: idx })))
+        const response = await fetch('/api/admin/groups/reorder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            groups: updatedGroups.map((g, idx) => ({ id: g.id, order: idx }))
+          })
+        })
+
+        const result = await response.json()
+        console.log('Reorder response:', result)
+
+        if (!result.success) {
+          console.error('Failed to reorder groups:', result.error)
+          fetchGroups() // Reload groups on error
+        }
+      } catch (error) {
+        console.error('Failed to reorder groups:', error)
+        fetchGroups()
+      }
+      return
+    }
+
+    // Handle service moving (existing code)
     const serviceId = draggableId
     const newGroupId = destination.droppableId
-    
+
     setServices(prev => prev.map(service => {
       if (service.id === serviceId) {
         return { ...service, groupId: newGroupId, order: destination.index }
@@ -357,15 +424,29 @@ export default function AdminServicesPage() {
 
         {/* Services by Groups */}
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="flex flex-col gap-4">
-            {filteredGroups.map(group => (
-              <div key={group.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+          <Droppable droppableId="groups" type="GROUP">
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef} className="flex flex-col gap-4">
+                {filteredGroups.map((group, index) => (
+                  <Draggable key={group.id} draggableId={group.id} index={index} isDragDisabled={group.id === 'ungrouped'}>
+                    {(dragProvided, dragSnapshot) => (
+                      <div
+                        ref={dragProvided.innerRef}
+                        {...dragProvided.draggableProps}
+                        className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden ${dragSnapshot.isDragging ? 'shadow-lg' : ''}`}
+                        style={dragProvided.draggableProps.style}
+                      >
                 <div 
                   className="p-4 px-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between cursor-pointer"
                   style={{ backgroundColor: `${group.color}10` }}
                   onClick={() => toggleGroup(group.id)}
                 >
                   <div className="flex items-center gap-3">
+                    {group.id !== 'ungrouped' && (
+                      <div {...dragProvided.dragHandleProps} className="cursor-grab">
+                        <GripVertical size={20} className="text-gray-400 dark:text-gray-500" />
+                      </div>
+                    )}
                     {group.isCollapsed ? <ChevronRight size={20} className="text-gray-600 dark:text-gray-400" /> : <ChevronDown size={20} className="text-gray-600 dark:text-gray-400" />}
                     <div 
                       className="w-3 h-3 rounded-full"
@@ -504,9 +585,14 @@ export default function AdminServicesPage() {
                     )}
                   </Droppable>
                 )}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
               </div>
-            ))}
-          </div>
+            )}
+          </Droppable>
         </DragDropContext>
 
         {/* Modals */}
