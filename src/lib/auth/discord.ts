@@ -29,11 +29,21 @@ export class DiscordAuth {
   }
 
   private getRedirectUri(requestUrl?: string): string {
+    // Priority: Use NEXTAUTH_URL from env if it's a full URL with https
+    const envUrl = process.env.NEXTAUTH_URL
+    if (envUrl && envUrl.startsWith('https://')) {
+      return `${envUrl}/api/auth/discord/callback`
+    }
+
+    // Otherwise use request URL if provided
     if (requestUrl) {
       const url = new URL(requestUrl)
-      return `${url.protocol}//${url.host}/api/auth/discord/callback`
+      // Force HTTPS in production or if NEXTAUTH_URL contains https
+      const protocol = process.env.NODE_ENV === 'production' || envUrl?.includes('https') ? 'https:' : url.protocol
+      return `${protocol}//${url.host}/api/auth/discord/callback`
     }
-    return `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/discord/callback`
+
+    return `${envUrl || 'http://localhost:3000'}/api/auth/discord/callback`
   }
 
   private checkConfig() {

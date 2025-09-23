@@ -10,10 +10,12 @@ export async function GET(request: NextRequest) {
   // Get the base URL with proper proxy handling
   const getBaseUrl = () => {
     const forwardedHost = request.headers.get('x-forwarded-host')
-    const forwardedProto = request.headers.get('x-forwarded-proto') || 'http'
+    const envUrl = process.env.NEXTAUTH_URL
 
     if (forwardedHost) {
-      return `${forwardedProto}://${forwardedHost}`
+      // Force HTTPS if NEXTAUTH_URL uses HTTPS
+      const proto = envUrl?.startsWith('https://') ? 'https' : (request.headers.get('x-forwarded-proto') || 'http')
+      return `${proto}://${forwardedHost}`
     }
 
     const url = new URL(request.url)
@@ -33,9 +35,16 @@ export async function GET(request: NextRequest) {
 
   try {
     // Authenticate user with Discord, passing the full request URL for redirect URI
-    const requestUrl = request.headers.get('x-forwarded-host')
-      ? `${request.headers.get('x-forwarded-proto') || 'http'}://${request.headers.get('x-forwarded-host')}`
-      : request.url
+    const forwardedHost = request.headers.get('x-forwarded-host')
+    const envUrl = process.env.NEXTAUTH_URL
+
+    let requestUrl: string
+    if (forwardedHost) {
+      const proto = envUrl?.startsWith('https://') ? 'https' : (request.headers.get('x-forwarded-proto') || 'http')
+      requestUrl = `${proto}://${forwardedHost}`
+    } else {
+      requestUrl = request.url
+    }
 
     const authResult = await discordAuth.authenticateUser(code, requestUrl)
 
