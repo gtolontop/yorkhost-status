@@ -13,21 +13,20 @@ interface CreateIncidentModalProps {
   onClose: () => void
   onSuccess: () => void
   editData?: any
-  isMaintenanceMode?: boolean
 }
 
-export default function CreateIncidentModal({ isOpen, onClose, onSuccess, editData, isMaintenanceMode = false }: CreateIncidentModalProps) {
+export default function CreateIncidentModal({ isOpen, onClose, onSuccess, editData }: CreateIncidentModalProps) {
   const [services, setServices] = useState<Service[]>([])
   const [formData, setFormData] = useState({
     title: editData?.title || '',
     description: editData?.description || '',
-    type: editData?.type || (isMaintenanceMode ? 'MAINTENANCE' : 'INCIDENT'),
-    status: editData?.status || (isMaintenanceMode ? 'SCHEDULED' : 'INVESTIGATING'),
+    type: 'INCIDENT' as const,
+    status: editData?.status || 'INVESTIGATING',
     severity: editData?.severity || 'MEDIUM',
     impact: editData?.impact || '',
-    isScheduled: editData?.isScheduled || isMaintenanceMode,
-    scheduledFor: editData?.scheduledFor ? new Date(editData.scheduledFor).toISOString().slice(0, 16) : '',
-    scheduledEnd: editData?.scheduledEnd ? new Date(editData.scheduledEnd).toISOString().slice(0, 16) : '',
+    isScheduled: false,
+    scheduledFor: '',
+    scheduledEnd: '',
     affectedServices: editData?.affectedServices || []
   })
   const [loading, setLoading] = useState(false)
@@ -92,13 +91,6 @@ export default function CreateIncidentModal({ isOpen, onClose, onSuccess, editDa
   }
 
   const getStatusOptions = () => {
-    if (formData.type === 'MAINTENANCE') {
-      return [
-        { value: 'SCHEDULED', label: 'Scheduled' },
-        { value: 'IN_PROGRESS', label: 'In Progress' },
-        { value: 'COMPLETED', label: 'Completed' }
-      ]
-    }
     return [
       { value: 'INVESTIGATING', label: 'Investigating' },
       { value: 'IDENTIFIED', label: 'Identified' },
@@ -114,7 +106,7 @@ export default function CreateIncidentModal({ isOpen, onClose, onSuccess, editDa
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
         <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-900">
-            {editData ? 'Edit' : 'Create'} {formData.type === 'MAINTENANCE' ? 'Maintenance' : 'Incident'}
+            {editData ? 'Edit' : 'Create'} Incident
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={20} />
@@ -123,31 +115,8 @@ export default function CreateIncidentModal({ isOpen, onClose, onSuccess, editDa
 
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="space-y-6">
-            {/* Type Selection - Only show if not forced mode */}
-            {!isMaintenanceMode && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, type: 'INCIDENT', status: 'INVESTIGATING' })}
-                    className={`p-3 rounded-lg border-2 transition-colors ${
-                      formData.type === 'INCIDENT'
-                        ? 'border-orange-500 bg-orange-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <AlertTriangle className={`w-6 h-6 mx-auto mb-1 ${
-                      formData.type === 'INCIDENT' ? 'text-orange-600' : 'text-gray-400'
-                    }`} />
-                    <div className={`text-sm font-medium ${
-                      formData.type === 'INCIDENT' ? 'text-orange-900' : 'text-gray-700'
-                    }`}>
-                      Incident
-                    </div>
-                  </button>
-
-                  <button
+            {/* Remove type selection - incidents only */}
+            <div className="hidden">
                     type="button"
                     onClick={() => setFormData({ ...formData, type: 'MAINTENANCE', status: 'SCHEDULED', isScheduled: true })}
                     className={`p-3 rounded-lg border-2 transition-colors ${
