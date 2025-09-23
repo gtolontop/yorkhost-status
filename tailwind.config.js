@@ -36,13 +36,11 @@ module.exports = {
           dark: '#2563eb',
         },
         // Custom dark mode colors
-        dark: {
-          bg: {
-            primary: '#0C0C14',
-            secondary: '#1A1A24',
-            tertiary: '#252530',
-          },
-          border: '#27272a',
+        yorkhost: {
+          dark: '#0C0C14',
+          darkCard: '#1A1A24',
+          darkHover: '#252530',
+          darkBorder: '#27272a',
         },
       },
       fontFamily: {

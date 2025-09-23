@@ -74,7 +74,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       case '/admin/machines':
         return { title: 'Machines', subtitle: 'Server configuration' }
       case '/admin/incidents':
-        return { title: 'Incidents', subtitle: 'Incident and maintenance management' }
+        return { title: 'Incidents', subtitle: 'Incident management and tracking' }
+      case '/admin/maintenances':
+        return { title: 'Maintenances', subtitle: 'Scheduled maintenance windows' }
       case '/admin/monitoring':
         return { title: 'Monitoring', subtitle: 'Real-time monitoring' }
       case '/admin/monitors':

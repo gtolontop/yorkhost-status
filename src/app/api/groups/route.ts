@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     // Use machines table as groups
     const machines = await prisma.machine.findMany({
       where: { isActive: true },
-      orderBy: { name: 'asc' },
+      orderBy: { order: 'asc' },
       include: {
         services: {
           where: { isActive: true }
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
         name: machine.name,
         description: machine.description || '',
         color,
-        order: 0,
+        order: machine.order,
         servicesCount: machine.services.length
       }
     })

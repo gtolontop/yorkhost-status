@@ -2,20 +2,21 @@
 
 import { useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { 
-  LayoutDashboard, 
-  Server, 
-  AlertTriangle, 
-  Activity, 
-  Users, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Server,
+  AlertTriangle,
+  Activity,
+  Users,
+  Settings,
   LogOut,
   ChevronLeft,
   ChevronRight,
   Monitor,
   Database,
   Shield,
-  Bell
+  Bell,
+  Wrench
 } from 'lucide-react'
 import styles from './AdminSidebar.module.scss'
 
@@ -61,6 +62,12 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       active: pathname.startsWith('/admin/incidents'),
       badge: '2',
       badgeColor: 'danger'
+    },
+    {
+      icon: Wrench,
+      label: 'Maintenances',
+      href: '/admin/maintenances',
+      active: pathname.startsWith('/admin/maintenances')
     },
     {
       icon: Activity,

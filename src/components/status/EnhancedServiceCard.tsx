@@ -122,7 +122,7 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
       const incidents = dayData?.incidents || []
       
       const getBarColor = () => {
-        if (!dayData || uptime === -1) return 'bg-gray-300' // No data = gray
+        if (!dayData || uptime === -1) return 'bg-gray-300 dark:bg-gray-600' // No data = gray
         if (uptime >= 99.9) return 'bg-green-500'
         if (uptime >= 90) return 'bg-yellow-500'
         return 'bg-red-500'
@@ -144,7 +144,7 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
           title={`${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}: ${uptime === -1 ? 'No data' : `${uptime.toFixed(1)}% uptime - ${getStatus()}`}`}
         >
           {/* Tooltip on hover */}
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
             <div className="font-medium">{date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
             <div>{uptime === -1 ? 'No data' : `${uptime.toFixed(1)}% - ${getStatus()}`}</div>
             {incidents.length > 0 && (
@@ -224,14 +224,14 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
 
         {/* Active Incident Banner */}
         {service.activeIncident && service.enhancedStatus === 'outage-with-incident' && (
-          <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-md">
-            <div className="text-sm text-orange-800">
+          <div className="mt-4 p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-md">
+            <div className="text-sm text-orange-800 dark:text-orange-300">
               <div className="flex items-center gap-2 mb-1">
                 <AlertCircle className="w-4 h-4" />
                 <span className="font-medium">Active Incident:</span>
               </div>
               <p className="ml-6">{service.activeIncident.title}</p>
-              <p className="ml-6 text-xs mt-1 text-orange-600">
+              <p className="ml-6 text-xs mt-1 text-orange-600 dark:text-orange-400">
                 Started {formatRelativeTime(service.activeIncident.startTime)}
               </p>
             </div>
@@ -240,15 +240,15 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
 
         {/* Maintenance Banner */}
         {service.activeIncident && service.enhancedStatus === 'maintenance' && (
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-            <div className="text-sm text-blue-800">
+          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+            <div className="text-sm text-blue-800 dark:text-blue-300">
               <div className="flex items-center gap-2 mb-1">
                 <Wrench className="w-4 h-4" />
                 <span className="font-medium">Scheduled Maintenance:</span>
               </div>
               <p className="ml-6">{service.activeIncident.title}</p>
               {service.activeIncident.scheduledEnd && (
-                <p className="ml-6 text-xs mt-1 text-blue-600">
+                <p className="ml-6 text-xs mt-1 text-blue-600 dark:text-blue-400">
                   Expected completion: {new Date(service.activeIncident.scheduledEnd).toLocaleString()}
                 </p>
               )}
@@ -259,7 +259,7 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="border-t border-gray-200 dark:border-gray-800 p-6">
+        <div className="border-t border-gray-200 dark:border-gray-700 p-6">
           {/* Stats Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 mb-6">
             <div className="text-center">
