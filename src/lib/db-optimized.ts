@@ -71,23 +71,37 @@ export async function getOptimizedUptimeHistory(serviceId: string, days: number 
 
   // Build result array
   const uptimeData: UptimeData[] = []
-  
+  let lastKnownUptime = 100 // Assume 100% if no previous data
+
   for (let i = 0; i < days; i++) {
     const date = new Date()
     date.setUTCDate(date.getUTCDate() - (days - 1 - i))
     date.setUTCHours(0, 0, 0, 0)
     const dateKey = date.toISOString().split('T')[0]
-    
+
     const dayStats = statsMap[dateKey]
-    let uptime = null
-    
+    let uptime: number
+
     if (dayStats && dayStats.total > 0) {
       uptime = (dayStats.successful / dayStats.total) * 100
+      lastKnownUptime = uptime // Update last known uptime
+    } else {
+      // Pas de données pour ce jour - maintenir la continuité avec le dernier statut connu
+      const hasIncidents = incidentsByDate[dateKey] && incidentsByDate[dateKey].length > 0
+
+      if (hasIncidents) {
+        // S'il y a des incidents, réduire l'uptime
+        uptime = Math.max(lastKnownUptime * 0.8, 0) // Réduire de 20%
+        lastKnownUptime = uptime
+      } else {
+        // Pas de données, pas d'incidents - maintenir le statut précédent
+        uptime = lastKnownUptime
+      }
     }
-    
+
     uptimeData.push({
       date: dateKey,
-      uptime: uptime !== null ? Math.round(uptime * 100) / 100 : null as any,
+      uptime: Math.round(uptime * 100) / 100,
       incidents: incidentsByDate[dateKey] || []
     })
   }
@@ -183,23 +197,37 @@ export async function getBulkUptimeHistory(serviceIds: string[], days: number = 
   // Build results for each service
   serviceIds.forEach(serviceId => {
     const uptimeData: UptimeData[] = []
-    
+    let lastKnownUptime = 100 // Assume 100% if no previous data
+
     for (let i = 0; i < days; i++) {
       const date = new Date()
       date.setUTCDate(date.getUTCDate() - (days - 1 - i))
       date.setUTCHours(0, 0, 0, 0)
       const dateKey = date.toISOString().split('T')[0]
-      
+
       const dayStats = statsByService[serviceId][dateKey]
-      let uptime = null
-      
+      let uptime: number
+
       if (dayStats && dayStats.total > 0) {
         uptime = (dayStats.successful / dayStats.total) * 100
+        lastKnownUptime = uptime // Update last known uptime
+      } else {
+        // Pas de données pour ce jour - maintenir la continuité avec le dernier statut connu
+        const hasIncidents = incidentsByService[serviceId][dateKey] && incidentsByService[serviceId][dateKey].length > 0
+
+        if (hasIncidents) {
+          // S'il y a des incidents, réduire l'uptime
+          uptime = Math.max(lastKnownUptime * 0.8, 0) // Réduire de 20%
+          lastKnownUptime = uptime
+        } else {
+          // Pas de données, pas d'incidents - maintenir le statut précédent
+          uptime = lastKnownUptime
+        }
       }
-      
+
       uptimeData.push({
         date: dateKey,
-        uptime: uptime !== null ? Math.round(uptime * 100) / 100 : null as any,
+        uptime: Math.round(uptime * 100) / 100,
         incidents: incidentsByService[serviceId][dateKey] || []
       })
     }
