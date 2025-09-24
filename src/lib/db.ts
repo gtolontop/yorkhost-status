@@ -146,7 +146,8 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
 
   // Convert to UptimeData array
   const uptimeData: UptimeData[] = []
-  
+  let lastKnownUptime = 100 // Assume 100% if no previous data
+
   for (let i = 0; i < days; i++) {
     const date = new Date()
     date.setDate(date.getDate() - (days - 1 - i))
@@ -157,20 +158,38 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
     const month = String(date.getMonth() + 1).padStart(2, '0')
     const day = String(date.getDate()).padStart(2, '0')
     const dateKey = `${year}-${month}-${day}`
-    
+
     const dayData = dailyData[dateKey]
     const today = new Date()
     today.setHours(23, 59, 59, 999) // End of today
-    
+
     // Si on a des données pour ce jour, calculer l'uptime
-    let uptime = null
+    let uptime: number
     if (dayData && dayData.total > 0) {
       uptime = (dayData.successful / dayData.total) * 100
+      lastKnownUptime = uptime // Update last known uptime
+    } else {
+      // Pas de données pour ce jour - maintenir la continuité avec le dernier statut connu
+      // Si il y a des incidents ce jour-là, considérer comme dégradé
+      const hasIncidents = incidentsByDate[dateKey] && incidentsByDate[dateKey].length > 0
+      const hasMaintenances = maintenancesByDate[dateKey] && maintenancesByDate[dateKey].length > 0
+
+      if (hasIncidents && !hasMaintenances) {
+        // S'il y a des incidents sans maintenance, réduire l'uptime
+        uptime = Math.max(lastKnownUptime * 0.8, 0) // Réduire de 20%
+        lastKnownUptime = uptime
+      } else if (hasMaintenances) {
+        // Maintenance planifiée - garder le dernier uptime connu
+        uptime = lastKnownUptime
+      } else {
+        // Pas de données, pas d'incidents - maintenir le statut précédent
+        uptime = lastKnownUptime
+      }
     }
-    
+
     uptimeData.push({
       date: dateKey,
-      uptime: uptime !== null ? Math.round(uptime * 100) / 100 : null as any,
+      uptime: Math.round(uptime * 100) / 100,
       incidents: incidentsByDate[dateKey] || [],
       maintenances: maintenancesByDate[dateKey] || []
     })
