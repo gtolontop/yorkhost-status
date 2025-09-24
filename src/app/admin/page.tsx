@@ -153,7 +153,7 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout>
-      <div className="admin-page">
+      <div className="">
         {/* Alert Banner for Services Down Without Incident */}
         {servicesDownWithoutIncident > 0 && (
           <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">

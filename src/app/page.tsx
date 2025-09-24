@@ -9,12 +9,31 @@ import PageHeader from '@/components/ui/PageHeader'
 import { StatusOverview as StatusOverviewType } from '@/types'
 import { useStatusUpdates } from '@/lib/pusher/client'
 import { UptimeHistoryProvider } from '@/contexts/UptimeHistoryContext'
+import { useStatusControls } from '@/contexts/StatusControlsContext'
+import { BellOff } from 'lucide-react'
 
 export default function HomePage() {
   const [status, setStatus] = useState<StatusOverviewType | null>(null)
   const [groups, setGroups] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showNotificationModal, setShowNotificationModal] = useState(false)
+
+  const statusControls = useStatusControls()
+
+  const handleManualRefresh = () => {
+    fetchStatus(false)
+  }
+
+  const handleNotificationClick = () => {
+    setShowNotificationModal(true)
+  }
+
+  useEffect(() => {
+    // Set our callback functions in the context
+    statusControls.setRefreshCallback(() => handleManualRefresh)
+    statusControls.setNotificationCallback(() => handleNotificationClick)
+  }, [])
 
   useEffect(() => {
     fetchStatus()
@@ -28,11 +47,11 @@ export default function HomePage() {
       fetchStatus()
     })
 
-    // Check maintenance auto-status every 30 seconds
+    // Check maintenance auto-status every 15 seconds for real-time updates
     const statusInterval = setInterval(() => {
       checkAutoStatus()
-      fetchStatus()
-    }, 30000)
+      fetchStatus(false) // Auto-refresh without loading state
+    }, 15000)
 
     return () => {
       unsubscribe()
@@ -50,14 +69,21 @@ export default function HomePage() {
     }
   }
 
-  const fetchStatus = async () => {
+  const fetchStatus = async (showLoading = true) => {
+    if (showLoading) {
+      setLoading(true)
+    } else {
+      statusControls.setIsRefreshing(true)
+    }
+
     try {
       const response = await fetch('/api/status')
       const result = await response.json()
-      
+
       if (result.success) {
         setStatus(result.data)
         setError(null)
+        statusControls.setLastUpdated(new Date())
       } else {
         setError(result.error || 'Failed to fetch status')
       }
@@ -66,6 +92,7 @@ export default function HomePage() {
       console.error('Status fetch error:', err)
     } finally {
       setLoading(false)
+      statusControls.setIsRefreshing(false)
     }
   }
 
@@ -104,8 +131,8 @@ export default function HomePage() {
           <div className="bg-white dark:bg-[#1a1a24] border border-gray-200 dark:border-[#0c0c14] rounded-lg shadow-sm text-center py-12 px-6">
             <h2 className="text-xl font-semibold text-danger mb-4">Error Loading Status</h2>
             <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
-            <button 
-              onClick={fetchStatus}
+            <button
+              onClick={() => fetchStatus()}
               className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white rounded-md font-medium hover:bg-primary-hover transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
             >
               Try Again
@@ -197,6 +224,47 @@ export default function HomePage() {
           <GroupedServiceGrid services={status?.services || []} groups={groups} />
         </UptimeHistoryProvider>
       </div>
+
+      {/* Notification Modal */}
+      {showNotificationModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-yorkhost-darkCard rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Notifications
+              </h3>
+              <button
+                onClick={() => setShowNotificationModal(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="text-center py-8">
+              <BellOff className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h4 className="text-xl font-medium text-gray-900 dark:text-white mb-2">
+                Coming Soon!
+              </h4>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                Push notifications for status updates are not yet available. This feature is currently under development.
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                For now, this page auto-refreshes every 15 seconds to keep you updated.
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setShowNotificationModal(false)}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   )
 }

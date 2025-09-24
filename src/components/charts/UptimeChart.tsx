@@ -30,11 +30,16 @@ interface UptimeChartProps {
 export default function UptimeChart({ data }: UptimeChartProps) {
   const chartRef = useRef<ChartJS<'bar'>>(null)
 
-  const getBarColor = (uptime: number, hasMaintenance: boolean) => {
+  const getBarColor = (uptime: number | null, hasMaintenance: boolean) => {
     if (hasMaintenance) return '#3b82f6' // Blue for maintenance (priority)
-    if (uptime >= 99.5) return '#22c55e' // Success
-    if (uptime >= 95) return '#f59e0b'   // Warning
-    return '#ef4444'                     // Danger
+
+    // Handle null or undefined uptime
+    if (uptime === null || uptime === undefined) return '#6b7280' // Gray for no data
+
+    if (uptime >= 99.5) return '#22c55e' // Green - Success
+    if (uptime >= 95) return '#f59e0b'   // Orange - Warning
+    if (uptime >= 90) return '#f97316'   // Orange-red - Poor
+    return '#ef4444'                     // Red - Critical
   }
 
   const chartData = {

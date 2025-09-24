@@ -199,7 +199,7 @@ export default function MaintenanceDetailPage() {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {maintenance.affectedServicesWithNames.map((service) => (
-                    <span key={service.id} className="px-2 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 rounded text-xs font-medium">
+                    <span key={service.id} className="px-2 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 rounded text-xs font-medium break-words">
                       {service.name}
                     </span>
                   ))}
@@ -231,9 +231,9 @@ export default function MaintenanceDetailPage() {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex flex-col gap-2 mb-1">
                           {update.title && (
-                            <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                            <h4 className="text-sm font-medium text-gray-900 dark:text-white break-words">
                               {update.title}
                             </h4>
                           )}
@@ -241,7 +241,7 @@ export default function MaintenanceDetailPage() {
                             {format(new Date(update.timestamp), 'PPP p')}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 whitespace-pre-wrap">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 whitespace-pre-wrap break-words overflow-wrap-anywhere">
                           {update.message}
                         </p>
                         {update.authorName && (

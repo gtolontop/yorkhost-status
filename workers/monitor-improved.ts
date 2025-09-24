@@ -205,6 +205,17 @@ class MonitorWorker {
 
   private async saveCheckResult(result: CheckResult) {
     try {
+      // Get service info for this check
+      const check = await prisma.check.findUnique({
+        where: { id: result.checkId },
+        include: { service: true }
+      })
+
+      if (!check) {
+        console.error(`❌ Check ${result.checkId} not found`)
+        return
+      }
+
       // Save the new result
       await prisma.checkResult.create({
         data: {
@@ -223,6 +234,9 @@ class MonitorWorker {
           result.success ? '✅ Success' : '❌ Failed'
         } (${result.responseTime}ms)`
       )
+
+      // Auto-incident logic will be handled directly in the monitoring worker
+      // based on the new service configuration fields (checksBeforeDown, etc.)
 
       // Cleanup old results for this check
       await this.cleanupCheckResults(result.checkId)

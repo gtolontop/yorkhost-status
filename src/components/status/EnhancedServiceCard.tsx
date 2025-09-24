@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { ServiceWithEnhancedStatus, UptimeData } from '@/types'
 import { formatResponseTime, formatRelativeTime } from '@/lib/utils'
 import { ChevronDown, ChevronUp, CheckCircle, AlertTriangle, XCircle, HelpCircle, AlertCircle, Wrench, Info } from 'lucide-react'
@@ -21,6 +22,9 @@ interface EnhancedServiceCardProps {
 export default function EnhancedServiceCard({ service, isExpanded, onToggle }: EnhancedServiceCardProps) {
   const historyContext = useUptimeHistory(service.id)
   const [isMobile, setIsMobile] = useState(false)
+  const [activeTooltip, setActiveTooltip] = useState<number | null>(null)
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+  const barRefs = useRef<{ [key: number]: HTMLDivElement | null }>({})
   
   useEffect(() => {
     const checkMobile = () => {
@@ -120,15 +124,20 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
       // Use real data if available
       const uptime = dayData ? (dayData.uptime !== null ? dayData.uptime : -1) : -1 // -1 indicates no data
       const incidents = dayData?.incidents || []
+      const maintenances = dayData?.maintenances || []
       
       const getBarColor = () => {
         if (!dayData || uptime === -1) return 'bg-gray-300 dark:bg-gray-600' // No data = gray
+        if (maintenances.length > 0) return 'bg-blue-500' // Blue for maintenance (priority)
         if (uptime >= 99.9) return 'bg-green-500'
         if (uptime >= 90) return 'bg-yellow-500'
         return 'bg-red-500'
       }
 
       const getStatus = () => {
+        if (maintenances.length > 0) {
+          return `${maintenances.length} maintenance${maintenances.length > 1 ? 's' : ''}`
+        }
         if (incidents.length > 0) {
           return `${incidents.length} incident${incidents.length > 1 ? 's' : ''}`
         }
@@ -140,22 +149,139 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
       bars.push(
         <div
           key={i}
+          ref={(el) => { barRefs.current[i] = el }}
           className={`h-8 flex-1 ${getBarColor()} hover:opacity-80 transition-opacity cursor-pointer relative group rounded-sm`}
           title={`${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}: ${uptime === -1 ? 'No data' : `${uptime.toFixed(1)}% uptime - ${getStatus()}`}`}
+          onMouseEnter={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect()
+            const tooltipWidth = 320
+            const windowWidth = window.innerWidth
+            let x = rect.left + rect.width / 2
+
+            // Adjust if tooltip would go off screen
+            if (x - tooltipWidth / 2 < 16) {
+              x = tooltipWidth / 2 + 16
+            } else if (x + tooltipWidth / 2 > windowWidth - 16) {
+              x = windowWidth - tooltipWidth / 2 - 16
+            }
+
+            setTooltipPosition({
+              x,
+              y: rect.top - 12
+            })
+            setActiveTooltip(i)
+          }}
+          onMouseLeave={() => {
+            // Small delay to allow moving to tooltip
+            setTimeout(() => setActiveTooltip(null), 150)
+          }}
         >
-          {/* Tooltip on hover */}
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-            <div className="font-medium">{date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-            <div>{uptime === -1 ? 'No data' : `${uptime.toFixed(1)}% - ${getStatus()}`}</div>
-            {incidents.length > 0 && (
-              <div className="text-xs text-gray-300 mt-0.5">
-                {incidents.map((inc: any) => inc.title).join(', ')}
+          {/* Tooltip Portal */}
+          {activeTooltip === i && typeof window !== 'undefined' && createPortal(
+            <div
+              className="fixed z-[9999] pointer-events-auto"
+              style={{
+                left: tooltipPosition.x,
+                top: tooltipPosition.y,
+                transform: 'translate(-50%, -100%)'
+              }}
+              onMouseEnter={() => setActiveTooltip(i)}
+              onMouseLeave={() => setActiveTooltip(null)}
+            >
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl p-4 min-w-[220px] max-w-[320px] backdrop-blur-sm">
+              {/* Date Header */}
+              <div className="font-semibold text-gray-900 dark:text-white text-sm border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
+                {date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
               </div>
-            )}
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
-              <div className="border-4 border-transparent border-t-gray-900"></div>
+
+              {/* Uptime Status */}
+              <div className="mb-2">
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Uptime</div>
+                <div className={`text-sm font-medium ${
+                  uptime === -1 ? 'text-gray-500' :
+                  uptime >= 99.9 ? 'text-green-600 dark:text-green-400' :
+                  uptime >= 90 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'
+                }`}>
+                  {uptime === -1 ? 'No data available' : `${uptime.toFixed(1)}% - ${getStatus()}`}
+                </div>
+              </div>
+
+              {/* Maintenances */}
+              {maintenances.length > 0 && (
+                <div className="mb-2">
+                  <div className="text-xs text-blue-600 dark:text-blue-400 uppercase tracking-wide font-medium">
+                    {maintenances.length} Maintenance{maintenances.length > 1 ? 's' : ''}
+                  </div>
+                  <div className="space-y-1 mt-1">
+                    {maintenances.slice(0, 3).map((mnt: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors p-1 -m-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          // Navigate to maintenance detail page
+                          window.open(`/maintenance/${mnt.id}`, '_blank')
+                        }}
+                      >
+                        • {mnt.title}
+                      </div>
+                    ))}
+                    {maintenances.length > 3 && (
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        +{maintenances.length - 3} more maintenance{maintenances.length - 3 > 1 ? 's' : ''}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Incidents */}
+              {incidents.length > 0 && (
+                <div className="mb-2">
+                  <div className="text-xs text-red-600 dark:text-red-400 uppercase tracking-wide font-medium">
+                    {incidents.length} Incident{incidents.length > 1 ? 's' : ''}
+                  </div>
+                  <div className="space-y-1 mt-1">
+                    {incidents.slice(0, 3).map((inc: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="text-sm text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 cursor-pointer transition-colors p-1 -m-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          // Navigate to incident detail page
+                          window.open(`/incident/${inc.id}`, '_blank')
+                        }}
+                      >
+                        • {inc.title}
+                      </div>
+                    ))}
+                    {incidents.length > 3 && (
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        +{incidents.length - 3} more incident{incidents.length - 3 > 1 ? 's' : ''}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Show message when no events */}
+              {maintenances.length === 0 && incidents.length === 0 && uptime !== -1 && (
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  No incidents or maintenances
+                </div>
+              )}
             </div>
-          </div>
+
+            {/* Tooltip Arrow */}
+            <div className="absolute top-full left-1/2 transform -translate-x-1/2">
+              <div className="border-6 border-transparent border-t-white dark:border-t-gray-800"></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-px">
+                <div className="border-6 border-transparent border-t-gray-200 dark:border-t-gray-600"></div>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
         </div>
       )
     }
@@ -209,8 +335,8 @@ export default function EnhancedServiceCard({ service, isExpanded, onToggle }: E
         </div>
 
         {/* Uptime Bars */}
-        <div>
-          <div className="flex items-center h-8 gap-0.5">
+        <div className="relative">
+          <div className="flex items-center h-8 gap-0.5 relative overflow-visible">
             {generateUptimeBars()}
           </div>
           <div className="flex justify-between text-xs text-gray-400 mt-2">

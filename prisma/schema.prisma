@@ -68,13 +68,17 @@ model Service {
   order        Int           @default(0)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  
+
+  // Monitoring settings
+  checksBeforeDown Int @default(2) // Number of failed checks before declaring service DOWN
+  checksBeforeUp Int   @default(2) // Number of successful checks before declaring service UP
+
   machine      Machine?      @relation(fields: [machineId], references: [id], onDelete: Cascade)
   group        ServiceGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
   checks       Check[]
   incidents    Incident[]
   notifications Notification[]
-  
+
   @@map("services")
 }
 
@@ -186,18 +190,19 @@ model Incident {
   tags          String[]         @default([])
   affectedUsers Int?
   affectedServices String[]      @default([])
-  
+
+
   // Relationships
   machineId     String?
   serviceId     String?
   createdBy     String
-  
+
   machine       Machine?         @relation(fields: [machineId], references: [id])
   service       Service?         @relation(fields: [serviceId], references: [id])
   creator       User             @relation(fields: [createdBy], references: [id])
   updates       IncidentUpdate[]
   notifications Notification[]
-  
+
   @@index([type, status])
   @@index([startTime])
   @@map("incidents")

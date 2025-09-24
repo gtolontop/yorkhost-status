@@ -44,7 +44,11 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
   const dailyData: { [key: string]: { total: number; successful: number } } = {}
   
   checkResults.forEach(result => {
-    const dateKey = result.timestamp.toISOString().split('T')[0]
+    // Utiliser la date locale au lieu d'UTC pour correspondre au frontend
+    const year = result.timestamp.getFullYear()
+    const month = String(result.timestamp.getMonth() + 1).padStart(2, '0')
+    const day = String(result.timestamp.getDate()).padStart(2, '0')
+    const dateKey = `${year}-${month}-${day}`
     
     if (!dailyData[dateKey]) {
       dailyData[dateKey] = { total: 0, successful: 0 }
@@ -114,7 +118,12 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
     const relevantDate = incident.type === 'MAINTENANCE' && incident.scheduledFor
       ? incident.scheduledFor
       : incident.startTime
-    const dateKey = relevantDate.toISOString().split('T')[0]
+
+    // Utiliser la même logique de date key locale
+    const year = relevantDate.getFullYear()
+    const month = String(relevantDate.getMonth() + 1).padStart(2, '0')
+    const day = String(relevantDate.getDate()).padStart(2, '0')
+    const dateKey = `${year}-${month}-${day}`
 
     if (incident.type === 'MAINTENANCE') {
       if (!maintenancesByDate[dateKey]) {
@@ -137,23 +146,54 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
 
   // Convert to UptimeData array
   const uptimeData: UptimeData[] = []
-  
+  let lastKnownUptime: number | null = null // No assumption, wait for real data
+  let hasSeenData = false // Track if we've seen any real data yet
+
   for (let i = 0; i < days; i++) {
     const date = new Date()
-    date.setUTCDate(date.getUTCDate() - (days - 1 - i))
-    date.setUTCHours(0, 0, 0, 0) // Reset time to start of day in UTC
-    const dateKey = date.toISOString().split('T')[0]
-    
+    date.setDate(date.getDate() - (days - 1 - i))
+    date.setHours(0, 0, 0, 0) // Reset time to start of day in local time
+
+    // Utiliser la même logique de date key que pour les données
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const dateKey = `${year}-${month}-${day}`
+
     const dayData = dailyData[dateKey]
     const today = new Date()
     today.setHours(23, 59, 59, 999) // End of today
-    
+
     // Si on a des données pour ce jour, calculer l'uptime
-    let uptime = null
+    let uptime: number | null
     if (dayData && dayData.total > 0) {
       uptime = (dayData.successful / dayData.total) * 100
+      lastKnownUptime = uptime // Update last known uptime
+      hasSeenData = true
+    } else {
+      // Pas de données pour ce jour
+      const hasIncidents = incidentsByDate[dateKey] && incidentsByDate[dateKey].length > 0
+      const hasMaintenances = maintenancesByDate[dateKey] && maintenancesByDate[dateKey].length > 0
+
+      if (hasSeenData && lastKnownUptime !== null) {
+        // On a déjà vu des données, maintenir la continuité
+        if (hasIncidents && !hasMaintenances) {
+          // S'il y a des incidents sans maintenance, réduire l'uptime
+          uptime = Math.max(lastKnownUptime * 0.8, 0) // Réduire de 20%
+          lastKnownUptime = uptime
+        } else if (hasMaintenances) {
+          // Maintenance planifiée - garder le dernier uptime connu
+          uptime = lastKnownUptime
+        } else {
+          // Pas de données, pas d'incidents - maintenir le statut précédent
+          uptime = lastKnownUptime
+        }
+      } else {
+        // Pas encore vu de données réelles, afficher "no data"
+        uptime = null
+      }
     }
-    
+
     uptimeData.push({
       date: dateKey,
       uptime: uptime !== null ? Math.round(uptime * 100) / 100 : null as any,
@@ -274,7 +314,7 @@ export async function getStatusOverview() {
             type: 'MAINTENANCE',
             status: 'SCHEDULED',
             scheduledFor: {
-              lte: new Date(Date.now() + 24 * 60 * 60 * 1000) // Next 24 hours
+              lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Next 7 days
             }
           },
           {
@@ -348,18 +388,60 @@ export async function getServicesWithEnhancedStatus() {
   const now = new Date()
   const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000)
 
-  // Get active maintenances to check affected services
-  const activeMaintenances = await prisma.incident.findMany({
-    where: {
-      type: 'MAINTENANCE',
-      status: 'IN_PROGRESS'
-    },
-    select: {
-      id: true,
-      title: true,
-      affectedServices: true
-    }
-  })
+  // Get active incidents and maintenances in parallel
+  const [activeMaintenances, activeIncidents] = await Promise.all([
+    prisma.incident.findMany({
+      where: {
+        type: 'MAINTENANCE',
+        status: 'IN_PROGRESS'
+      },
+      select: {
+        id: true,
+        title: true,
+        affectedServices: true
+      }
+    }),
+    prisma.incident.findMany({
+      where: {
+        OR: [
+          {
+            // Active incidents
+            type: 'INCIDENT',
+            status: {
+              in: ['INVESTIGATING', 'IDENTIFIED', 'MONITORING']
+            }
+          },
+          {
+            // Scheduled maintenances
+            type: 'MAINTENANCE',
+            status: 'SCHEDULED',
+            scheduledFor: {
+              lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Next 7 days
+            }
+          },
+          {
+            // Ongoing maintenances
+            type: 'MAINTENANCE',
+            status: 'IN_PROGRESS'
+          }
+        ]
+      },
+      include: {
+        updates: {
+          orderBy: { timestamp: 'desc' }
+        },
+        service: true,
+        machine: true,
+        creator: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true
+          }
+        }
+      }
+    })
+  ])
 
   // Create a map of service IDs that are in maintenance
   const servicesInMaintenance = new Set<string>()
@@ -415,14 +497,25 @@ export async function getServicesWithEnhancedStatus() {
       // Determine enhanced status based on:
       // 1. Operational status (operational, degraded, outage)
       // 2. Whether there's a linked incident
+      // 3. Active incidents for this service (even if created manually)
       let enhancedStatus: 'operational' | 'degraded' | 'outage' | 'outage-with-incident' | 'maintenance' = 'operational'
-      
+
       const hasActiveIncident = service.incidents.length > 0 && service.incidents[0].type === 'INCIDENT'
       const hasActiveMaintenance = service.incidents.length > 0 && service.incidents[0].type === 'MAINTENANCE'
       const isInMaintenance = servicesInMaintenance.has(service.id)
 
+      // Check if there are any active incidents for this service
+      const hasAnyActiveIncident = activeIncidents.some(incident =>
+        incident.serviceId === service.id &&
+        incident.type === 'INCIDENT' &&
+        ['INVESTIGATING', 'IDENTIFIED', 'MONITORING'].includes(incident.status)
+      )
+
       if (hasActiveMaintenance || isInMaintenance) {
         enhancedStatus = 'maintenance'
+      } else if (hasAnyActiveIncident) {
+        // Force status to outage-with-incident if there's an active incident
+        enhancedStatus = 'outage-with-incident'
       } else if (stats.currentStatus === 'outage') {
         enhancedStatus = hasActiveIncident ? 'outage-with-incident' : 'outage'
       } else if (stats.currentStatus === 'degraded') {
@@ -431,11 +524,20 @@ export async function getServicesWithEnhancedStatus() {
         enhancedStatus = 'operational'
       }
 
+      // Find the correct active incident (prioritize the one from activeIncidents list)
+      const correctActiveIncident = hasAnyActiveIncident
+        ? activeIncidents.find(incident =>
+            incident.serviceId === service.id &&
+            incident.type === 'INCIDENT' &&
+            ['INVESTIGATING', 'IDENTIFIED', 'MONITORING'].includes(incident.status)
+          )
+        : service.incidents[0]
+
       return {
         ...service,
         ...stats,
         enhancedStatus,
-        activeIncident: service.incidents[0] || null
+        activeIncident: correctActiveIncident || null
       }
     })
   )
