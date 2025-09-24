@@ -146,7 +146,8 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
 
   // Convert to UptimeData array
   const uptimeData: UptimeData[] = []
-  let lastKnownUptime = 100 // Assume 100% if no previous data
+  let lastKnownUptime: number | null = null // No assumption, wait for real data
+  let hasSeenData = false // Track if we've seen any real data yet
 
   for (let i = 0; i < days; i++) {
     const date = new Date()
@@ -164,32 +165,38 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
     today.setHours(23, 59, 59, 999) // End of today
 
     // Si on a des données pour ce jour, calculer l'uptime
-    let uptime: number
+    let uptime: number | null
     if (dayData && dayData.total > 0) {
       uptime = (dayData.successful / dayData.total) * 100
       lastKnownUptime = uptime // Update last known uptime
+      hasSeenData = true
     } else {
-      // Pas de données pour ce jour - maintenir la continuité avec le dernier statut connu
-      // Si il y a des incidents ce jour-là, considérer comme dégradé
+      // Pas de données pour ce jour
       const hasIncidents = incidentsByDate[dateKey] && incidentsByDate[dateKey].length > 0
       const hasMaintenances = maintenancesByDate[dateKey] && maintenancesByDate[dateKey].length > 0
 
-      if (hasIncidents && !hasMaintenances) {
-        // S'il y a des incidents sans maintenance, réduire l'uptime
-        uptime = Math.max(lastKnownUptime * 0.8, 0) // Réduire de 20%
-        lastKnownUptime = uptime
-      } else if (hasMaintenances) {
-        // Maintenance planifiée - garder le dernier uptime connu
-        uptime = lastKnownUptime
+      if (hasSeenData && lastKnownUptime !== null) {
+        // On a déjà vu des données, maintenir la continuité
+        if (hasIncidents && !hasMaintenances) {
+          // S'il y a des incidents sans maintenance, réduire l'uptime
+          uptime = Math.max(lastKnownUptime * 0.8, 0) // Réduire de 20%
+          lastKnownUptime = uptime
+        } else if (hasMaintenances) {
+          // Maintenance planifiée - garder le dernier uptime connu
+          uptime = lastKnownUptime
+        } else {
+          // Pas de données, pas d'incidents - maintenir le statut précédent
+          uptime = lastKnownUptime
+        }
       } else {
-        // Pas de données, pas d'incidents - maintenir le statut précédent
-        uptime = lastKnownUptime
+        // Pas encore vu de données réelles, afficher "no data"
+        uptime = null
       }
     }
 
     uptimeData.push({
       date: dateKey,
-      uptime: Math.round(uptime * 100) / 100,
+      uptime: uptime !== null ? Math.round(uptime * 100) / 100 : null as any,
       incidents: incidentsByDate[dateKey] || [],
       maintenances: maintenancesByDate[dateKey] || []
     })
@@ -307,7 +314,7 @@ export async function getStatusOverview() {
             type: 'MAINTENANCE',
             status: 'SCHEDULED',
             scheduledFor: {
-              lte: new Date(Date.now() + 24 * 60 * 60 * 1000) // Next 24 hours
+              lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Next 7 days
             }
           },
           {
@@ -409,7 +416,7 @@ export async function getServicesWithEnhancedStatus() {
             type: 'MAINTENANCE',
             status: 'SCHEDULED',
             scheduledFor: {
-              lte: new Date(Date.now() + 24 * 60 * 60 * 1000) // Next 24 hours
+              lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Next 7 days
             }
           },
           {
