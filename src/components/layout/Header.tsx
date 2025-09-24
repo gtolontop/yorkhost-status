@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Moon, Sun, MessageCircle } from 'lucide-react'
+import { Moon, Sun, MessageCircle, Bell, RefreshCw } from 'lucide-react'
 import { useTheme } from '@/components/providers/ThemeProvider'
+import { useStatusControls } from '@/contexts/StatusControlsContext'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
+  const { isRefreshing, onRefresh, onNotificationClick } = useStatusControls()
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
@@ -60,6 +62,30 @@ export default function Header() {
 
             {/* Right Actions */}
             <div className="flex items-center justify-end gap-2 flex-1 lg:flex-none">
+              {/* Status Control Buttons - Only on homepage */}
+              <div className="hidden sm:flex items-center gap-1">
+                {/* Notifications Button */}
+                <button
+                  onClick={onNotificationClick}
+                  className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-[#1a1a24]"
+                  aria-label="Get notifications"
+                  title="Get notifications"
+                >
+                  <Bell size={18} />
+                </button>
+
+                {/* Refresh Button */}
+                <button
+                  onClick={onRefresh}
+                  disabled={isRefreshing}
+                  className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-[#1a1a24]"
+                  aria-label="Refresh status"
+                  title="Refresh status"
+                >
+                  <RefreshCw className={`w-[18px] h-[18px] ${isRefreshing ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
@@ -68,7 +94,7 @@ export default function Header() {
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
-              
+
               {/* Discord Button - Hidden on mobile when burger menu is visible */}
               <a
                 href="https://discord.gg/yorkhost"
@@ -159,7 +185,33 @@ export default function Header() {
             <span className="font-medium">Previous Incidents</span>
           </Link>
 
-          <div className="pt-4 mt-4 border-t border-gray-200 dark:border-[#1a1a24]">
+          <div className="pt-4 mt-4 border-t border-gray-200 dark:border-[#1a1a24] space-y-3">
+            {/* Status Controls for Mobile */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  onNotificationClick()
+                  setIsMenuOpen(false)
+                }}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Bell size={18} />
+                <span className="font-medium">Notifications</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  onRefresh()
+                  setIsMenuOpen(false)
+                }}
+                disabled={isRefreshing}
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              >
+                <RefreshCw className={`w-[18px] h-[18px] ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span className="font-medium">Refresh</span>
+              </button>
+            </div>
+
             <a
               href="https://discord.gg/yorkhost"
               target="_blank"

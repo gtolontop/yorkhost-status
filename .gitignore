@@ -56,3 +56,4 @@ prisma/migrations/
 /uploads
 /public/uploads
 .claude/settings.local.json
+.claude/settings.local.json
