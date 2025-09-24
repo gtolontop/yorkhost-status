@@ -71,7 +71,8 @@ export async function getOptimizedUptimeHistory(serviceId: string, days: number 
 
   // Build result array
   const uptimeData: UptimeData[] = []
-  let lastKnownUptime = 100 // Assume 100% if no previous data
+  let lastKnownUptime: number | null = null // No assumption, wait for real data
+  let hasSeenData = false // Track if we've seen any real data yet
 
   for (let i = 0; i < days; i++) {
     const date = new Date()
@@ -80,28 +81,35 @@ export async function getOptimizedUptimeHistory(serviceId: string, days: number 
     const dateKey = date.toISOString().split('T')[0]
 
     const dayStats = statsMap[dateKey]
-    let uptime: number
+    let uptime: number | null
 
     if (dayStats && dayStats.total > 0) {
       uptime = (dayStats.successful / dayStats.total) * 100
       lastKnownUptime = uptime // Update last known uptime
+      hasSeenData = true
     } else {
-      // Pas de données pour ce jour - maintenir la continuité avec le dernier statut connu
+      // Pas de données pour ce jour
       const hasIncidents = incidentsByDate[dateKey] && incidentsByDate[dateKey].length > 0
 
-      if (hasIncidents) {
-        // S'il y a des incidents, réduire l'uptime
-        uptime = Math.max(lastKnownUptime * 0.8, 0) // Réduire de 20%
-        lastKnownUptime = uptime
+      if (hasSeenData && lastKnownUptime !== null) {
+        // On a déjà vu des données, maintenir la continuité
+        if (hasIncidents) {
+          // S'il y a des incidents, réduire l'uptime
+          uptime = Math.max(lastKnownUptime * 0.8, 0) // Réduire de 20%
+          lastKnownUptime = uptime
+        } else {
+          // Pas de données, pas d'incidents - maintenir le statut précédent
+          uptime = lastKnownUptime
+        }
       } else {
-        // Pas de données, pas d'incidents - maintenir le statut précédent
-        uptime = lastKnownUptime
+        // Pas encore vu de données réelles, afficher "no data"
+        uptime = null
       }
     }
 
     uptimeData.push({
       date: dateKey,
-      uptime: Math.round(uptime * 100) / 100,
+      uptime: uptime !== null ? Math.round(uptime * 100) / 100 : null as any,
       incidents: incidentsByDate[dateKey] || []
     })
   }
@@ -197,7 +205,8 @@ export async function getBulkUptimeHistory(serviceIds: string[], days: number = 
   // Build results for each service
   serviceIds.forEach(serviceId => {
     const uptimeData: UptimeData[] = []
-    let lastKnownUptime = 100 // Assume 100% if no previous data
+    let lastKnownUptime: number | null = null // No assumption, wait for real data
+    let hasSeenData = false // Track if we've seen any real data yet
 
     for (let i = 0; i < days; i++) {
       const date = new Date()
@@ -206,28 +215,35 @@ export async function getBulkUptimeHistory(serviceIds: string[], days: number = 
       const dateKey = date.toISOString().split('T')[0]
 
       const dayStats = statsByService[serviceId][dateKey]
-      let uptime: number
+      let uptime: number | null
 
       if (dayStats && dayStats.total > 0) {
         uptime = (dayStats.successful / dayStats.total) * 100
         lastKnownUptime = uptime // Update last known uptime
+        hasSeenData = true
       } else {
-        // Pas de données pour ce jour - maintenir la continuité avec le dernier statut connu
+        // Pas de données pour ce jour
         const hasIncidents = incidentsByService[serviceId][dateKey] && incidentsByService[serviceId][dateKey].length > 0
 
-        if (hasIncidents) {
-          // S'il y a des incidents, réduire l'uptime
-          uptime = Math.max(lastKnownUptime * 0.8, 0) // Réduire de 20%
-          lastKnownUptime = uptime
+        if (hasSeenData && lastKnownUptime !== null) {
+          // On a déjà vu des données, maintenir la continuité
+          if (hasIncidents) {
+            // S'il y a des incidents, réduire l'uptime
+            uptime = Math.max(lastKnownUptime * 0.8, 0) // Réduire de 20%
+            lastKnownUptime = uptime
+          } else {
+            // Pas de données, pas d'incidents - maintenir le statut précédent
+            uptime = lastKnownUptime
+          }
         } else {
-          // Pas de données, pas d'incidents - maintenir le statut précédent
-          uptime = lastKnownUptime
+          // Pas encore vu de données réelles, afficher "no data"
+          uptime = null
         }
       }
 
       uptimeData.push({
         date: dateKey,
-        uptime: Math.round(uptime * 100) / 100,
+        uptime: uptime !== null ? Math.round(uptime * 100) / 100 : null as any,
         incidents: incidentsByService[serviceId][dateKey] || []
       })
     }

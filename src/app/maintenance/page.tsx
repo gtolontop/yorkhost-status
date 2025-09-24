@@ -124,22 +124,25 @@ export default function MaintenancePage() {
                 <div key={maintenance.id} className="bg-white dark:bg-yorkhost-darkCard rounded-lg shadow-sm border border-gray-200 dark:border-yorkhost-darkBorder overflow-hidden">
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <Wrench className="text-blue-500" size={24} />
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <Wrench className="text-blue-500 flex-shrink-0" size={24} />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white break-words">
                             {maintenance.title}
                           </h3>
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(maintenance.status)}`}>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(maintenance.status)} mt-1`}>
                             {maintenance.status.replace('_', ' ')}
                           </span>
                         </div>
                       </div>
-                      <span className="text-2xl">{getSeverityIcon(maintenance.severity)}</span>
+                      <span className="text-2xl flex-shrink-0">{getSeverityIcon(maintenance.severity)}</span>
                     </div>
 
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">
-                      {maintenance.description}
+                    <p className="text-gray-600 dark:text-gray-400 mb-4 break-words">
+                      {maintenance.description.length > 200
+                        ? `${maintenance.description.substring(0, 200)}...`
+                        : maintenance.description
+                      }
                     </p>
 
                     <div className="space-y-2 mb-4">
@@ -180,11 +183,14 @@ export default function MaintenancePage() {
                       <div className="pt-4 border-t border-gray-200 dark:border-yorkhost-darkBorder mt-4">
                         <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Latest Update</h4>
                         <div className="bg-gray-50 dark:bg-yorkhost-darkBg rounded-md p-3">
-                          <p className="text-sm text-gray-900 dark:text-white font-medium">
+                          <p className="text-sm text-gray-900 dark:text-white font-medium break-words">
                             {maintenance.updates[0].title}
                           </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                            {maintenance.updates[0].message}
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 break-words">
+                            {maintenance.updates[0].message.length > 150
+                              ? `${maintenance.updates[0].message.substring(0, 150)}...`
+                              : maintenance.updates[0].message
+                            }
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
                             {format(new Date(maintenance.updates[0].timestamp), 'PPP p')}
@@ -192,6 +198,18 @@ export default function MaintenancePage() {
                         </div>
                       </div>
                     )}
+
+                    {/* View Details Button */}
+                    <div className="pt-4 border-t border-gray-200 dark:border-yorkhost-darkBorder mt-4">
+                      <Link
+                        href={`/maintenance/${maintenance.id}`}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                      >
+                        <Info size={16} />
+                        View Details
+                        <ChevronRight size={16} />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -207,17 +225,25 @@ export default function MaintenancePage() {
                     .slice(0, 3)
                     .map((maintenance) => (
                     <div key={maintenance.id} className="bg-gray-50 dark:bg-yorkhost-darkCard/50 rounded-lg p-4 border border-gray-200 dark:border-yorkhost-darkBorder">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-medium text-gray-900 dark:text-white break-words">
                             {maintenance.title}
                           </h4>
                           <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                             Completed on {maintenance.endTime ? format(new Date(maintenance.endTime), 'PPP') : 'N/A'}
                           </p>
                         </div>
-                        <span className="text-green-500">✓</span>
+                        <span className="text-green-500 flex-shrink-0 ml-2">✓</span>
                       </div>
+                      <Link
+                        href={`/maintenance/${maintenance.id}`}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white text-xs font-medium rounded-md transition-colors"
+                      >
+                        <Info size={14} />
+                        View Details
+                        <ChevronRight size={14} />
+                      </Link>
                     </div>
                   ))}
                 </>
