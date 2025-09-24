@@ -145,22 +145,12 @@ export default function MaintenanceDetailPage() {
           </div>
 
           {/* Header */}
-          <div className="mb-8">
-            <PageHeader
-              icon={<Wrench size={96} />}
-              title={
-                <div className="break-words max-w-full">
-                  {maintenance.title}
-                </div>
-              }
-              subtitle={
-                <div className="break-words max-w-full">
-                  {maintenance.description}
-                </div>
-              }
-              status="maintenance"
-            />
-          </div>
+          <PageHeader
+            icon={<Wrench size={96} />}
+            title={maintenance.title}
+            subtitle={maintenance.description}
+            status="maintenance"
+          />
 
           {/* Maintenance Info Card */}
           <div className="bg-white dark:bg-yorkhost-darkCard border border-gray-200 dark:border-yorkhost-darkBorder rounded-lg p-6 mb-6">

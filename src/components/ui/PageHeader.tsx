@@ -37,16 +37,16 @@ export default function PageHeader({ icon, title, subtitle, status, lastUpdate }
       </div>
       
       <h1
-        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 whitespace-nowrap text-gray-900 dark:text-white"
+        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 text-gray-900 dark:text-white break-words"
         style={{
           lineHeight: '1.2'
         }}
       >
         {title}
       </h1>
-      
-      <p 
-        className="text-sm sm:text-base md:text-lg"
+
+      <p
+        className="text-sm sm:text-base md:text-lg break-words"
         style={{
           color: 'var(--text-secondary)',
           lineHeight: '1.6'
