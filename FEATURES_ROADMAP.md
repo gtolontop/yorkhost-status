@@ -115,42 +115,8 @@ src/lib/audit/logger.ts
 ---
 
 ### 3. 📊 Export & Reporting
-**Impact**: 🟡 HAUTE - Demande client fréquente
+Fait mais à tester.
 
-#### Manquant
-- [ ] **Export de données**
-  - [ ] Export CSV (incidents, uptime)
-  - [ ] Export JSON (API)
-  - [ ] Export PDF (rapports)
-  - [ ] Export Excel (statistiques)
-  - [ ] Génération de rapports planifiés
-
-- [ ] **Rapports d'uptime**
-  - [ ] Rapport mensuel automatique
-  - [ ] Rapport personnalisé par période
-  - [ ] Rapport par service
-  - [ ] Rapport SLA compliance
-  - [ ] Email automatique des rapports
-
-- [ ] **Status Badges**
-  - [ ] Badges SVG dynamiques
-  - [ ] Embed codes
-  - [ ] Personnalisation couleurs
-  - [ ] Cache des badges
-  - [ ] Shields.io compatible
-
-**Fichiers à créer:**
-```
-src/app/api/reports/uptime/route.ts
-src/app/api/reports/export/route.ts
-src/app/api/badges/[serviceId]/route.ts
-src/lib/reports/generator.ts
-src/lib/reports/templates/
-```
-
-**Estimation**: 2 semaines
-
----
 
 ### 4. 🌐 Widgets & Intégrations
 **Impact**: 🟡 HAUTE - Visibilité publique

@@ -246,12 +246,36 @@ function generateCSV(headers: string[], data: any[]): string {
     return stringValue
   }
 
+  // Mapping des headers aux clés réelles des objets
+  const headerKeyMap: Record<string, string> = {
+    'Date': 'date',
+    'Service': 'service',
+    'Total Checks': 'total',
+    'Successful': 'successful',
+    'Failed': 'failed',
+    'Uptime %': 'uptime',
+    'ID': 'id',
+    'Title': 'title',
+    'Type': 'type',
+    'Severity': 'severity',
+    'Status': 'status',
+    'Start Time': 'startTime',
+    'End Time': 'endTime',
+    'Duration (min)': 'duration',
+    'Affected Services': 'affectedServices',
+    'Name': 'name',
+    'URL/Target': 'target',
+    'Uptime 7d': 'uptime7d',
+    'Uptime 30d': 'uptime30d',
+    'Last Check': 'lastCheck'
+  }
+
   const rows = [
     headers.join(','),
     ...data.map(row =>
       headers.map(header => {
-        const key = header.toLowerCase().replace(/ /g, '_').replace(/%/g, '').replace(/\(.*\)/g, '').trim()
-        return escapeCSV(row[key] || row[header] || '')
+        const key = headerKeyMap[header] || header.toLowerCase().replace(/ /g, '_')
+        return escapeCSV(row[key] || '')
       }).join(',')
     )
   ]
