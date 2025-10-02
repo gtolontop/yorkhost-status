@@ -210,27 +210,88 @@ export default function AdminServicesPage() {
       return
     }
 
-    // Handle service moving (existing code)
+    // Handle service moving
     const serviceId = draggableId
-    const newGroupId = destination.droppableId
+    const sourceGroupId = source.droppableId
+    const destinationGroupId = destination.droppableId
+    const sourceIndex = source.index
+    const destinationIndex = destination.index
 
-    setServices(prev => prev.map(service => {
-      if (service.id === serviceId) {
-        return { ...service, groupId: newGroupId, order: destination.index }
+    // Optimistically update UI
+    setServices(prev => {
+      const updatedServices = [...prev]
+
+      // Get services in source and destination groups
+      const sourceGroupServices = updatedServices.filter(s => s.groupId === sourceGroupId)
+      const destinationGroupServices = updatedServices.filter(s => s.groupId === destinationGroupId)
+
+      // Find the moved service
+      const movedService = updatedServices.find(s => s.id === serviceId)
+      if (!movedService) return prev
+
+      // If moving within the same group
+      if (sourceGroupId === destinationGroupId) {
+        // Remove from source position
+        sourceGroupServices.splice(sourceIndex, 1)
+        // Insert at destination position
+        sourceGroupServices.splice(destinationIndex, 0, movedService)
+
+        // Update orders for all services in the group
+        sourceGroupServices.forEach((service, index) => {
+          const serviceInArray = updatedServices.find(s => s.id === service.id)
+          if (serviceInArray) {
+            serviceInArray.order = index
+          }
+        })
+      } else {
+        // Moving to a different group
+        // Update the moved service's group and order
+        movedService.groupId = destinationGroupId
+        movedService.order = destinationIndex
+
+        // Reorder remaining services in source group
+        sourceGroupServices
+          .filter(s => s.id !== serviceId)
+          .forEach((service, index) => {
+            const serviceInArray = updatedServices.find(s => s.id === service.id)
+            if (serviceInArray) {
+              serviceInArray.order = index
+            }
+          })
+
+        // Reorder services in destination group (make space for new service)
+        destinationGroupServices.forEach((service, index) => {
+          const serviceInArray = updatedServices.find(s => s.id === service.id)
+          if (serviceInArray) {
+            if (index >= destinationIndex) {
+              serviceInArray.order = index + 1
+            } else {
+              serviceInArray.order = index
+            }
+          }
+        })
       }
-      return service
-    }))
+
+      return updatedServices
+    })
 
     // Update server
     try {
-      await fetch(`/api/admin/services/${serviceId}/move`, {
+      const response = await fetch(`/api/admin/services/${serviceId}/move`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          groupId: newGroupId,
-          order: destination.index
+          groupId: destinationGroupId,
+          order: destinationIndex
         })
       })
+
+      if (!response.ok) {
+        throw new Error('Failed to move service')
+      }
+
+      // Refresh to ensure consistency with server
+      await fetchServices()
     } catch (error) {
       console.error('Failed to move service:', error)
       // Revert on error
