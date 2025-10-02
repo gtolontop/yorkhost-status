@@ -3,11 +3,13 @@ import { prisma } from '@/lib/db'
 
 export async function POST() {
   try {
-    console.log('🧹 Starting database cleanup...')
-    
-    // Delete ALL old check results to start fresh
-    const deletedResults = await prisma.checkResult.deleteMany({})
-    console.log(`✅ Deleted ${deletedResults.count} old check results`)
+    console.log('🧹 Database cleanup - DÉSACTIVÉ')
+    console.log('❌ La suppression automatique des données est désactivée')
+    console.log('ℹ️  Les données sont conservées indéfiniment')
+
+    // DÉSACTIVÉ: Conservation permanente de toutes les données
+    // Les données ne sont JAMAIS supprimées automatiquement
+    const deletedResults = { count: 0 }
     
     // Make sure all checks are active
     const updatedChecks = await prisma.check.updateMany({
@@ -34,9 +36,9 @@ export async function POST() {
     
     return NextResponse.json({
       success: true,
-      message: 'Database cleaned successfully',
+      message: 'Cleanup désactivé - Les données sont conservées indéfiniment',
       stats: {
-        deletedResults: deletedResults.count,
+        deletedResults: 0,
         updatedChecks: updatedChecks.count,
         totalServices: services.length
       },

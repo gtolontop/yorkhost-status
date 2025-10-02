@@ -171,36 +171,9 @@ class MonitorWorker {
   }
 
   private async cleanupOldResults(checkId: string) {
-    try {
-      // Get the count of results
-      const count = await prisma.checkResult.count({
-        where: { checkId }
-      })
-
-      // If more than 1000 results, delete the oldest ones
-      if (count > 1000) {
-        const toDelete = count - 1000
-
-        // Find the IDs of the oldest results to delete
-        const oldResults = await prisma.checkResult.findMany({
-          where: { checkId },
-          orderBy: { timestamp: 'asc' },
-          take: toDelete,
-          select: { id: true }
-        })
-
-        // Delete them
-        await prisma.checkResult.deleteMany({
-          where: {
-            id: { in: oldResults.map(r => r.id) }
-          }
-        })
-
-        console.log(`🧹 Cleaned up ${toDelete} old results for check ${checkId}`)
-      }
-    } catch (error) {
-      console.error('❌ Failed to cleanup old results:', error)
-    }
+    // Désactivé: Conservation permanente de toutes les données
+    // Les données ne sont jamais supprimées automatiquement
+    return
   }
 }
 
