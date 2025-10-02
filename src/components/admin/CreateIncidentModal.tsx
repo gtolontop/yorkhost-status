@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, AlertTriangle, Server, Layers } from 'lucide-react'
+import { X, AlertTriangle, Server, ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react'
 
 interface Service {
   id: string
@@ -12,73 +12,144 @@ interface Service {
 interface Machine {
   id: string
   name: string
+  services?: Service[]
+}
+
+interface IncidentUpdate {
+  title?: string
+  message: string
+  status?: string
+  timestamp: string
 }
 
 interface CreateIncidentModalProps {
   isOpen: boolean
   onClose: () => void
   onSuccess: () => void
+  editData?: any
 }
 
-export default function CreateIncidentModal({
-  isOpen,
-  onClose,
-  onSuccess
-}: CreateIncidentModalProps) {
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    severity: 'MEDIUM',
-    serviceId: '',
-    machineId: '',
-    tags: [] as string[],
-    isScheduled: false,
-    scheduledFor: '',
-    eta: ''
-  })
+export default function CreateIncidentModal({ isOpen, onClose, onSuccess, editData }: CreateIncidentModalProps) {
   const [services, setServices] = useState<Service[]>([])
   const [machines, setMachines] = useState<Machine[]>([])
+  const [selectedServices, setSelectedServices] = useState<string[]>([])
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
 
+  const [formData, setFormData] = useState({
+    title: editData?.title || '',
+    description: editData?.description || '',
+    type: 'INCIDENT' as const,
+    status: editData?.status || 'INVESTIGATING',
+    severity: editData?.severity || 'MEDIUM',
+    impact: editData?.impact || '',
+    startTime: editData?.startTime ? new Date(editData.startTime).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
+    endTime: editData?.endTime ? new Date(editData.endTime).toISOString().slice(0, 16) : '',
+    affectedServices: editData?.affectedServices || []
+  })
+
+  const [updates, setUpdates] = useState<IncidentUpdate[]>(
+    editData?.updates?.map((u: any) => ({
+      title: u.title || '',
+      message: u.message || '',
+      status: u.status || '',
+      timestamp: new Date(u.timestamp).toISOString().slice(0, 16)
+    })) || []
+  )
+
   useEffect(() => {
-    if (isOpen) {
-      fetchServicesAndMachines()
-      // Reset form
-      setFormData({
-        title: '',
-        description: '',
-        severity: 'MEDIUM',
-        serviceId: '',
-        machineId: '',
-        tags: [],
-        isScheduled: false,
-        scheduledFor: '',
-        eta: ''
-      })
+    fetchServicesAndMachines()
+    if (editData?.affectedServices) {
+      setSelectedServices(editData.affectedServices)
     }
-  }, [isOpen])
+  }, [editData])
 
   const fetchServicesAndMachines = async () => {
     try {
-      const [servicesRes, machinesRes] = await Promise.all([
-        fetch('/api/services'),
-        fetch('/api/groups')
-      ])
-
-      const servicesData = await servicesRes.json()
-      const machinesData = await machinesRes.json()
-
+      // Fetch services
+      const servicesResponse = await fetch('/api/services')
+      const servicesData = await servicesResponse.json()
       const servicesList = servicesData.success ? servicesData.data : servicesData
       if (Array.isArray(servicesList)) {
         setServices(servicesList)
       }
 
+      // Fetch machines/groups
+      const machinesResponse = await fetch('/api/groups')
+      const machinesData = await machinesResponse.json()
       if (machinesData.success) {
-        setMachines(machinesData.data)
+        const machinesWithServices = machinesData.data.map((machine: Machine) => ({
+          ...machine,
+          services: servicesList?.filter((service: Service) => service.machineId === machine.id) || []
+        }))
+
+        // Add ungrouped services
+        const ungroupedServices = servicesList?.filter((service: Service) => !service.machineId) || []
+        if (ungroupedServices.length > 0) {
+          machinesWithServices.push({
+            id: 'ungrouped',
+            name: 'Ungrouped Services',
+            services: ungroupedServices
+          })
+        }
+
+        setMachines(machinesWithServices)
       }
     } catch (error) {
       console.error('Failed to fetch services and machines:', error)
     }
+  }
+
+  const toggleGroup = (machineId: string) => {
+    const newExpanded = new Set(expandedGroups)
+    if (newExpanded.has(machineId)) {
+      newExpanded.delete(machineId)
+    } else {
+      newExpanded.add(machineId)
+    }
+    setExpandedGroups(newExpanded)
+  }
+
+  const toggleGroupSelection = (machine: Machine) => {
+    const groupServiceIds = machine.services?.map(s => s.id) || []
+    const allSelected = groupServiceIds.every(id => selectedServices.includes(id))
+
+    if (allSelected) {
+      setSelectedServices(selectedServices.filter(id => !groupServiceIds.includes(id)))
+    } else {
+      const newSelection = Array.from(new Set([...selectedServices, ...groupServiceIds]))
+      setSelectedServices(newSelection)
+    }
+  }
+
+  const toggleServiceSelection = (serviceId: string) => {
+    if (selectedServices.includes(serviceId)) {
+      setSelectedServices(selectedServices.filter(id => id !== serviceId))
+    } else {
+      setSelectedServices([...selectedServices, serviceId])
+    }
+  }
+
+  const addUpdate = () => {
+    setUpdates([
+      ...updates,
+      {
+        title: '',
+        message: '',
+        status: formData.status,
+        timestamp: new Date().toISOString().slice(0, 16)
+      }
+    ])
+  }
+
+  const removeUpdate = (index: number) => {
+    setUpdates(updates.filter((_, i) => i !== index))
+  }
+
+  const updateUpdate = (index: number, field: keyof IncidentUpdate, value: string) => {
+    const newUpdates = [...updates]
+    newUpdates[index] = { ...newUpdates[index], [field]: value }
+    setUpdates(newUpdates)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,30 +157,45 @@ export default function CreateIncidentModal({
     setLoading(true)
 
     try {
+      const slug = formData.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '') +
+        '-' + Date.now()
+
       const payload = {
         ...formData,
-        serviceId: formData.serviceId || undefined,
-        machineId: formData.machineId || undefined,
-        scheduledFor: formData.scheduledFor ? new Date(formData.scheduledFor).toISOString() : undefined,
-        eta: formData.eta ? new Date(formData.eta).toISOString() : undefined
+        slug,
+        startTime: new Date(formData.startTime).toISOString(),
+        endTime: formData.endTime ? new Date(formData.endTime).toISOString() : null,
+        resolvedAt: formData.endTime ? new Date(formData.endTime).toISOString() : null,
+        affectedServices: selectedServices,
+        updates: updates.map(u => ({
+          ...u,
+          timestamp: new Date(u.timestamp).toISOString(),
+          isStatusChange: !!u.status
+        }))
       }
 
-      const response = await fetch('/api/admin/incidents', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
+      const response = await fetch(
+        editData ? `/api/admin/incidents/${editData.id}` : '/api/admin/incidents',
+        {
+          method: editData ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }
+      )
 
       if (response.ok) {
         onSuccess()
         onClose()
       } else {
         const error = await response.json()
-        alert(error.error || 'Failed to create incident')
+        alert(error.error || 'Failed to save incident')
       }
     } catch (error) {
-      console.error('Failed to create incident:', error)
-      alert('Failed to create incident')
+      console.error('Failed to save incident:', error)
+      alert('Failed to save incident')
     } finally {
       setLoading(false)
     }
@@ -118,28 +204,27 @@ export default function CreateIncidentModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-yorkhost-darkCard rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="border-b border-gray-200 dark:border-yorkhost-darkBorder px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Create Incident
-          </h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl my-8">
+        <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="text-red-500" size={24} />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {editData ? 'Edit' : 'Create'} Incident
+            </h2>
+          </div>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-            disabled={loading}
           >
             <X size={24} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
           {/* Basic Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
-              Incident Details
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Basic Information</h3>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -150,8 +235,8 @@ export default function CreateIncidentModal({
                 required
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-800 dark:text-white"
-                placeholder="Brief description of the incident"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                placeholder="e.g., Database connectivity issues"
               />
             </div>
 
@@ -161,117 +246,259 @@ export default function CreateIncidentModal({
               </label>
               <textarea
                 required
-                rows={4}
+                rows={3}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-800 dark:text-white"
-                placeholder="Detailed description of what happened and current status..."
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                placeholder="Describe the incident and its impact..."
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Severity <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={formData.severity}
-                onChange={(e) => setFormData({ ...formData, severity: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-800 dark:text-white"
-              >
-                <option value="LOW">Low - Minor issues</option>
-                <option value="MEDIUM">Medium - Some users affected</option>
-                <option value="HIGH">High - Many users affected</option>
-                <option value="CRITICAL">Critical - Service unavailable</option>
-              </select>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Status <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="INVESTIGATING">Investigating</option>
+                  <option value="IDENTIFIED">Identified</option>
+                  <option value="MONITORING">Monitoring</option>
+                  <option value="RESOLVED">Resolved</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Severity <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.severity}
+                  onChange={(e) => setFormData({ ...formData, severity: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="LOW">Low</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="HIGH">High</option>
+                  <option value="CRITICAL">Critical</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Impact
+                </label>
+                <input
+                  type="text"
+                  value={formData.impact}
+                  onChange={(e) => setFormData({ ...formData, impact: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                  placeholder="e.g., Degraded performance"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Affected Resources */}
+          {/* Timeline */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Affected Resources</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Timeline</h3>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
-                  <Server className="w-4 h-4" />
-                  Affected Service
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Start Time <span className="text-red-500">*</span>
                 </label>
-                <select
-                  value={formData.serviceId}
-                  onChange={(e) => setFormData({ ...formData, serviceId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-800 dark:text-white"
-                >
-                  <option value="">No specific service</option>
-                  {services.map((service) => (
-                    <option key={service.id} value={service.id}>
-                      {service.name}
-                    </option>
-                  ))}
-                </select>
+                <input
+                  type="datetime-local"
+                  required
+                  value={formData.startTime}
+                  onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
-                  <Layers className="w-4 h-4" />
-                  Affected Group
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  End Time <span className="text-gray-400">(Optional - leave empty if ongoing)</span>
                 </label>
-                <select
-                  value={formData.machineId}
-                  onChange={(e) => setFormData({ ...formData, machineId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-800 dark:text-white"
-                >
-                  <option value="">No specific group</option>
-                  {machines.map((machine) => (
-                    <option key={machine.id} value={machine.id}>
-                      {machine.name}
-                    </option>
-                  ))}
-                </select>
+                <input
+                  type="datetime-local"
+                  value={formData.endTime}
+                  onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                />
               </div>
             </div>
           </div>
 
-          {/* Scheduling */}
+          {/* Affected Services */}
           <div className="space-y-4">
-            <div>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={formData.isScheduled}
-                  onChange={(e) => setFormData({ ...formData, isScheduled: e.target.checked })}
-                  className="rounded border-gray-300 dark:border-gray-600 text-red-600 focus:ring-red-500"
-                />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  This is a scheduled incident (maintenance)
-                </span>
-              </label>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Affected Services</h3>
+              <span className="text-sm text-gray-500">
+                {selectedServices.length} service(s) selected
+              </span>
             </div>
 
-            {formData.isScheduled && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Scheduled For
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={formData.scheduledFor}
-                    onChange={(e) => setFormData({ ...formData, scheduledFor: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-800 dark:text-white"
-                  />
-                </div>
+            <div className="border border-gray-200 dark:border-gray-600 rounded-lg max-h-64 overflow-y-auto">
+              {machines.map((machine) => (
+                <div key={machine.id} className="border-b border-gray-200 dark:border-gray-700 last:border-b-0">
+                  {/* Group Header */}
+                  <div className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleGroup(machine.id)}
+                        className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                      >
+                        {expandedGroups.has(machine.id) ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
+                      </button>
+                      <Server className="w-4 h-4 text-gray-500" />
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {machine.name}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        ({machine.services?.length || 0} services)
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => toggleGroupSelection(machine)}
+                      className={`px-3 py-1 text-xs rounded-full transition-colors ${
+                        machine.services?.every(s => selectedServices.includes(s.id))
+                          ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                          : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                      }`}
+                    >
+                      {machine.services?.every(s => selectedServices.includes(s.id))
+                        ? 'Deselect All'
+                        : 'Select All'}
+                    </button>
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Estimated Resolution
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={formData.eta}
-                    onChange={(e) => setFormData({ ...formData, eta: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-800 dark:text-white"
-                  />
+                  {/* Services List */}
+                  {expandedGroups.has(machine.id) && machine.services && (
+                    <div className="pl-10 pb-2">
+                      {machine.services.map((service) => (
+                        <label
+                          key={service.id}
+                          className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedServices.includes(service.id)}
+                            onChange={() => toggleServiceSelection(service.id)}
+                            className="rounded border-gray-300 dark:border-gray-600 text-red-600 focus:ring-red-500"
+                          />
+                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                            {service.name}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                 </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Updates */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Incident Updates</h3>
+              <button
+                type="button"
+                onClick={addUpdate}
+                className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center gap-1"
+              >
+                <Plus className="w-4 h-4" />
+                Add Update
+              </button>
+            </div>
+
+            {updates.length > 0 && (
+              <div className="space-y-3">
+                {updates.map((update, index) => (
+                  <div key={index} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Update #{index + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeUpdate(index)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Title (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          value={update.title}
+                          onChange={(e) => updateUpdate(index, 'title', e.target.value)}
+                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                          placeholder="e.g., Root cause identified"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Status Change (Optional)
+                        </label>
+                        <select
+                          value={update.status || ''}
+                          onChange={(e) => updateUpdate(index, 'status', e.target.value)}
+                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                        >
+                          <option value="">No status change</option>
+                          <option value="INVESTIGATING">Investigating</option>
+                          <option value="IDENTIFIED">Identified</option>
+                          <option value="MONITORING">Monitoring</option>
+                          <option value="RESOLVED">Resolved</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Message <span className="text-red-500">*</span>
+                      </label>
+                      <textarea
+                        required
+                        rows={2}
+                        value={update.message}
+                        onChange={(e) => updateUpdate(index, 'message', e.target.value)}
+                        className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                        placeholder="Update message..."
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Timestamp
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={update.timestamp}
+                        onChange={(e) => updateUpdate(index, 'timestamp', e.target.value)}
+                        className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -281,27 +508,16 @@ export default function CreateIncidentModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800"
-              disabled={loading}
+              className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors flex items-center gap-2"
               disabled={loading}
+              className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-md transition-colors"
             >
-              {loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <AlertTriangle className="w-4 h-4" />
-                  Create Incident
-                </>
-              )}
+              {loading ? 'Saving...' : (editData ? 'Update' : 'Create')} Incident
             </button>
           </div>
         </form>

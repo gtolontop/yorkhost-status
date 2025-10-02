@@ -8,12 +8,25 @@ const createIncidentSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().min(1),
   severity: z.nativeEnum(IncidentSeverity),
+  status: z.nativeEnum(IncidentStatus).optional(),
+  impact: z.string().optional(),
   isScheduled: z.boolean().default(false),
   scheduledFor: z.string().datetime().optional(),
   eta: z.string().datetime().optional(),
+  startTime: z.string().datetime().optional(),
+  endTime: z.string().datetime().optional(),
+  resolvedAt: z.string().datetime().optional(),
+  affectedServices: z.array(z.string()).default([]),
   serviceId: z.string().cuid().optional(),
   machineId: z.string().cuid().optional(),
-  tags: z.array(z.string()).default([])
+  tags: z.array(z.string()).default([]),
+  updates: z.array(z.object({
+    title: z.string().optional(),
+    message: z.string().min(1),
+    status: z.string().optional(),
+    timestamp: z.string().datetime(),
+    isStatusChange: z.boolean().optional()
+  })).default([])
 })
 
 const updateIncidentSchema = z.object({
@@ -122,27 +135,59 @@ export async function POST(request: NextRequest) {
     const slug = data.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '') + 
+      .replace(/(^-|-$)/g, '') +
       '-' + Date.now()
 
+    // Create incident with all affected services
     const incident = await prisma.incident.create({
       data: {
-        ...data,
+        title: data.title,
+        description: data.description,
         slug,
         type: 'INCIDENT',
+        severity: data.severity,
+        status: data.status || (data.isScheduled ? IncidentStatus.SCHEDULED : IncidentStatus.INVESTIGATING),
+        impact: data.impact || null,
+        startTime: data.startTime ? new Date(data.startTime) : new Date(),
+        endTime: data.endTime ? new Date(data.endTime) : null,
+        resolvedAt: data.resolvedAt ? new Date(data.resolvedAt) : null,
         scheduledFor: data.scheduledFor ? new Date(data.scheduledFor) : undefined,
         eta: data.eta ? new Date(data.eta) : undefined,
-        status: data.isScheduled ? IncidentStatus.SCHEDULED : IncidentStatus.INVESTIGATING,
+        isScheduled: data.isScheduled,
+        serviceId: data.serviceId || null,
+        machineId: data.machineId || null,
+        tags: data.tags,
         createdBy: auth.user!.userId,
+        affectedServices: data.affectedServices,
         updates: {
-          create: {
+          create: data.updates.length > 0 ? data.updates.map(u => ({
+            title: u.title || null,
+            message: u.message,
+            status: u.status || null,
+            timestamp: new Date(u.timestamp),
+            isStatusChange: u.isStatusChange || false,
+            authorId: auth.user!.userId
+          })) : [{
             title: 'Incident Created',
-            message: data.description
-          }
+            message: data.description,
+            timestamp: data.startTime ? new Date(data.startTime) : new Date(),
+            authorId: auth.user!.userId
+          }]
         }
       },
       include: {
-        updates: true,
+        updates: {
+          include: {
+            author: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true
+              }
+            }
+          },
+          orderBy: { timestamp: 'desc' }
+        },
         service: true,
         machine: true,
         creator: {

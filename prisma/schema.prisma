@@ -8,20 +8,19 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  discordId     String    @unique
-  username      String
-  avatar        String?
-  email         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  lastLoginAt   DateTime?
-  
-  // Admin relationships
-  adminRole     AdminRole?
-  auditLogs     AuditLog[]
-  incidents     Incident[]
-  
+  id              String           @id @default(cuid())
+  discordId       String           @unique
+  username        String
+  avatar          String?
+  email           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  lastLoginAt     DateTime?
+  adminRole       AdminRole?
+  auditLogs       AuditLog[]
+  incidents       Incident[]
+  incidentUpdates IncidentUpdate[]
+
   @@map("users")
 }
 
@@ -32,9 +31,8 @@ model AdminRole {
   permissions Json     @default("{}")
   grantedAt   DateTime @default(now())
   grantedBy   String?
-  
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@map("admin_roles")
 }
 
@@ -45,57 +43,187 @@ model Machine {
   category    String     @default("general")
   location    String?
   tags        String[]   @default([])
-  order       Int        @default(0)
   isActive    Boolean    @default(true)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-
-  services    Service[]
+  order       Int        @default(0)
   incidents   Incident[]
+  services    Service[]
 
   @@map("machines")
 }
 
 model Service {
-  id           String        @id @default(cuid())
-  machineId    String?
-  groupId      String?
-  name         String
-  description  String?
-  url          String?
-  icon         String?
-  isActive     Boolean       @default(true)
-  order        Int           @default(0)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-
-  // Monitoring settings
-  checksBeforeDown Int @default(2) // Number of failed checks before declaring service DOWN
-  checksBeforeUp Int   @default(2) // Number of successful checks before declaring service UP
-
-  machine      Machine?      @relation(fields: [machineId], references: [id], onDelete: Cascade)
-  group        ServiceGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
-  checks       Check[]
-  incidents    Incident[]
-  notifications Notification[]
+  id               String         @id @default(cuid())
+  machineId        String?
+  groupId          String?
+  name             String
+  description      String?
+  url              String?
+  icon             String?
+  isActive         Boolean        @default(true)
+  order            Int            @default(0)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  checksBeforeDown Int            @default(2)
+  checksBeforeUp   Int            @default(2)
+  checks           Check[]
+  incidents        Incident[]
+  notifications    Notification[]
+  group            ServiceGroup?  @relation(fields: [groupId], references: [id])
+  machine          Machine?       @relation(fields: [machineId], references: [id], onDelete: Cascade)
 
   @@map("services")
 }
 
 model ServiceGroup {
-  id                  String        @id @default(cuid())
+  id                  String    @id @default(cuid())
   name                String
   description         String?
-  color               String        @default("#6b7280")
+  color               String    @default("#6b7280")
   icon                String?
-  order               Int           @default(0)
-  isExpandedByDefault Boolean       @default(true)
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
-
+  order               Int       @default(0)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  isExpandedByDefault Boolean   @default(true)
   services            Service[]
 
   @@map("service_groups")
+}
+
+model Check {
+  id                  String        @id @default(cuid())
+  serviceId           String
+  name                String
+  type                CheckType
+  target              String
+  port                Int?
+  timeout             Int           @default(10000)
+  interval            Int           @default(60)
+  retryAttempts       Int           @default(3)
+  retryInterval       Int           @default(5)
+  expectedStatus      Int?
+  expectedBody        String?
+  headers             Json          @default("{}")
+  followRedirects     Boolean       @default(true)
+  sslCheck            Boolean       @default(false)
+  isActive            Boolean       @default(true)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  acceptedStatusCodes Int[]         @default([200, 201, 202, 203, 204, 301, 302, 303, 304, 307, 308])
+  results             CheckResult[]
+  service             Service       @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@map("checks")
+}
+
+model CheckResult {
+  id           String   @id @default(cuid())
+  checkId      String
+  success      Boolean
+  responseTime Int?
+  statusCode   Int?
+  error        String?
+  responseBody String?
+  timestamp    DateTime @default(now())
+  check        Check    @relation(fields: [checkId], references: [id], onDelete: Cascade)
+
+  @@index([checkId, timestamp])
+  @@map("check_results")
+}
+
+model Incident {
+  id               String           @id @default(cuid())
+  slug             String?          @unique
+  title            String
+  description      String
+  type             IncidentType?    @default(INCIDENT)
+  status           IncidentStatus   @default(INVESTIGATING)
+  severity         IncidentSeverity @default(MEDIUM)
+  isScheduled      Boolean          @default(false)
+  scheduledFor     DateTime?
+  scheduledEnd     DateTime?
+  startTime        DateTime         @default(now())
+  endTime          DateTime?
+  resolvedAt       DateTime?
+  eta              DateTime?
+  impact           String?
+  tags             String[]         @default([])
+  affectedUsers    Int?
+  affectedServices String[]         @default([])
+  machineId        String?
+  serviceId        String?
+  createdBy        String
+  updates          IncidentUpdate[]
+  creator          User             @relation(fields: [createdBy], references: [id])
+  machine          Machine?         @relation(fields: [machineId], references: [id])
+  service          Service?         @relation(fields: [serviceId], references: [id])
+  notifications    Notification[]
+
+  @@index([type, status])
+  @@index([startTime])
+  @@map("incidents")
+}
+
+model IncidentUpdate {
+  id             String          @id @default(cuid())
+  incidentId     String
+  title          String?
+  message        String
+  status         IncidentStatus?
+  timestamp      DateTime        @default(now())
+  authorId       String?
+  authorName     String?
+  isStatusChange Boolean         @default(false)
+  incident       Incident        @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  author         User?           @relation(fields: [authorId], references: [id])
+
+  @@index([incidentId, timestamp])
+  @@map("incident_updates")
+}
+
+model Notification {
+  id         String           @id @default(cuid())
+  type       NotificationType
+  target     String
+  isActive   Boolean          @default(true)
+  serviceId  String?
+  incidentId String?
+  incident   Incident?        @relation(fields: [incidentId], references: [id])
+  service    Service?         @relation(fields: [serviceId], references: [id])
+
+  @@map("notifications")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  action     String
+  resource   String
+  resourceId String?
+  details    Json     @default("{}")
+  timestamp  DateTime @default(now())
+  ipAddress  String?
+  userAgent  String?
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, timestamp])
+  @@index([resource, timestamp])
+  @@map("audit_logs")
+}
+
+model UptimeStats {
+  id                  String   @id @default(cuid())
+  serviceId           String
+  date                DateTime @db.Date
+  uptimePercent       Float
+  totalChecks         Int
+  successfulChecks    Int
+  averageResponseTime Float?
+
+  @@unique([serviceId, date])
+  @@index([serviceId, date])
+  @@map("uptime_stats")
 }
 
 enum CheckType {
@@ -104,49 +232,6 @@ enum CheckType {
   TCP
   UDP
   ICMP
-}
-
-model Check {
-  id                  String       @id @default(cuid())
-  serviceId           String
-  name                String
-  type                CheckType
-  target              String
-  port                Int?
-  timeout             Int          @default(10000)
-  interval            Int          @default(60)
-  retryAttempts       Int          @default(3)
-  retryInterval       Int          @default(5)
-  expectedStatus      Int?
-  expectedBody        String?
-  acceptedStatusCodes Int[]        @default([200, 201, 202, 203, 204, 301, 302, 303, 304, 307, 308])
-  headers             Json         @default("{}")
-  followRedirects     Boolean      @default(true)
-  sslCheck            Boolean      @default(false)
-  isActive            Boolean      @default(true)
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
-
-  service             Service      @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  results             CheckResult[]
-
-  @@map("checks")
-}
-
-model CheckResult {
-  id          String   @id @default(cuid())
-  checkId     String
-  success     Boolean
-  responseTime Int?
-  statusCode  Int?
-  error       String?
-  responseBody String?
-  timestamp   DateTime @default(now())
-  
-  check       Check    @relation(fields: [checkId], references: [id], onDelete: Cascade)
-  
-  @@index([checkId, timestamp])
-  @@map("check_results")
 }
 
 enum IncidentType {
@@ -171,111 +256,9 @@ enum IncidentSeverity {
   CRITICAL
 }
 
-model Incident {
-  id            String           @id @default(cuid())
-  slug          String?          @unique
-  title         String
-  description   String
-  type          IncidentType?    @default(INCIDENT)
-  status        IncidentStatus   @default(INVESTIGATING)
-  severity      IncidentSeverity @default(MEDIUM)
-  isScheduled   Boolean          @default(false)
-  scheduledFor  DateTime?
-  scheduledEnd  DateTime?
-  startTime     DateTime         @default(now())
-  endTime       DateTime?
-  resolvedAt    DateTime?
-  eta           DateTime?
-  impact        String?
-  tags          String[]         @default([])
-  affectedUsers Int?
-  affectedServices String[]      @default([])
-
-
-  // Relationships
-  machineId     String?
-  serviceId     String?
-  createdBy     String
-
-  machine       Machine?         @relation(fields: [machineId], references: [id])
-  service       Service?         @relation(fields: [serviceId], references: [id])
-  creator       User             @relation(fields: [createdBy], references: [id])
-  updates       IncidentUpdate[]
-  notifications Notification[]
-
-  @@index([type, status])
-  @@index([startTime])
-  @@map("incidents")
-}
-
-model IncidentUpdate {
-  id          String         @id @default(cuid())
-  incidentId  String
-  title       String?
-  message     String
-  status      IncidentStatus?
-  timestamp   DateTime       @default(now())
-  authorId    String?
-  authorName  String?
-  isStatusChange Boolean     @default(false)
-  
-  incident    Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
-  
-  @@index([incidentId, timestamp])
-  @@map("incident_updates")
-}
-
 enum NotificationType {
   EMAIL
   WEBHOOK
   DISCORD
   SLACK
-}
-
-model Notification {
-  id          String           @id @default(cuid())
-  type        NotificationType
-  target      String
-  isActive    Boolean          @default(true)
-  
-  // Relationships
-  serviceId   String?
-  incidentId  String?
-  
-  service     Service?         @relation(fields: [serviceId], references: [id])
-  incident    Incident?        @relation(fields: [incidentId], references: [id])
-  
-  @@map("notifications")
-}
-
-model AuditLog {
-  id          String   @id @default(cuid())
-  userId      String
-  action      String
-  resource    String
-  resourceId  String?
-  details     Json     @default("{}")
-  timestamp   DateTime @default(now())
-  ipAddress   String?
-  userAgent   String?
-  
-  user        User     @relation(fields: [userId], references: [id])
-  
-  @@index([userId, timestamp])
-  @@index([resource, timestamp])
-  @@map("audit_logs")
-}
-
-model UptimeStats {
-  id              String   @id @default(cuid())
-  serviceId       String
-  date            DateTime @db.Date
-  uptimePercent   Float
-  totalChecks     Int
-  successfulChecks Int
-  averageResponseTime Float?
-  
-  @@unique([serviceId, date])
-  @@index([serviceId, date])
-  @@map("uptime_stats")
 }
