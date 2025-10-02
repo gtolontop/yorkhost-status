@@ -16,7 +16,8 @@ import {
   Database,
   Shield,
   Bell,
-  Wrench
+  Wrench,
+  FileText
 } from 'lucide-react'
 import styles from './AdminSidebar.module.scss'
 
@@ -86,6 +87,12 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       label: 'Notifications',
       href: '/admin/notifications',
       active: pathname.startsWith('/admin/notifications')
+    },
+    {
+      icon: FileText,
+      label: 'Reports',
+      href: '/admin/reports',
+      active: pathname.startsWith('/admin/reports')
     }
   ]
 
