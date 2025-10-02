@@ -164,34 +164,18 @@ export async function getUptimeHistory(serviceId: string, days: number = 30): Pr
     const today = new Date()
     today.setHours(23, 59, 59, 999) // End of today
 
-    // Si on a des données pour ce jour, calculer l'uptime
+    // L'uptime est UNIQUEMENT calculé à partir des check results
+    // Les incidents n'affectent PAS l'uptime - ils sont juste informatifs
     let uptime: number | null
     if (dayData && dayData.total > 0) {
+      // On a des données de checks pour ce jour
       uptime = (dayData.successful / dayData.total) * 100
-      lastKnownUptime = uptime // Update last known uptime
+      lastKnownUptime = uptime
       hasSeenData = true
     } else {
-      // Pas de données pour ce jour
-      const hasIncidents = incidentsByDate[dateKey] && incidentsByDate[dateKey].length > 0
-      const hasMaintenances = maintenancesByDate[dateKey] && maintenancesByDate[dateKey].length > 0
-
-      if (hasSeenData && lastKnownUptime !== null) {
-        // On a déjà vu des données, maintenir la continuité
-        if (hasIncidents && !hasMaintenances) {
-          // S'il y a des incidents sans maintenance, réduire l'uptime
-          uptime = Math.max(lastKnownUptime * 0.8, 0) // Réduire de 20%
-          lastKnownUptime = uptime
-        } else if (hasMaintenances) {
-          // Maintenance planifiée - garder le dernier uptime connu
-          uptime = lastKnownUptime
-        } else {
-          // Pas de données, pas d'incidents - maintenir le statut précédent
-          uptime = lastKnownUptime
-        }
-      } else {
-        // Pas encore vu de données réelles, afficher "no data"
-        uptime = null
-      }
+      // Pas de données de checks pour ce jour
+      // On affiche "no data" au lieu d'inventer un uptime basé sur les incidents
+      uptime = null
     }
 
     uptimeData.push({

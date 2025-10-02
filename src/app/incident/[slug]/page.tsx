@@ -243,13 +243,13 @@ export default function IncidentDetailPage() {
             </div>
           </div>
 
-          <p className="text-gray-700 mb-4">{incident.description}</p>
+          <p className="text-gray-700 mb-4 whitespace-pre-line">{incident.description}</p>
 
           {/* Impact */}
           {incident.impact && (
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
               <h3 className="font-semibold text-amber-900 mb-1">Impact</h3>
-              <p className="text-amber-800">{incident.impact}</p>
+              <p className="text-amber-800 whitespace-pre-line">{incident.impact}</p>
             </div>
           )}
 
@@ -321,7 +321,7 @@ export default function IncidentDetailPage() {
                         </span>
                       </div>
                     )}
-                    <p className="text-gray-700 mb-2">{update.message}</p>
+                    <p className="text-gray-700 mb-2 whitespace-pre-line">{update.message}</p>
                     <div className="flex items-center gap-3 text-sm text-gray-500">
                       <span>{new Date(update.timestamp).toLocaleString()}</span>
                       {update.authorName && (

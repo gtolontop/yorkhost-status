@@ -328,7 +328,7 @@ export default function PreviousIncidentsPage() {
                                 </span>
                               </div>
                               
-                              <p className="text-gray-600 mb-3">{incident.description}</p>
+                              <p className="text-gray-600 mb-3 whitespace-pre-line">{incident.description}</p>
                               
                               {incident.affectedServices.length > 0 && (
                                 <div className="flex flex-wrap gap-2">
