@@ -53,18 +53,18 @@ export default function GroupedServiceGrid({ services, groups }: GroupedServiceG
     servicesByGroup.get(groupId)!.push(service as ServiceWithEnhancedStatus)
   })
 
-  // Create group objects
+  // Create group objects with sorted services
   const groupedData: ServiceGroup[] = groups.map(group => ({
     id: group.id,
     name: group.name,
     description: group.description,
     color: group.color,
-    services: servicesByGroup.get(group.id) || [],
+    services: (servicesByGroup.get(group.id) || []).sort((a, b) => (a.order || 0) - (b.order || 0)),
     isExpandedByDefault: group.isExpandedByDefault
   }))
 
-  // Add ungrouped services if any
-  const ungroupedServices = servicesByGroup.get('ungrouped') || []
+  // Add ungrouped services if any (sorted by order)
+  const ungroupedServices = (servicesByGroup.get('ungrouped') || []).sort((a, b) => (a.order || 0) - (b.order || 0))
   if (ungroupedServices.length > 0) {
     groupedData.push({
       id: 'ungrouped',
