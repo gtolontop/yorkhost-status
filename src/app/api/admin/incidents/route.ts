@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
           create: data.updates.length > 0 ? data.updates.map(u => ({
             title: u.title || null,
             message: u.message,
-            status: u.status || null,
+            status: u.status ? (u.status as IncidentStatus) : null,
             timestamp: new Date(u.timestamp),
             isStatusChange: u.isStatusChange || false,
             authorId: auth.user!.userId
