@@ -1,7 +1,9 @@
 import { PrismaClient } from '@prisma/client'
 
-// Force using the production database URL
-process.env.DATABASE_URL = 'postgresql://neondb_owner:REDACTED_DB_PASSWORD@ep-flat-sound-ag98carx-pooler.c-2.eu-central-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require'
+// Destructive: point DATABASE_URL at the database you actually want reset.
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is not set — refusing to reset an unknown database.')
+}
 
 const prisma = new PrismaClient()
 
